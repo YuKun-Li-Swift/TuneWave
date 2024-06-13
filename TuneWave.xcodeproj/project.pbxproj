@@ -1,0 +1,1026 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7CB3D2402C1A6E41004A186D /* TuneWaveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */; };
+		7CB3D2422C1A6E41004A186D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2412C1A6E41004A186D /* ContentView.swift */; };
+		7CB3D2442C1A6E43004A186D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB3D2432C1A6E43004A186D /* Assets.xcassets */; };
+		7CB3D2472C1A6E43004A186D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB3D2462C1A6E43004A186D /* Preview Assets.xcassets */; };
+		7CB3D2512C1A6E43004A186D /* TuneWaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2502C1A6E43004A186D /* TuneWaveTests.swift */; };
+		7CB3D25B2C1A6E43004A186D /* TuneWaveUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D25A2C1A6E43004A186D /* TuneWaveUITests.swift */; };
+		7CB3D25D2C1A6E43004A186D /* TuneWaveUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D25C2C1A6E43004A186D /* TuneWaveUITestsLaunchTests.swift */; };
+		7CB3D2632C1A6E43004A186D /* TuneWave Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7CB3D2682C1A6E43004A186D /* TuneWaveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2672C1A6E43004A186D /* TuneWaveApp.swift */; };
+		7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2692C1A6E43004A186D /* ContentView.swift */; };
+		7CB3D26C2C1A6E44004A186D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB3D26B2C1A6E44004A186D /* Assets.xcassets */; };
+		7CB3D26F2C1A6E44004A186D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB3D26E2C1A6E44004A186D /* Preview Assets.xcassets */; };
+		7CB3D2792C1A6E44004A186D /* TuneWave_Watch_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2782C1A6E44004A186D /* TuneWave_Watch_AppTests.swift */; };
+		7CB3D2832C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */; };
+		7CB3D2852C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7CB3D24D2C1A6E43004A186D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7CB3D2342C1A6E41004A186D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7CB3D23B2C1A6E41004A186D;
+			remoteInfo = TuneWave;
+		};
+		7CB3D2572C1A6E43004A186D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7CB3D2342C1A6E41004A186D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7CB3D23B2C1A6E41004A186D;
+			remoteInfo = TuneWave;
+		};
+		7CB3D2642C1A6E43004A186D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7CB3D2342C1A6E41004A186D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7CB3D2612C1A6E43004A186D;
+			remoteInfo = "TuneWave Watch App";
+		};
+		7CB3D2752C1A6E44004A186D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7CB3D2342C1A6E41004A186D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7CB3D2612C1A6E43004A186D;
+			remoteInfo = "TuneWave Watch App";
+		};
+		7CB3D27F2C1A6E44004A186D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7CB3D2342C1A6E41004A186D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7CB3D2612C1A6E43004A186D;
+			remoteInfo = "TuneWave Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7CB3D28B2C1A6E44004A186D /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				7CB3D2632C1A6E43004A186D /* TuneWave Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7CB3D23C2C1A6E41004A186D /* TuneWave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneWave.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveApp.swift; sourceTree = "<group>"; };
+		7CB3D2412C1A6E41004A186D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		7CB3D2432C1A6E43004A186D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7CB3D2462C1A6E43004A186D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7CB3D24C2C1A6E43004A186D /* TuneWaveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneWaveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB3D2502C1A6E43004A186D /* TuneWaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveTests.swift; sourceTree = "<group>"; };
+		7CB3D2562C1A6E43004A186D /* TuneWaveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TuneWaveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB3D25A2C1A6E43004A186D /* TuneWaveUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveUITests.swift; sourceTree = "<group>"; };
+		7CB3D25C2C1A6E43004A186D /* TuneWaveUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TuneWave Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB3D2672C1A6E43004A186D /* TuneWaveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveApp.swift; sourceTree = "<group>"; };
+		7CB3D2692C1A6E43004A186D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		7CB3D26B2C1A6E44004A186D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7CB3D26E2C1A6E44004A186D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7CB3D2742C1A6E44004A186D /* TuneWave Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TuneWave Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB3D2782C1A6E44004A186D /* TuneWave_Watch_AppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppTests.swift; sourceTree = "<group>"; };
+		7CB3D27E2C1A6E44004A186D /* TuneWave Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TuneWave Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITests.swift; sourceTree = "<group>"; };
+		7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7CB3D2392C1A6E41004A186D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2492C1A6E43004A186D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2532C1A6E43004A186D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D25F2C1A6E43004A186D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2712C1A6E44004A186D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D27B2C1A6E44004A186D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7CB3D2332C1A6E41004A186D = {
+			isa = PBXGroup;
+			children = (
+				7CB3D23E2C1A6E41004A186D /* TuneWave */,
+				7CB3D24F2C1A6E43004A186D /* TuneWaveTests */,
+				7CB3D2592C1A6E43004A186D /* TuneWaveUITests */,
+				7CB3D2662C1A6E43004A186D /* TuneWave Watch App */,
+				7CB3D2772C1A6E44004A186D /* TuneWave Watch AppTests */,
+				7CB3D2812C1A6E44004A186D /* TuneWave Watch AppUITests */,
+				7CB3D23D2C1A6E41004A186D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7CB3D23D2C1A6E41004A186D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D23C2C1A6E41004A186D /* TuneWave.app */,
+				7CB3D24C2C1A6E43004A186D /* TuneWaveTests.xctest */,
+				7CB3D2562C1A6E43004A186D /* TuneWaveUITests.xctest */,
+				7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */,
+				7CB3D2742C1A6E44004A186D /* TuneWave Watch AppTests.xctest */,
+				7CB3D27E2C1A6E44004A186D /* TuneWave Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7CB3D23E2C1A6E41004A186D /* TuneWave */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */,
+				7CB3D2412C1A6E41004A186D /* ContentView.swift */,
+				7CB3D2432C1A6E43004A186D /* Assets.xcassets */,
+				7CB3D2452C1A6E43004A186D /* Preview Content */,
+			);
+			path = TuneWave;
+			sourceTree = "<group>";
+		};
+		7CB3D2452C1A6E43004A186D /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D2462C1A6E43004A186D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		7CB3D24F2C1A6E43004A186D /* TuneWaveTests */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D2502C1A6E43004A186D /* TuneWaveTests.swift */,
+			);
+			path = TuneWaveTests;
+			sourceTree = "<group>";
+		};
+		7CB3D2592C1A6E43004A186D /* TuneWaveUITests */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D25A2C1A6E43004A186D /* TuneWaveUITests.swift */,
+				7CB3D25C2C1A6E43004A186D /* TuneWaveUITestsLaunchTests.swift */,
+			);
+			path = TuneWaveUITests;
+			sourceTree = "<group>";
+		};
+		7CB3D2662C1A6E43004A186D /* TuneWave Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D2672C1A6E43004A186D /* TuneWaveApp.swift */,
+				7CB3D2692C1A6E43004A186D /* ContentView.swift */,
+				7CB3D26B2C1A6E44004A186D /* Assets.xcassets */,
+				7CB3D26D2C1A6E44004A186D /* Preview Content */,
+			);
+			path = "TuneWave Watch App";
+			sourceTree = "<group>";
+		};
+		7CB3D26D2C1A6E44004A186D /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D26E2C1A6E44004A186D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		7CB3D2772C1A6E44004A186D /* TuneWave Watch AppTests */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D2782C1A6E44004A186D /* TuneWave_Watch_AppTests.swift */,
+			);
+			path = "TuneWave Watch AppTests";
+			sourceTree = "<group>";
+		};
+		7CB3D2812C1A6E44004A186D /* TuneWave Watch AppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */,
+				7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */,
+			);
+			path = "TuneWave Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7CB3D23B2C1A6E41004A186D /* TuneWave */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7CB3D28C2C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave" */;
+			buildPhases = (
+				7CB3D2382C1A6E41004A186D /* Sources */,
+				7CB3D2392C1A6E41004A186D /* Frameworks */,
+				7CB3D23A2C1A6E41004A186D /* Resources */,
+				7CB3D28B2C1A6E44004A186D /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7CB3D2652C1A6E43004A186D /* PBXTargetDependency */,
+			);
+			name = TuneWave;
+			productName = TuneWave;
+			productReference = 7CB3D23C2C1A6E41004A186D /* TuneWave.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7CB3D24B2C1A6E43004A186D /* TuneWaveTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7CB3D28F2C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWaveTests" */;
+			buildPhases = (
+				7CB3D2482C1A6E43004A186D /* Sources */,
+				7CB3D2492C1A6E43004A186D /* Frameworks */,
+				7CB3D24A2C1A6E43004A186D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7CB3D24E2C1A6E43004A186D /* PBXTargetDependency */,
+			);
+			name = TuneWaveTests;
+			productName = TuneWaveTests;
+			productReference = 7CB3D24C2C1A6E43004A186D /* TuneWaveTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7CB3D2552C1A6E43004A186D /* TuneWaveUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7CB3D2922C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWaveUITests" */;
+			buildPhases = (
+				7CB3D2522C1A6E43004A186D /* Sources */,
+				7CB3D2532C1A6E43004A186D /* Frameworks */,
+				7CB3D2542C1A6E43004A186D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7CB3D2582C1A6E43004A186D /* PBXTargetDependency */,
+			);
+			name = TuneWaveUITests;
+			productName = TuneWaveUITests;
+			productReference = 7CB3D2562C1A6E43004A186D /* TuneWaveUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		7CB3D2612C1A6E43004A186D /* TuneWave Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7CB3D2882C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave Watch App" */;
+			buildPhases = (
+				7CB3D25E2C1A6E43004A186D /* Sources */,
+				7CB3D25F2C1A6E43004A186D /* Frameworks */,
+				7CB3D2602C1A6E43004A186D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "TuneWave Watch App";
+			productName = "TuneWave Watch App";
+			productReference = 7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7CB3D2732C1A6E44004A186D /* TuneWave Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7CB3D2952C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave Watch AppTests" */;
+			buildPhases = (
+				7CB3D2702C1A6E44004A186D /* Sources */,
+				7CB3D2712C1A6E44004A186D /* Frameworks */,
+				7CB3D2722C1A6E44004A186D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7CB3D2762C1A6E44004A186D /* PBXTargetDependency */,
+			);
+			name = "TuneWave Watch AppTests";
+			productName = "TuneWave Watch AppTests";
+			productReference = 7CB3D2742C1A6E44004A186D /* TuneWave Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		7CB3D27D2C1A6E44004A186D /* TuneWave Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7CB3D2982C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave Watch AppUITests" */;
+			buildPhases = (
+				7CB3D27A2C1A6E44004A186D /* Sources */,
+				7CB3D27B2C1A6E44004A186D /* Frameworks */,
+				7CB3D27C2C1A6E44004A186D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7CB3D2802C1A6E44004A186D /* PBXTargetDependency */,
+			);
+			name = "TuneWave Watch AppUITests";
+			productName = "TuneWave Watch AppUITests";
+			productReference = 7CB3D27E2C1A6E44004A186D /* TuneWave Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7CB3D2342C1A6E41004A186D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					7CB3D23B2C1A6E41004A186D = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					7CB3D24B2C1A6E43004A186D = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 7CB3D23B2C1A6E41004A186D;
+					};
+					7CB3D2552C1A6E43004A186D = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 7CB3D23B2C1A6E41004A186D;
+					};
+					7CB3D2612C1A6E43004A186D = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					7CB3D2732C1A6E44004A186D = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 7CB3D2612C1A6E43004A186D;
+					};
+					7CB3D27D2C1A6E44004A186D = {
+						CreatedOnToolsVersion = 15.4;
+						TestTargetID = 7CB3D2612C1A6E43004A186D;
+					};
+				};
+			};
+			buildConfigurationList = 7CB3D2372C1A6E41004A186D /* Build configuration list for PBXProject "TuneWave" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7CB3D2332C1A6E41004A186D;
+			productRefGroup = 7CB3D23D2C1A6E41004A186D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7CB3D23B2C1A6E41004A186D /* TuneWave */,
+				7CB3D24B2C1A6E43004A186D /* TuneWaveTests */,
+				7CB3D2552C1A6E43004A186D /* TuneWaveUITests */,
+				7CB3D2612C1A6E43004A186D /* TuneWave Watch App */,
+				7CB3D2732C1A6E44004A186D /* TuneWave Watch AppTests */,
+				7CB3D27D2C1A6E44004A186D /* TuneWave Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7CB3D23A2C1A6E41004A186D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D2472C1A6E43004A186D /* Preview Assets.xcassets in Resources */,
+				7CB3D2442C1A6E43004A186D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D24A2C1A6E43004A186D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2542C1A6E43004A186D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2602C1A6E43004A186D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D26F2C1A6E44004A186D /* Preview Assets.xcassets in Resources */,
+				7CB3D26C2C1A6E44004A186D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2722C1A6E44004A186D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D27C2C1A6E44004A186D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7CB3D2382C1A6E41004A186D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D2422C1A6E41004A186D /* ContentView.swift in Sources */,
+				7CB3D2402C1A6E41004A186D /* TuneWaveApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2482C1A6E43004A186D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D2512C1A6E43004A186D /* TuneWaveTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2522C1A6E43004A186D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D25D2C1A6E43004A186D /* TuneWaveUITestsLaunchTests.swift in Sources */,
+				7CB3D25B2C1A6E43004A186D /* TuneWaveUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D25E2C1A6E43004A186D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */,
+				7CB3D2682C1A6E43004A186D /* TuneWaveApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D2702C1A6E44004A186D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D2792C1A6E44004A186D /* TuneWave_Watch_AppTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7CB3D27A2C1A6E44004A186D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7CB3D2832C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift in Sources */,
+				7CB3D2852C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7CB3D24E2C1A6E43004A186D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7CB3D23B2C1A6E41004A186D /* TuneWave */;
+			targetProxy = 7CB3D24D2C1A6E43004A186D /* PBXContainerItemProxy */;
+		};
+		7CB3D2582C1A6E43004A186D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7CB3D23B2C1A6E41004A186D /* TuneWave */;
+			targetProxy = 7CB3D2572C1A6E43004A186D /* PBXContainerItemProxy */;
+		};
+		7CB3D2652C1A6E43004A186D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7CB3D2612C1A6E43004A186D /* TuneWave Watch App */;
+			targetProxy = 7CB3D2642C1A6E43004A186D /* PBXContainerItemProxy */;
+		};
+		7CB3D2762C1A6E44004A186D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7CB3D2612C1A6E43004A186D /* TuneWave Watch App */;
+			targetProxy = 7CB3D2752C1A6E44004A186D /* PBXContainerItemProxy */;
+		};
+		7CB3D2802C1A6E44004A186D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7CB3D2612C1A6E43004A186D /* TuneWave Watch App */;
+			targetProxy = 7CB3D27F2C1A6E44004A186D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		7CB3D2862C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7CB3D2872C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		7CB3D2892C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"TuneWave Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.TuneWave;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Debug;
+		};
+		7CB3D28A2C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"TuneWave Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.TuneWave;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Release;
+		};
+		7CB3D28D2C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"TuneWave/Preview Content\"";
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7CB3D28E2C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"TuneWave/Preview Content\"";
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7CB3D2902C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneWave.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneWave";
+			};
+			name = Debug;
+		};
+		7CB3D2912C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneWave.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneWave";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7CB3D2932C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TuneWave;
+			};
+			name = Debug;
+		};
+		7CB3D2942C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TuneWave;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7CB3D2962C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneWave Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneWave Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Debug;
+		};
+		7CB3D2972C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TuneWave Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TuneWave Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Release;
+		};
+		7CB3D2992C1A6E44004A186D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "TuneWave Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Debug;
+		};
+		7CB3D29A2C1A6E44004A186D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "TuneWave Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7CB3D2372C1A6E41004A186D /* Build configuration list for PBXProject "TuneWave" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D2862C1A6E44004A186D /* Debug */,
+				7CB3D2872C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7CB3D2882C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D2892C1A6E44004A186D /* Debug */,
+				7CB3D28A2C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7CB3D28C2C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D28D2C1A6E44004A186D /* Debug */,
+				7CB3D28E2C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7CB3D28F2C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWaveTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D2902C1A6E44004A186D /* Debug */,
+				7CB3D2912C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7CB3D2922C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWaveUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D2932C1A6E44004A186D /* Debug */,
+				7CB3D2942C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7CB3D2952C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D2962C1A6E44004A186D /* Debug */,
+				7CB3D2972C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7CB3D2982C1A6E44004A186D /* Build configuration list for PBXNativeTarget "TuneWave Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7CB3D2992C1A6E44004A186D /* Debug */,
+				7CB3D29A2C1A6E44004A186D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7CB3D2342C1A6E41004A186D /* Project object */;
+}
