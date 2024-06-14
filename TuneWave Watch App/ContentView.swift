@@ -10,12 +10,17 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            NavigationStack {
+                VStack {
+                    NavigationLink(destination: {
+                        
+                    }) {
+                        Label("登录网易云账号", systemImage: "person.fill.badge.plus")
+                    }
+                }
+                .navigationTitle("悦音音乐")
+            }
         }
-        .padding()
     }
 }
 

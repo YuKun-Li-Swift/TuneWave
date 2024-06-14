@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C44BA102C1C7860008DB511 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA0F2C1C7860008DB511 /* LoginModel.swift */; };
+		7C44BA132C1C7DC7008DB511 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 7C44BA122C1C7DC7008DB511 /* Alamofire */; };
+		7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7C44BA172C1C7DDC008DB511 /* SwiftyJSON */; };
+		7C44BA1C2C1C7FC0008DB511 /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1B2C1C7FC0008DB511 /* LoginPage.swift */; };
+		7C44BA1E2C1C86C4008DB511 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
 		7CB3D2402C1A6E41004A186D /* TuneWaveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */; };
 		7CB3D2422C1A6E41004A186D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2412C1A6E41004A186D /* ContentView.swift */; };
 		7CB3D2442C1A6E43004A186D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB3D2432C1A6E43004A186D /* Assets.xcassets */; };
@@ -63,6 +68,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7C44BA1A2C1C7E0D008DB511 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7CB3D28B2C1A6E44004A186D /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -77,6 +92,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7C44BA0F2C1C7860008DB511 /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
+		7C44BA1B2C1C7FC0008DB511 /* LoginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
+		7C44BA1D2C1C86C4008DB511 /* Environments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environments.swift; sourceTree = SOURCE_ROOT; };
 		7CB3D23C2C1A6E41004A186D /* TuneWave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneWave.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveApp.swift; sourceTree = "<group>"; };
 		7CB3D2412C1A6E41004A186D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -125,6 +143,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */,
+				7C44BA132C1C7DC7008DB511 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +232,9 @@
 			children = (
 				7CB3D2672C1A6E43004A186D /* TuneWaveApp.swift */,
 				7CB3D2692C1A6E43004A186D /* ContentView.swift */,
+				7C44BA1B2C1C7FC0008DB511 /* LoginPage.swift */,
+				7C44BA0F2C1C7860008DB511 /* LoginModel.swift */,
+				7C44BA1D2C1C86C4008DB511 /* Environments.swift */,
 				7CB3D26B2C1A6E44004A186D /* Assets.xcassets */,
 				7CB3D26D2C1A6E44004A186D /* Preview Content */,
 			);
@@ -308,12 +331,17 @@
 				7CB3D25E2C1A6E43004A186D /* Sources */,
 				7CB3D25F2C1A6E43004A186D /* Frameworks */,
 				7CB3D2602C1A6E43004A186D /* Resources */,
+				7C44BA1A2C1C7E0D008DB511 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "TuneWave Watch App";
+			packageProductDependencies = (
+				7C44BA122C1C7DC7008DB511 /* Alamofire */,
+				7C44BA172C1C7DDC008DB511 /* SwiftyJSON */,
+			);
 			productName = "TuneWave Watch App";
 			productReference = 7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */;
 			productType = "com.apple.product-type.application";
@@ -397,6 +425,10 @@
 				Base,
 			);
 			mainGroup = 7CB3D2332C1A6E41004A186D;
+			packageReferences = (
+				7C44BA112C1C7DC7008DB511 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+			);
 			productRefGroup = 7CB3D23D2C1A6E41004A186D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -491,7 +523,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C44BA1C2C1C7FC0008DB511 /* LoginPage.swift in Sources */,
 				7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */,
+				7C44BA102C1C7860008DB511 /* LoginModel.swift in Sources */,
+				7C44BA1E2C1C86C4008DB511 /* Environments.swift in Sources */,
 				7CB3D2682C1A6E43004A186D /* TuneWaveApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -671,13 +706,13 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.TuneWave;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.tunewave;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -701,13 +736,13 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.TuneWave;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.tunewave;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -743,7 +778,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -776,7 +811,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWave;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -797,7 +832,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewaveTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -818,7 +853,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewaveTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -839,7 +874,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewaveUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -859,7 +894,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.TuneWaveUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewaveUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -880,7 +915,7 @@
 				DEVELOPMENT_TEAM = HXPM794ZFN;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.tunewave-Watch-AppTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -901,7 +936,7 @@
 				DEVELOPMENT_TEAM = HXPM794ZFN;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.tunewave-Watch-AppTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -922,7 +957,7 @@
 				DEVELOPMENT_TEAM = HXPM794ZFN;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.tunewave-Watch-AppUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -942,7 +977,7 @@
 				DEVELOPMENT_TEAM = HXPM794ZFN;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.TuneWave-Watch-AppUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xvkun.tunewave-Watch-AppUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1021,6 +1056,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7C44BA112C1C7DC7008DB511 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.1;
+			};
+		};
+		7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7C44BA122C1C7DC7008DB511 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C44BA112C1C7DC7008DB511 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		7C44BA172C1C7DDC008DB511 /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 7CB3D2342C1A6E41004A186D /* Project object */;
 }

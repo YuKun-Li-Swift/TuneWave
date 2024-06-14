@@ -6,14 +6,15 @@
 //
 
 import SwiftUI
+import AVKit
+import AVFoundation
 
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Label("在Apple Watch上使用全部功能", systemImage: "applewatch")
+            //显示操作教程视频
+            VideoPlayer(player: nil)
         }
         .padding()
     }
