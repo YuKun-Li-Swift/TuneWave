@@ -47,7 +47,10 @@ struct AboutPage: View {
 struct ThirdPartPackage: View {
     var body: some View {
         List {
-            ThirdPartPackageRow(use: "歌词解析", url: "https://github.com/jayasme/SpotlightLyrics")
+            ThirdPartPackageRow(use: "LRC歌词解析", url: "https://github.com/jayasme/SpotlightLyrics")
+            ThirdPartPackageRow(use: "图片显示器", url: "https://github.com/SDWebImage/SDWebImageSwiftUI")
+            ThirdPartPackageRow(use: "网络请求", url: "https://github.com/Alamofire/Alamofire")
+            ThirdPartPackageRow(use: "JSON数据解析", url: "https://github.com/SwiftyJSON/SwiftyJSON")
         }
         .navigationTitle("软件包引用")
     }
