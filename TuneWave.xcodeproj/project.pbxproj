@@ -66,6 +66,7 @@
 		7CB3D2792C1A6E44004A186D /* TuneWave_Watch_AppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2782C1A6E44004A186D /* TuneWave_Watch_AppTests.swift */; };
 		7CB3D2832C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */; };
 		7CB3D2852C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */; };
+		7CCC3AA12C482B000014AA37 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -615,11 +616,12 @@
 			};
 			buildConfigurationList = 7CB3D2372C1A6E41004A186D /* Build configuration list for PBXProject "TuneWave" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 7CB3D2332C1A6E41004A186D;
 			packageReferences = (
@@ -697,6 +699,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CCC3AA12C482B000014AA37 /* Environments.swift in Sources */,
 				7CB3D2422C1A6E41004A186D /* ContentView.swift in Sources */,
 				7CB3D2402C1A6E41004A186D /* TuneWaveApp.swift in Sources */,
 			);
@@ -943,9 +946,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TuneWave-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.tunewave;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -960,7 +964,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
@@ -978,9 +982,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TuneWave-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.tunewave;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -996,7 +1001,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -1014,13 +1019,13 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = HXPM794ZFN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1051,13 +1056,13 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = HXPM794ZFN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = TuneWave;
+				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

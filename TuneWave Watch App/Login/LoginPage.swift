@@ -44,11 +44,11 @@ struct LoginView: View {
     @State
     private var phonePasswordShip:PhonePasswordLogin? = nil
     @State
-    var showTipView = true
+    var showLoginView = false
     var body: some View {
         VStack(content: {
-            if showTipView {
-                LoginTipView(continue: $showTipView)
+            if !showLoginView {
+                LoginTipView(continue: $showLoginView)
             } else {
                 ScrollView {
                     VStack {
@@ -280,6 +280,7 @@ struct VerificationCodeSendButton: View {
             self.showVerificationCodeSendErrorSheet = true
         }
         .contentTransition(.numericText())
+        .animation(.smooth, value: buttonLabel)
         .onReceive(timer) { _ in
             if startToCount {
                 count -= 1

@@ -12,6 +12,10 @@ import AVFoundation
 struct ContentView: View {
     var body: some View {
         V2HomeView()
+            .task {
+                //触发网络权限弹弹窗
+                try? await URLSession.shared.data(for: URLRequest(url: URL(string: baseAPI)!))
+            }
     }
 }
 

@@ -61,7 +61,7 @@ struct ContentView: View {
                         NavigationLink {
                             AboutPage()
                         } label: {
-                            Label("关于", systemImage: "shield")
+                            Label("关于", systemImage: "apple.terminal.on.rectangle.fill")
                         }
                         DisclaimerView()
                     }
@@ -82,11 +82,73 @@ struct ContentView: View {
                     }
                 })
                 .modifier(RefreshCookie(userContainer: $userContainer))
+                .modifier(ShowDisclaimer())
                 .navigationTitle("悦音音乐")
+                
             }
         }
     }
 }
+
+struct ShowDisclaimer: ViewModifier {
+    @State
+    private var showAlert = false
+    @State
+    private var alertText = ""
+    @AppStorage("DisclaimerAccepted")
+    var disclaimerAccepted = false
+    func body(content: Content) -> some View {
+        content
+            .fullScreenCover(isPresented: $showAlert, content: {
+                //虽然根本不需要Navigation，但为了navigationBarBackButtonHidden能工作，所以放一个NavigationStack
+                    ScrollView {
+                        VStack(content: {
+                            VStack(alignment: .center, content: {
+                                Text(alertText)
+                                    .font(.headline)
+                                    .multilineTextAlignment(.center)
+                            })
+                            .scenePadding(.horizontal)
+                            Button("同意") {
+                                showAlert = false
+                                disclaimerAccepted = true
+                            }
+                            Button("拒绝",role:.destructive) {
+                                exit(0)
+                            }
+                        })
+                    }
+                 
+                    .toolbar {
+                        //不允许关闭
+                        ToolbarItem(placement: .cancellationAction) {
+                            Text("")
+                        }
+                    }
+            })
+            .onLoad { 
+                if disclaimerAccepted == false {
+                if let url = Bundle.main.url(forResource: "DisclaimerContent", withExtension: "md") {
+                    if let text = try? String(contentsOf: url) {
+                        print("免责声明\(alertText)")
+                        showAlert = true
+                       
+                        Task {
+                            try? await Task.sleep(nanoseconds:100000000)//0.1s
+                            withAnimation(.snappy) {
+                                alertText = text
+                            }
+                        }
+                    }
+                }
+            }
+               
+            }
+    }
+}
+
+
+
 
 struct RefreshCookie: ViewModifier {
     @Environment(\.modelContext)
