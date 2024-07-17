@@ -41,7 +41,7 @@ struct MyPlayList: View {
                         Text("该账号下没有歌单")
                     } else {
                         ScrollView {
-                            //如果新号只有一个歌单，就一列。
+                            
                             HStack(alignment: .center, spacing: 16.7/3) {
                                 VStack(alignment: .center, spacing: 16.7/3) {
                                     ForEach(leftColumn) { i in
@@ -49,8 +49,15 @@ struct MyPlayList: View {
                                     }
                                 }
                                 VStack(alignment: .center, spacing: 16.7/3) {
-                                    ForEach(rightColumn) { i in
-                                        PlayListGrid(playList: i,selected:$selected)
+                                    if !rightColumn.isEmpty {
+                                        ForEach(rightColumn) { i in
+                                            PlayListGrid(playList: i,selected:$selected)
+                                        }
+                                    } else {
+                                        //如果新号只有一个歌单
+                                        //占位，不然布局不对了
+                                        PlayListGrid(playList: .placeholder(),selected:$selected)
+                                            .hidden()
                                     }
                                 }
                             }

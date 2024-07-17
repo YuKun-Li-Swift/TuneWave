@@ -107,13 +107,15 @@ struct UserPicView: View {
         }
     }
 }
+
 struct PlaceHolderAvatarImage: View {
     var body: some View {
         Image(systemName: "person.circle.fill")
             .resizable()
-            .foregroundStyle(Color.gray.gradient)
-            .background(Circle().fill(Color.white))
             .aspectRatio(1, contentMode: .fit)
+            .foregroundStyle(Color.gray.gradient)
+            //把person区域填充成白色，好看点
+            .background(Circle().fill(Color.white).padding())
             .transition(.blurReplace.animation(.smooth))
 
     }

@@ -244,15 +244,24 @@ struct PlayListDetailSearchNotFound: View {
     var keyword:String
     var body: some View {
         ScrollViewOrNot {
-            VStack {
+            VStack(spacing:12.3) {
+                HomeMakeSlashSymbol(symbolName: "music.note", accessibilityLabel: "未搜索到音乐")
+                    .imageScale(.large)
                 Text("未搜索到结果")
+                    .font(.headline)
                 Divider()
                 if !keyword.isEmpty {
                     Text("没有歌名包含“\(keyword)”的音乐在歌单中")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 } else {
                     Text("请输入不为空的搜索关键词")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
             }
+            .padding(.vertical, 12.3)
+            .scenePadding(.horizontal)
         }
     }
 }
@@ -288,11 +297,15 @@ actor PlayListDetailSearchBackendModel {
 
 struct ForceReloadAlertContent: View {
     var body: some View {
-        VStack {
-            Text("正在刷新")
-            Text("歌单较大，需要一会儿")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+        ScrollViewOrNot {
+            VStack {
+                Text("正在刷新")
+                Text("歌单较大，需要一会儿")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 12.3)
+            .scenePadding(.horizontal)
         }
     }
 }
@@ -300,17 +313,21 @@ struct ForceReloadAlertContent: View {
 
 struct NoMusicInPlayList: View {
     var body: some View {
-        VStack {
-            Spacer()
-            Image(systemName: "bookmark.slash.fill")
-                .imageScale(.large)
-            Spacer()
-            Text("歌单内没有歌曲")
-                .font(.headline)
-            Text("请在手机上添加音乐")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            Spacer()
+        ScrollViewOrNot {
+            VStack(spacing:12.3) {
+                Image(systemName: "star.slash.fill")
+                    .imageScale(.large)
+                Text("歌单内没有音乐")
+                    .font(.headline)
+                Text("请在手机上的“网易云音乐”APP中添加音乐")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                Text("如已添加，请点击右下角刷新")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 12.3)
+            .scenePadding(.horizontal)
         }
     }
 }

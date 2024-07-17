@@ -30,6 +30,7 @@ class MusicLoadingViewModel {
     func playMusicWithCached(yiMusic: YiMusic, playerHolder: MusicPlayerHolder) {
         do {
             try playerHolder.playMusic(yiMusic)
+            //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
             showPlayPage = true
         } catch {
             self.playError = error
@@ -42,7 +43,9 @@ class MusicLoadingViewModel {
             modelContext.insert(yiMusic)
             try modelContext.save()
             try playerHolder.playMusic(yiMusic)
-            showPlayPage = true
+            withAnimation(.smooth) {
+                showPlayPage = true
+            }
         } catch {
             self.playError = error
         }

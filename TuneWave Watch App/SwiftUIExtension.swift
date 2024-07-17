@@ -20,3 +20,18 @@ struct ScrollViewOrNot<V:View>: View {
         }
     }
 }
+
+//为任何SFSymbol创建Slash变体
+struct HomeMakeSlashSymbol: View {
+    var symbolName:String
+    var accessibilityLabel:String
+    var body: some View {
+        ZStack {
+            Image(systemName: symbolName)
+            Image(systemName: "line.diagonal")
+                .rotationEffect(.degrees(90), anchor: .center)
+        }
+        .accessibilityLabel(Text(accessibilityLabel))
+    }
+}
+

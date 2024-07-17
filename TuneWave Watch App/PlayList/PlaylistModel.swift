@@ -28,7 +28,7 @@ actor PlayListModel {
         var errorDescription: String? {
             switch self {
             case .toBigPlaylist:
-                "歌单内音乐数量过多，建议您在手机上将想在Apple Watch上听的音乐拆分到一个单独的歌单里"
+                "歌单内音乐数量过多，建议您打开手机上的“网易云音乐”APP，把想在Apple Watch上听的音乐拆分到一个单独的歌单里"
             }
         }
     }
@@ -199,6 +199,10 @@ actor PlayListModel {
             let creatorJson = json["creator"]
             let creator = try YiOnlineUser.parse(creatorJson)
             return PlayListObj(playListID: String(id), name: name, description: "", updateAt: Date(timeIntervalSince1970:  TimeInterval(updateTime)), coverImgUrl: image, creator: creator)
+        }
+        static
+        func placeholder() -> Self {
+            .init(playListID: "", name: "", description: "", updateAt: .now, creator: .init(userID: ""))
         }
     }
     enum PlayListObjParseError:Error,LocalizedError {
