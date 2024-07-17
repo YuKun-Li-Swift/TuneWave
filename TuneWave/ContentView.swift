@@ -6,14 +6,27 @@
 //
 
 import SwiftUI
+import AVKit
+import AVFoundation
 
 struct ContentView: View {
     var body: some View {
+        V2HomeView()
+    }
+}
+
+struct V1HomeView: View {
+    var body: some View {
+        Label("Continue on Apple Watch", systemImage: "applewatch")
+            .font(.largeTitle.bold())
+            .padding()
+    }
+}
+
+struct V2HomeView: View {
+    var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Label("在Apple Watch上使用全部功能", systemImage: "applewatch")
         }
         .padding()
     }
