@@ -63,6 +63,7 @@ struct ContentView: View {
                         } label: {
                             Label("关于", systemImage: "shield")
                         }
+                        DisclaimerView()
                     }
                 }
                 .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView)).environment(playerHolder)

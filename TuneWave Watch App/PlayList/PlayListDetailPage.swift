@@ -254,6 +254,9 @@ struct PlayListDetailSearchNotFound: View {
                     Text("没有歌名包含“\(keyword)”的音乐在歌单中")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                    Text("本搜索严格区分大小写、简繁体")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 } else {
                     Text("请输入不为空的搜索关键词")
                         .font(.footnote)
