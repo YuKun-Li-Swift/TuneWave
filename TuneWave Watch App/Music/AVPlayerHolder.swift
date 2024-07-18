@@ -43,6 +43,7 @@ class MusicPlayerHolder {
         avplayer.replaceCurrentItem(with: item)
         avplayer.audiovisualBackgroundPlaybackPolicy = .continuesIfPossible
         avplayer.actionAtItemEnd = .none
+        configureRemoteCommandCenter()
         NowPlayHelper.updateNowPlayingInfoWith(yiMusic)
         avplayer.playImmediately(atRate: 1.0)
         cancellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
@@ -55,6 +56,58 @@ class MusicPlayerHolder {
                     print("self已经销毁了")
                 }
             })
+    }
+    // 配置远程控制事件
+    // 不配置这个，不会在Now Play显示歌曲信息
+    func configureRemoteCommandCenter() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+//        commandCenter.playCommand.addTarget { [weak self] event in
+//            if let self {
+//                if self.avplayer.timeControlStatus == .paused {
+//                    self.avplayer.playImmediately(atRate: 1.0)
+//                    return .success
+//                }
+//            }
+//            return .commandFailed
+//        }
+        
+        commandCenter.playCommand.addTarget { [self] event in
+            avplayer.playImmediately(atRate: 1.0)
+            return .success
+        }
+        
+//        commandCenter.pauseCommand.addTarget { [weak self] event in
+//            if let self {
+//                if self.avplayer.timeControlStatus == .playing && self.avplayer.timeControlStatus == .waitingToPlayAtSpecifiedRate {
+//                    self.avplayer.pause()
+//                    return .success
+//                }
+//            }
+//            return .commandFailed
+//        }
+        
+        commandCenter.pauseCommand.addTarget { [self] event in
+            avplayer.pause()
+            return .success
+        }
+        
+        // 其他远程控制命令可以在这里添加，如下一首、上一首等
+        commandCenter.previousTrackCommand.isEnabled = false
+        commandCenter.nextTrackCommand.isEnabled = false
+        
+        commandCenter.skipForwardCommand.isEnabled = true
+        commandCenter.skipForwardCommand.addTarget { [self] event in
+            avplayer.seek(to: avplayer.currentTime() + CMTime(value: 15, timescale: 60), toleranceBefore: .zero, toleranceAfter: .zero)
+            return .success
+        }
+        commandCenter.skipBackwardCommand.isEnabled = true
+        commandCenter.skipBackwardCommand.addTarget { [self] event in
+            avplayer.seek(to: avplayer.currentTime() - CMTime(value: 15, timescale: 60), toleranceBefore: .zero, toleranceAfter: .zero)
+            return .success
+        }
+        
+        commandCenter.ratingCommand.isEnabled = true
     }
     enum ItemInsertError:Error,LocalizedError {
         case noMusicURL
@@ -155,7 +208,6 @@ struct NowPlayHelper {
         } else {
             nowPlayingInfo[MPMediaItemPropertyArtwork] = nil
         }
-        
         // 将信息传递给MPNowPlayingInfoCenter
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }

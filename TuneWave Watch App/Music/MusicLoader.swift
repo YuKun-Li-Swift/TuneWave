@@ -10,7 +10,9 @@ import SwiftData
 import Alamofire
 
 //这个类负责加载已经缓存的音乐、负责请求音乐链接（step1）、负责下载封面图（step2）、负责下载歌词（step3）、负责下载音乐文件并且实时追踪进度（step4）
+//步骤1必须在步骤4前，其余步骤可以并行化
 actor MusicLoader {
+    var isOnline:Bool
     var musicID: String
     var name: String
     var artist: String
@@ -19,7 +21,8 @@ actor MusicLoader {
     var user: YiUserContainer
     //这里要求YiUserContainer是为了提醒开发人员，登录后才能播放音乐。因为不登录的话还要处理试听版的问题。
     //即使是登录后也要处理会员状态变化，之前缓存的音乐现在是不是应该重新下载（以更高音质/非试听版）。
-    init(musicID: String, name: String, artist: String, coverImgURL: URL,vm:MusicLoadingViewModel, user: YiUserContainer) {
+    init(isOnline:Bool,musicID: String, name: String, artist: String, coverImgURL: URL,vm:MusicLoadingViewModel, user: YiUserContainer) {
+        self.isOnline = isOnline
         self.musicID = musicID
         self.name = name
         self.artist = artist
@@ -50,7 +53,13 @@ actor MusicLoader {
     func step1() async throws {
         let route = "/song/url"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: ["id":musicID,"br":"64000"] as [String:String]).LSAsyncJSON()
+        let json = try await AF.request(fullURL,parameters: {
+            if isOnline {
+                ["id":musicID,"br":"64000"] as [String:String]//在线播放用64k音质，加载速度很重要
+            } else {
+                ["id":musicID,"br":"320000"] as [String:String]//下载的话用320k音质
+            }
+        }()).LSAsyncJSON()
         try json.errorCheck()
         print("请求到音乐链接\(json)")
         guard let link = json["data"].array?.first?["url"].url else {
@@ -93,8 +102,14 @@ actor MusicLoader {
         }
     }
     var coverData:Data? = nil
-    func step2() throws {
-        let cover = try Data(contentsOf: coverImgURL)
+    func step2() async throws {
+        let (cover,_) = try await URLSession.shared.data(from: {
+            if isOnline {
+                coverImgURL.lowRes(xy2x: 172*3)//在线播放用小图。为什么选择这个尺寸？因为41mm的NowPlay的大封面图是这个尺寸
+            } else {
+                coverImgURL
+            }
+        }())
         self.coverData = cover
     }
     

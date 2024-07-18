@@ -13,7 +13,7 @@ import SwiftData
 @MainActor
 @Observable
 class MusicLoadingViewModel {
-    var showPlayPage = false
+    var showPlayPage:()->() = {}
     var step1Done = false
     var step1Error:String? = nil
     var step2Done = false
@@ -31,7 +31,7 @@ class MusicLoadingViewModel {
         do {
             try playerHolder.playMusic(yiMusic)
             //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
-            showPlayPage = true
+            showPlayPage()
         } catch {
             self.playError = error
         }
@@ -44,7 +44,7 @@ class MusicLoadingViewModel {
             try modelContext.save()
             try playerHolder.playMusic(yiMusic)
             withAnimation(.smooth) {
-                showPlayPage = true
+                showPlayPage()
             }
         } catch {
             self.playError = error

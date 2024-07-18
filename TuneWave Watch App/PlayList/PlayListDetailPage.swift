@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlayListDetailPage: View {
-    var playList:PlayListModel.PlayListObj
+    var playList:UserPlayListModel.PlayListObj
     @State
     var vm:PlayListDetailPageModel?
     @State
@@ -37,9 +37,10 @@ struct PlayListDetailPage: View {
         } errorView: { error in
             APIErrorDisplay(remoteControlTag: "playListDetailPage", error: error)
         } loadingAction: {
-            let result =  try await reqMod.getPlaylistDetail(playlist: playList,useCache: true)
-            let newVM = PlayListDetailPageModel(data:result.0, haveMore: result.1)
+            let cachedPlayList =  try await reqMod.getPlaylistDetail(playlist: playList,useCache: true)
+            let newVM = PlayListDetailPageModel(data:cachedPlayList.0, haveMore: cachedPlayList.1)
             self.vm = newVM
+            vm?.loadingByNoCache(cachedPlayList: cachedPlayList, playList: playList, reqMod: reqMod)
         }
         .navigationTitle(playList.name)
     }
@@ -73,15 +74,9 @@ struct PlayListDetailList: View {
     @State
     var vm:PlayListDetailPageModel
     @State
-    private var showReloadingAlert = false
-    @State
-    private var showReloadingFailAlert = false
-    @State
-    private var reloadingFail:Error? = nil
-    @State
-    private var reloadTask:Task<(), Never>?
-    @State
     private var showSearchPage = false
+    @State
+    private var showNoCacheLoadingError = false
     //忽略缓存
     var focrceReload:() async throws -> ()
     var body: some View {
@@ -97,6 +92,8 @@ struct PlayListDetailList: View {
                         MusicRowSingleLine(tapAction:{
                             playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, converImgURL: song.imageURL))
                         },imageURL: song.imageURL, name: song.name)
+                        //因为静默刷新，为了避免刷新的时候导致批量重载，我们需要显式添加id
+                        .id(song.id)
                     }
                 }
             }
@@ -109,23 +106,16 @@ struct PlayListDetailList: View {
                 Rectangle()
                     .frame(width: 1, height: 1, alignment: .center)
                     .hidden()
-                Button {
-                    showReloadingAlert = true
-                    reloadTask = Task {
-                        reloadingFail = nil
-                        do {
-                            try await focrceReload()
-                            showReloadingAlert = false
-                        } catch {
-                            showReloadingAlert = false
-                            reloadingFail = error
-                            showReloadingFailAlert = true
-                        }
+                if vm.forceIgnoreCacheLoadProgressing {
+                    ProgressView()
+                } else if let _ = vm.forceIgnoreCacheLoadError {
+                    Button {
+                        showNoCacheLoadingError = true
+                    } label: {
+                        Label("歌单加载遇到问题", systemImage: "exclamationmark.icloud.fill")
                     }
-                } label: {
-                    Label("刷新", systemImage: "arrow.triangle.2.circlepath")
+
                 }
-                
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
@@ -135,33 +125,10 @@ struct PlayListDetailList: View {
                 }
             }
         }
-        .sheet(isPresented: $showReloadingAlert, content: {
-            ViewThatFits {
-                ForceReloadAlertContent()
-                ScrollView {
-                    ForceReloadAlertContent()
-                }
-            }.toolbar {
-                ToolbarItemGroup(placement: .cancellationAction) {
-                    Button {
-                        reloadTask?.cancel()
-                    } label: {
-                        Label("取消", systemImage: "chevron.backward")
-                    }
-                    
-                }
-            }
-        })
         .sheet(isPresented: $showSearchPage, content: {
             PlayListDetailSearchPage(allSongs: $vm.data.songs)
         })
-        .alert({
-            if let e = reloadingFail {
-                return "出错了：\n" + e.localizedDescription
-            } else {
-                return "未知错误"
-            }
-        }(), isPresented: $showReloadingFailAlert, actions: {
+        .alert("未能从云端同步最新歌单\n"+(vm.forceIgnoreCacheLoadError ?? "未知错误"), isPresented: $showNoCacheLoadingError, actions: {
             
         })
     }
@@ -354,4 +321,29 @@ class PlayListDetailPageModel:Hashable {
         self.data = data
         self.haveMore = haveMore
     }
+    
+    
+    var forceIgnoreCacheLoadProgressing = true
+    var forceIgnoreCacheLoadError:String? = nil
+    func update(data: PlayListModel.PlayListDeatil,haveMore:Bool) {
+        self.data = data
+        self.haveMore = haveMore
+    }
+    
+    //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表
+    func loadingByNoCache(cachedPlayList:(PlayListModel.PlayListDeatil,haveMore:Bool),playList:UserPlayListModel.PlayListObj,reqMod:PlayListModel) {
+        Task {
+            forceIgnoreCacheLoadError = nil
+            forceIgnoreCacheLoadProgressing = true
+            
+            do {
+                let forceedPlayListParsed = try await reqMod.getPlaylistDetail(playlist: playList, useCache: false)
+                update(data:  forceedPlayListParsed.0, haveMore: forceedPlayListParsed.1)
+            } catch {
+                forceIgnoreCacheLoadError = error.localizedDescription
+            }
+            forceIgnoreCacheLoadProgressing = false
+        }
+    }
+    
 }

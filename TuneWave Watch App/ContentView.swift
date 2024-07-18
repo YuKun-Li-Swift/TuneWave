@@ -190,7 +190,10 @@ struct MusicPlayerCover: ViewModifier {
     func body(content: Content) -> some View {
         content
             .sheet(item: $ship) { ship in
-                PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.converImgURL)
+                PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.converImgURL,showPlayPage:{
+                    self.ship = nil
+                    self.showNowPlayView = true
+                })
                     .environment(playerHolder)
             }
             .onReceive(playMusic, perform: {

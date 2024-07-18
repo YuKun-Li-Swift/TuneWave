@@ -23,13 +23,7 @@ struct MusicRowSingleLine: View {
                         WebImage(url: imageURL.lowRes(xy2x: 80), transaction: .init(animation: .smooth)) { phase in
                             switch phase {
                             case .empty:
-                                Rectangle()
-                                    .fill(.clear)
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .overlay(alignment: .center) {
-                                        Image(systemName: "photo.badge.arrow.down")
-                                    }
-                                .transition(.blurReplace.animation(.smooth))
+                                FixSizeImage(systemName: "photo.badge.arrow.down")
                             case .success(let image):
                                 image
                                     .resizable()
@@ -37,13 +31,11 @@ struct MusicRowSingleLine: View {
                                     .transition(.blurReplace.animation(.smooth))
                                     .clipShape(RoundedRectangle(cornerRadius: 16.7/3, style: .continuous))
                             case .failure(let error):
-                                Image(systemName: "wifi.exclamationmark")
-                                    .transition(.blurReplace.animation(.smooth))
+                                FixSizeImage(systemName: "wifi.exclamationmark")
                             }
                         }
                     } else {
-                        Image(systemName: "photo")
-                            .transition(.blurReplace.animation(.smooth))
+                        FixSizeImage(systemName: "photo")
                     }
                 
                 }
@@ -58,6 +50,38 @@ struct MusicRowSingleLine: View {
     }
 }
 
+struct FixSizeImage: View {
+    var systemName:String
+    var body: some View {
+        Rectangle()
+            .fill(.clear)
+            .aspectRatio(1, contentMode: .fit)
+            .overlay(alignment: .center) {
+                Image(systemName: systemName)
+            }
+            .transition(.blurReplace.animation(.smooth))
+            .accessibilityRepresentation {
+                Image(systemName: systemName)
+            }
+    }
+}
+
+struct FixSizeImageLarge: View {
+    var systemName:String
+    var body: some View {
+        Rectangle()
+            .fill(.clear)
+            .aspectRatio(1, contentMode: .fit)
+            .overlay(alignment: .center) {
+                Image(systemName: systemName)
+                    .imageScale(.large)
+            }
+            .transition(.blurReplace.animation(.smooth))            
+            .accessibilityRepresentation {
+                Image(systemName: systemName)
+            }
+    }
+}
 
 struct MusicRowGrid: View {
     var body: some View {

@@ -238,12 +238,12 @@ struct APIErrorDisplay: View {
     }
     @ViewBuilder
     func qrSheet() -> some View {
-        ScrollView {
+       
             Image(.contactQR)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .navigationTitle("手机扫码联系开发者")
-        }
+        
     }
 }
 

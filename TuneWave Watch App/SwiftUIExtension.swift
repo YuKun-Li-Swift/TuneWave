@@ -35,3 +35,30 @@ struct HomeMakeSlashSymbol: View {
     }
 }
 
+
+//为了在隐藏导航栏的时候还能有一个返回按钮，同时相比原版按钮增加了弥散光质感的毛玻璃
+//确保容器最左上角对准了页面左上角
+struct LightCancelButton: View {
+    var symbolName:String
+    var accessbilityLabel:String
+    var body: some View {
+        Button {
+            
+        } label: {
+            ZStack {
+                Image(systemName: symbolName)
+                Circle()
+                    .fill(Material.ultraThin)
+                    .brightness(-0.23)
+                    .colorScheme(.light)
+                Image(systemName: symbolName)
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(width: 32, height: 32, alignment: .center)
+
+        .position(x: 27.5, y: 30)
+        .accessibilityLabel(Text(accessbilityLabel))
+    }
+}
+

@@ -177,8 +177,10 @@ struct LyricsView: View {
                         })
                         .overlay(alignment: .center, content: {
                             if vm.parsedLyrics.isEmpty {
-                                Text("歌词为空")
-                                    .transition(.opacity.animation(.smooth.delay(0.3)))//给0.3秒的时间来解析歌词，如果0.3秒后还是空的，说明解析歌词的函数出错了
+                                Zero3Delay {
+                                    Text("歌词为空")
+                                }
+                                //给0.3秒的时间来解析歌词，如果0.3秒后还是空的，说明解析歌词的函数出错了
                             }
                         })
                         .navigationTitle("歌词")
@@ -334,6 +336,31 @@ struct LyricsView: View {
         }
     }
 }
+
+struct Zero3Delay<V:View>: View {
+    var content:()->(V)
+    @State
+    private var showMe = false
+    var body: some View {
+        if showMe {
+            content()
+        } else {
+            Rectangle()
+                .frame(width: 1, height: 1, alignment: .center)
+                .hidden()
+                .task {
+                    if showMe == false {
+                        try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                        withAnimation(.smooth) {
+                            showMe = true
+                        }
+                    }
+                }
+        }
+    }
+}
+
+
 
 //每一行分离到一个显式的View，便于SwiftUI自己优化性能
 struct LyricsLineView: View {

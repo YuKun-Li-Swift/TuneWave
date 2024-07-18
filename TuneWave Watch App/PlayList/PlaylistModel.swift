@@ -9,20 +9,119 @@ import SwiftUI
 import Alamofire
 import SwiftyJSON
 
+//可能要用的参数："timestamp":String(Int64(Date.now.timeIntervalSince1970))
+actor UserPlayListModel {
+    let session:Session = AlaCache.createCachebleAlamofire(diskPath: "YiPlayListURLCache")
+    func getMyPlayList(user:YiUser,useCache:Bool) async throws -> PlayListResponse {
+        let route = "/user/playlist"
+        let fullURL = baseAPI + route
+//        print("fullURL:\(fullURL)")
+        let json = try await session.request(URLRequest.create(fullURL, parameters: ["uid":user.userID] as [String:String], cachePolicy: useCache ? .returnCacheDataElseLoad : .reloadIgnoringLocalAndRemoteCacheData)).LSAsyncJSON()
+//        print("UserID:\(user.userID)")
+        try json.errorCheck()
+//        print("getMyPlayList\(json)")
+        return try PlayListResponse.parse(json)
+    }
+    
+    struct PlayListResponse:Identifiable,Equatable {
+        var id = UUID()
+        var playlists:[PlayListObj]
+        static
+        func parse(_ json:JSON) throws -> Self {
+            guard let plArray = json["playlist"].array else {
+                throw PlayListResponseError.array
+            }
+            let mappedArray = try plArray.map { json in
+                return try PlayListObj.parse(json)
+            }
+            return PlayListResponse(playlists:mappedArray)
+        }
+        enum PlayListResponseError:Error,LocalizedError {
+            case array
+            var errorDescription: String? {
+                switch self {
+                case .array:
+                    "获取歌单失败（playlist字段缺失）"
+                }
+            }
+        }
+    }
+    struct PlayListObj:Identifiable,Equatable,Hashable {
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id)
+        }
+        //这样即使是歌单变化了，View刷新的时候，因为ID仍保持一致，不会触发动画了
+        var id:String {
+            playListID
+        }
+        var playListID:String
+        var name:String
+        var description:String
+        var updateAt:Date
+        var coverImgUrl:URL?
+        var creator:YiOnlineUser
+        static
+        func parse(_ json:JSON) throws -> Self {
+            guard let updateTime = json["updateTime"].int64 else {
+                throw PlayListObjParseError.updateTime
+            }
+            guard let image = json["coverImgUrl"].url else {
+                throw PlayListObjParseError.image
+            }
+            guard let name = json["name"].string else {
+                throw PlayListObjParseError.name
+            }
+            guard let id = json["id"].int64 else {
+                throw PlayListObjParseError.id
+            }
+            let creatorJson = json["creator"]
+            let creator = try YiOnlineUser.parse(creatorJson)
+            return PlayListObj(playListID: String(id), name: name, description: "", updateAt: Date(timeIntervalSince1970:  TimeInterval(updateTime)), coverImgUrl: image, creator: creator)
+        }
+        static
+        func placeholder() -> Self {
+            .init(playListID: "", name: "", description: "", updateAt: .now, creator: .init(userID: ""))
+        }
+    }
+    enum PlayListObjParseError:Error,LocalizedError {
+        case updateTime
+        case image
+        case name
+        case id
+        case noCreator
+        var errorDescription: String? {
+            switch self {
+            case .updateTime:
+                "获取歌单失败（updateTime字段缺失）"
+            case .image:
+                "获取歌单失败（coverImgUrl字段缺失）"
+            case .name:
+                "获取歌单失败（name字段缺失）"
+            case .id:
+                "获取歌单失败（id字段缺失）"
+            case .noCreator:
+                "获取歌单失败（creator字段缺失）"
+            }
+        }
+    }
+}
 actor PlayListModel {
     struct PlayListDeatil {
         var id = UUID()
-        var basic:PlayListObj
+        var basic:UserPlayListModel.PlayListObj
         var songs:[PlayListSong]
     }
     struct PlayListSong:Identifiable {
-        var id = UUID()
+        var id:String {
+            songID
+        }
         var songID:String
         var name:String
         var artist:String
         var imageURL:URL
     }
     let session:Session = AlaCache.createCachebleAlamofire(diskPath: "YiPlayListURLCache")
+    
     enum PlaylistTimeoutError:Error,LocalizedError {
         case toBigPlaylist
         var errorDescription: String? {
@@ -32,7 +131,9 @@ actor PlayListModel {
             }
         }
     }
-    func getPlaylistDetail(playlist:PlayListObj,useCache:Bool) async throws -> (PlayListDeatil,haveMore:Bool) {
+    
+    //可能还有服务器端缓存
+    func getPlaylistDetail(playlist:UserPlayListModel.PlayListObj,useCache:Bool) async throws -> (PlayListDeatil,haveMore:Bool) {
         let playlistID = playlist.playListID
         let route = "/playlist/detail"
         let fullURL = baseAPI + route
@@ -137,95 +238,7 @@ actor PlayListModel {
             }
         }
     }
-    func getMyPlayList(user:YiUser) async throws -> PlayListResponse {
-        let route = "/user/playlist"
-        let fullURL = baseAPI + route
-        print("fullURL:\(fullURL)")
-        let json = try await AF.request(fullURL,parameters: ["uid":user.userID,"timestamp":String(Int64(Date.now.timeIntervalSince1970))] as [String:String]).LSAsyncJSON()
-        print("UserID:\(user.userID)")
-        try json.errorCheck()
-        print("getMyPlayList\(json)")
-        return try PlayListResponse.parse(json)
-    }
-    
-    struct PlayListResponse:Identifiable,Equatable {
-        var id = UUID()
-        var playlists:[PlayListObj]
-        static
-        func parse(_ json:JSON) throws -> Self {
-            guard let plArray = json["playlist"].array else {
-                throw PlayListResponseError.array
-            }
-            let mappedArray = try plArray.map { json in
-                return try PlayListObj.parse(json)
-            }
-            return PlayListResponse(playlists:mappedArray)
-        }
-        enum PlayListResponseError:Error,LocalizedError {
-            case array
-            var errorDescription: String? {
-                switch self {
-                case .array:
-                    "获取歌单失败（playlist字段缺失）"
-                }
-            }
-        }
-    }
-    struct PlayListObj:Identifiable,Equatable,Hashable {
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-        }
-        var id = UUID()
-        var playListID:String
-        var name:String
-        var description:String
-        var updateAt:Date
-        var coverImgUrl:URL?
-        var creator:YiOnlineUser
-        static
-        func parse(_ json:JSON) throws -> Self {
-            guard let updateTime = json["updateTime"].int64 else {
-                throw PlayListObjParseError.updateTime
-            }
-            guard let image = json["coverImgUrl"].url else {
-                throw PlayListObjParseError.image
-            }
-            guard let name = json["name"].string else {
-                throw PlayListObjParseError.name
-            }
-            guard let id = json["id"].int64 else {
-                throw PlayListObjParseError.id
-            }
-            let creatorJson = json["creator"]
-            let creator = try YiOnlineUser.parse(creatorJson)
-            return PlayListObj(playListID: String(id), name: name, description: "", updateAt: Date(timeIntervalSince1970:  TimeInterval(updateTime)), coverImgUrl: image, creator: creator)
-        }
-        static
-        func placeholder() -> Self {
-            .init(playListID: "", name: "", description: "", updateAt: .now, creator: .init(userID: ""))
-        }
-    }
-    enum PlayListObjParseError:Error,LocalizedError {
-        case updateTime
-        case image
-        case name
-        case id
-        case noCreator
-        var errorDescription: String? {
-            switch self {
-            case .updateTime:
-                "获取歌单失败（updateTime字段缺失）"
-            case .image:
-                "获取歌单失败（coverImgUrl字段缺失）"
-            case .name:
-                "获取歌单失败（name字段缺失）"
-            case .id:
-                "获取歌单失败（id字段缺失）"
-            case .noCreator:
-                "获取歌单失败（creator字段缺失）"
-            }
-        }
-    }
+
 }
 
 @Observable
@@ -237,14 +250,55 @@ class MyPlayListViewModel:Hashable {
         hasher.combine(id)
     }
     var id = UUID()
-    var playListContainer:PlayListModel.PlayListResponse
-    init(playList: PlayListModel.PlayListResponse) {
+    var playListContainer:UserPlayListModel.PlayListResponse
+
+    init(playList: UserPlayListModel.PlayListResponse) {
         self.playListContainer = playList
+    }
+    
+    var forceIgnoreCacheLoadProgressing = true
+    var forceIgnoreCacheLoadError:String? = nil
+    func update(playList: UserPlayListModel.PlayListResponse) {
+        self.playListContainer = playList
+    }
+    //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表
+    func loadingByNoCache(mod:UserPlayListModel,user:YiUser,cachedPlayList:UserPlayListModel.PlayListResponse) {
+      
+        Task {
+            forceIgnoreCacheLoadError = nil
+            forceIgnoreCacheLoadProgressing = true
+            
+            do {
+                let forceedPlayListParsed = try await mod.getMyPlayList(user: user, useCache: false)
+                update(playList: forceedPlayListParsed)
+            } catch {
+                forceIgnoreCacheLoadError = error.localizedDescription
+            }
+            forceIgnoreCacheLoadProgressing = false
+        }
+    }
+    func rebuildPlayList(origin:[UserPlayListModel.PlayListObj]) -> (left:[UserPlayListModel.PlayListObj],right:[UserPlayListModel.PlayListObj]) {
+        var left:[UserPlayListModel.PlayListObj] = []
+        var right:[UserPlayListModel.PlayListObj] = []
+        for (index,i) in origin.enumerated() {
+            let reamain = index % 2
+            switch reamain {
+            case 0:
+                left.append(i)
+            case 1:
+                right.append(i)
+            default:
+                fatalError("不可能——数学有问题")
+            }
+        }
+        return (left,right)
     }
 }
 
 struct YiOnlineUser:Identifiable,Equatable {
-    var id = UUID()
+    var id:String {
+        userID
+    }
     var userID:String
     var nickName:String? = nil
     var avatarImgURL:URL? = nil

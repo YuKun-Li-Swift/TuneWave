@@ -14,12 +14,12 @@ class AlaCache {
         // 创建一个URLCache实例
         let memoryCapacity = 50 * 1024 * 1024 // 50 MB 内存缓存
         let diskCapacity = 100 * 1024 * 1024  // 100 MB 磁盘缓存
-        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: "myCachePath")
+        let cache = URLCache(memoryCapacity: memoryCapacity, diskCapacity: diskCapacity, diskPath: diskPath)
 
         // 创建一个自定义的URLSessionConfiguration
         let configuration = URLSessionConfiguration.default
         configuration.urlCache = cache
-        configuration.requestCachePolicy = .useProtocolCachePolicy
+//        configuration.requestCachePolicy = .returnCacheDataElseLoad
         return Session(configuration: configuration)
     }
 }

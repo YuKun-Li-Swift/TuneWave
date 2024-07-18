@@ -14,7 +14,6 @@
 		7C310E8D2C454FAB00E9143F /* OpenSourcePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7D2C454FAB00E9143F /* OpenSourcePage.swift */; };
 		7C310E8E2C454FAB00E9143F /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7E2C454FAB00E9143F /* LoginPage.swift */; };
 		7C310E8F2C454FAB00E9143F /* DateExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7F2C454FAB00E9143F /* DateExtension.swift */; };
-		7C310E902C454FAB00E9143F /* URLRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E802C454FAB00E9143F /* URLRequestExtension.swift */; };
 		7C310E912C454FAB00E9143F /* AsyncButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E812C454FAB00E9143F /* AsyncButton.swift */; };
 		7C310E922C454FAB00E9143F /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E822C454FAB00E9143F /* LoginModel.swift */; };
 		7C310E932C454FAB00E9143F /* SearchPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E832C454FAB00E9143F /* SearchPage.swift */; };
@@ -51,6 +50,9 @@
 		7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7C44BA172C1C7DDC008DB511 /* SwiftyJSON */; };
 		7C44BA1E2C1C86C4008DB511 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
 		7C80A2B52C4686A700A8807C /* UserInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C80A2B42C4686A700A8807C /* UserInfoView.swift */; };
+		7CB18B3B2C490DD90042DB8B /* AnimatedLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */; };
+		7CB18B3D2C490EB30042DB8B /* YiMusicLogo.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */; };
+		7CB18B412C491FA80042DB8B /* URLRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */; };
 		7CB3D2402C1A6E41004A186D /* TuneWaveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */; };
 		7CB3D2422C1A6E41004A186D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2412C1A6E41004A186D /* ContentView.swift */; };
 		7CB3D2442C1A6E43004A186D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7CB3D2432C1A6E43004A186D /* Assets.xcassets */; };
@@ -138,7 +140,6 @@
 		7C310E7D2C454FAB00E9143F /* OpenSourcePage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenSourcePage.swift; sourceTree = "<group>"; };
 		7C310E7E2C454FAB00E9143F /* LoginPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
 		7C310E7F2C454FAB00E9143F /* DateExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateExtension.swift; sourceTree = "<group>"; };
-		7C310E802C454FAB00E9143F /* URLRequestExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
 		7C310E812C454FAB00E9143F /* AsyncButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncButton.swift; sourceTree = "<group>"; };
 		7C310E822C454FAB00E9143F /* LoginModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
 		7C310E832C454FAB00E9143F /* SearchPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchPage.swift; sourceTree = "<group>"; };
@@ -173,6 +174,9 @@
 		7C310ED12C46439300E9143F /* MusicPlayingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayingPage.swift; sourceTree = "<group>"; };
 		7C44BA1D2C1C86C4008DB511 /* Environments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environments.swift; sourceTree = SOURCE_ROOT; };
 		7C80A2B42C4686A700A8807C /* UserInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoView.swift; sourceTree = "<group>"; };
+		7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatedLoadingView.swift; sourceTree = "<group>"; };
+		7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = YiMusicLogo.usdz; sourceTree = "<group>"; };
+		7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
 		7CB3D23C2C1A6E41004A186D /* TuneWave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TuneWave.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CB3D23F2C1A6E41004A186D /* TuneWaveApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWaveApp.swift; sourceTree = "<group>"; };
 		7CB3D2412C1A6E41004A186D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -256,6 +260,7 @@
 		7C310EA02C454FBA00E9143F /* Music */ = {
 			isa = PBXGroup;
 			children = (
+				7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */,
 				7C310E9E2C454FBA00E9143F /* MusicLoadingPage.swift */,
 				7C310ED12C46439300E9143F /* MusicPlayingPage.swift */,
 				7C310EB72C45518B00E9143F /* MusicLoader.swift */,
@@ -414,6 +419,7 @@
 				7C310EAC2C454FC200E9143F /* SettingPgae */,
 				7C310EA72C454FBE00E9143F /* PlayList */,
 				7C310EA02C454FBA00E9143F /* Music */,
+				7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */,
 				7CB3D2672C1A6E43004A186D /* TuneWaveApp.swift */,
 				7CB3D2692C1A6E43004A186D /* ContentView.swift */,
 				7C310E882C454FAB00E9143F /* AlamofireCacheExtension.swift */,
@@ -429,10 +435,10 @@
 				7C310E832C454FAB00E9143F /* SearchPage.swift */,
 				7C310E862C454FAB00E9143F /* SwiftUIExtension.swift */,
 				7C310E8A2C454FAB00E9143F /* TuneWaveApp.swift */,
-				7C310E802C454FAB00E9143F /* URLRequestExtension.swift */,
 				7C310E872C454FAB00E9143F /* UserInfoPage.swift */,
 				7C44BA1D2C1C86C4008DB511 /* Environments.swift */,
 				7CB3D26B2C1A6E44004A186D /* Assets.xcassets */,
+				7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */,
 				7CB3D26D2C1A6E44004A186D /* Preview Content */,
 			);
 			path = "TuneWave Watch App";
@@ -672,6 +678,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CB18B3D2C490EB30042DB8B /* YiMusicLogo.usdz in Resources */,
 				7CB3D26F2C1A6E44004A186D /* Preview Assets.xcassets in Resources */,
 				7CB3D26C2C1A6E44004A186D /* Assets.xcassets in Resources */,
 				7C0F33CF2C480D770055F4B7 /* DisclaimerContent.md in Resources */,
@@ -728,6 +735,7 @@
 			files = (
 				7C310E9A2C454FAB00E9143F /* TuneWaveApp.swift in Sources */,
 				7C310ED22C46439300E9143F /* MusicPlayingPage.swift in Sources */,
+				7CB18B3B2C490DD90042DB8B /* AnimatedLoadingView.swift in Sources */,
 				7C310EBA2C4551AC00E9143F /* MusicLoadingViewModel.swift in Sources */,
 				7C310EC62C45555F00E9143F /* ErrorView.swift in Sources */,
 				7C310E912C454FAB00E9143F /* AsyncButton.swift in Sources */,
@@ -736,7 +744,6 @@
 				7C310EA12C454FBA00E9143F /* MusicModel.swift in Sources */,
 				7C310E942C454FAB00E9143F /* ContentView.swift in Sources */,
 				7C310E8E2C454FAB00E9143F /* LoginPage.swift in Sources */,
-				7C310E902C454FAB00E9143F /* URLRequestExtension.swift in Sources */,
 				7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */,
 				7C310ECB2C455C7200E9143F /* TempURLCreator.swift in Sources */,
 				7C310EA22C454FBA00E9143F /* MusicLoadingPage.swift in Sources */,
@@ -765,6 +772,7 @@
 				7C310EA92C454FBE00E9143F /* PlayListDetailPage.swift in Sources */,
 				7C310EBC2C45526500E9143F /* YiImageCompressor.swift in Sources */,
 				7C310E8D2C454FAB00E9143F /* OpenSourcePage.swift in Sources */,
+				7CB18B412C491FA80042DB8B /* URLRequestExtension.swift in Sources */,
 				7C310EAA2C454FBE00E9143F /* PlaylistModel.swift in Sources */,
 				7C310E952C454FAB00E9143F /* AlertButton.swift in Sources */,
 			);
