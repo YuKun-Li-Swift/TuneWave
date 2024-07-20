@@ -74,8 +74,6 @@ struct PlayListDetailList: View {
     @State
     var vm:PlayListDetailPageModel
     @State
-    private var showSearchPage = false
-    @State
     private var showNoCacheLoadingError = false
     //忽略缓存
     var focrceReload:() async throws -> ()
@@ -119,20 +117,63 @@ struct PlayListDetailList: View {
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    showSearchPage = true
+                    vm.showMoreActionPage = true
                 } label: {
-                    Label("搜索", systemImage: "magnifyingglass")
+                    Label("更多操作", systemImage: "ellipsis")
                 }
             }
         }
-        .sheet(isPresented: $showSearchPage, content: {
-            PlayListDetailSearchPage(allSongs: $vm.data.songs)
+        .sheet(isPresented: $vm.showMoreActionPage, content: {
+            PlayListDetailActionsSheet(vm: vm)
         })
         .alert("未能从云端同步最新歌单\n"+(vm.forceIgnoreCacheLoadError ?? "未知错误"), isPresented: $showNoCacheLoadingError, actions: {
             
         })
     }
 }
+
+struct PlayListDetailActionsSheet: View {
+    @State
+    var vm:PlayListDetailPageModel
+    
+    var body: some View {
+        NavigationStack {
+            ScrollViewOrNot {
+                VStack {
+                    Button {
+                        vm.showSearchPage = true
+                    } label: {
+                        Label("搜索", systemImage: "magnifyingglass")
+                    }
+                    .navigationDestination(isPresented: $vm.showSearchPage) {
+                        PlayListDetailSearchPage(allSongs: $vm.data.songs)
+                    }
+                    if !vm.data.songs.isEmpty {
+                        Button(action: {
+                            Task {
+                                vm.showMoreActionPage = false
+                                try? await Task.sleep(nanoseconds:300000000)//0.3s，等自己所处的sheet先收回去
+                                if let song = vm.data.songs.randomElement() {
+                                    playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, converImgURL: song.imageURL))
+                                } else {
+                                    #if DEBUG
+                                    fatalError("我也不知道出什么错了")
+                                    #endif
+                                }
+                            }
+                        }, label: {
+                            Label("随机播放一首歌", systemImage: "shuffle")
+                        })
+                        .transition(.blurReplace.animation(.smooth))
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
 struct PlayListDetailListHaveMoreBanner: View {
     var body: some View {
         VStack(alignment: .leading) {
@@ -152,7 +193,7 @@ struct PlayListDetailSearchPage: View {
     @State
     var showSearchResultPage = false
     var body: some View {
-        NavigationStack {
+  
             VStack {
                 TextField("输入搜索关键词", text: $keyword)
                     .onSubmit {
@@ -167,7 +208,7 @@ struct PlayListDetailSearchPage: View {
                 PlayListDetailSearchResultPage(allSongs: $allSongs, keyword: $keyword)
             })
             .navigationTitle("搜索")
-        }
+        
     }
     func goSearch() {
         if !keyword.isEmpty {
@@ -309,8 +350,8 @@ class PlayListDetailPageModel:Hashable {
     static func == (lhs: PlayListDetailPageModel, rhs: PlayListDetailPageModel) -> Bool {
         lhs.id == rhs.id
     }
-    
-    
+    var showSearchPage = false
+    var showMoreActionPage = false
     var id = UUID()
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

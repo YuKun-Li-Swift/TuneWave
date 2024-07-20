@@ -41,24 +41,70 @@ struct HomeMakeSlashSymbol: View {
 struct LightCancelButton: View {
     var symbolName:String
     var accessbilityLabel:String
+    var action:()->()
+    var body: some View {
+        LightToolbarButton(symbolName: symbolName, accessbilityLabel: accessbilityLabel, action: action)
+        .position(x: 27.5, y: 30)
+    }
+}
+
+struct LightToolbarButton: View {
+    var symbolName:String
+    var accessbilityLabel:String
+    let cirlce = 32.0//圆的边界框
+    let squre = 22.63//内部icon的边界框
+    var action:()->()
     var body: some View {
         Button {
-            
+            action()
         } label: {
             ZStack {
                 Image(systemName: symbolName)
+                    .frame(width: squre, height: squre, alignment: .center)
                 Circle()
                     .fill(Material.ultraThin)
                     .brightness(-0.23)
                     .colorScheme(.light)
                 Image(systemName: symbolName)
+                    .frame(width: squre, height: squre, alignment: .center)
             }
         }
         .buttonStyle(.plain)
-        .frame(width: 32, height: 32, alignment: .center)
-
-        .position(x: 27.5, y: 30)
+        .frame(width: cirlce, height: cirlce, alignment: .center)
         .accessibilityLabel(Text(accessbilityLabel))
+    }
+}
+
+struct FourLineHeightPlaceholder: View {
+    var body: some View {
+        VStack(content: {
+            HStack {
+                Spacer()
+                Text("Line1")
+                    .lineLimit(1)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Text("Line2")
+                    .lineLimit(1)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Text("Line3")
+                    .lineLimit(1)
+                Spacer()
+            }
+            HStack {
+                Spacer()
+                Text("Line4")
+                    .lineLimit(1)
+                Spacer()
+            }
+        })
+        .hidden()
+        .accessibilityHidden(true)
     }
 }
 

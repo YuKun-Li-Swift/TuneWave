@@ -45,17 +45,29 @@ class MusicPlayerHolder {
         avplayer.actionAtItemEnd = .none
         configureRemoteCommandCenter()
         NowPlayHelper.updateNowPlayingInfoWith(yiMusic)
+        avplayer.defaultRate = 1.0
+        avplayer.rate = 1.0
         avplayer.playImmediately(atRate: 1.0)
         cancellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
             .sink(receiveValue: { [weak self] _ in
                 print("播放到结尾了，从头继续")
                 if let self {
                     avplayer.seek(to: CMTime.zero)
-                    avplayer.playImmediately(atRate: 1.0)
+                    //可能被通过Now Play更改了，不是1.0
+                    let currentRate = avplayer.defaultRate
+                    avplayer.playImmediately(atRate: currentRate)
                 } else {
                     print("self已经销毁了")
                 }
             })
+    }
+    func updateNowPlay() {
+        if let yiMusic {
+            configureRemoteCommandCenter()
+            NowPlayHelper.updateNowPlayingInfoWith(yiMusic)
+        } else {
+            print("Now Play不用刷新，因为没在播放")
+        }
     }
     // 配置远程控制事件
     // 不配置这个，不会在Now Play显示歌曲信息
@@ -71,10 +83,14 @@ class MusicPlayerHolder {
 //            }
 //            return .commandFailed
 //        }
-        
-        commandCenter.playCommand.addTarget { [self] event in
-            avplayer.playImmediately(atRate: 1.0)
-            return .success
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget { [weak self] event in
+            if let self {
+                avplayer.playImmediately(atRate: 1.0)
+                return .success
+            } else {
+                return .noSuchContent
+            }
         }
         
 //        commandCenter.pauseCommand.addTarget { [weak self] event in
@@ -86,10 +102,14 @@ class MusicPlayerHolder {
 //            }
 //            return .commandFailed
 //        }
-        
-        commandCenter.pauseCommand.addTarget { [self] event in
-            avplayer.pause()
-            return .success
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget { [weak self] event in
+            if let self {
+                avplayer.pause()
+                return .success
+            } else {
+                return .noSuchContent
+            }
         }
         
         // 其他远程控制命令可以在这里添加，如下一首、上一首等
@@ -97,17 +117,65 @@ class MusicPlayerHolder {
         commandCenter.nextTrackCommand.isEnabled = false
         
         commandCenter.skipForwardCommand.isEnabled = true
-        commandCenter.skipForwardCommand.addTarget { [self] event in
-            avplayer.seek(to: avplayer.currentTime() + CMTime(value: 15, timescale: 60), toleranceBefore: .zero, toleranceAfter: .zero)
-            return .success
+        commandCenter.skipForwardCommand.addTarget { [weak self] event in
+            if let self {
+                do {
+                    //因为Now Play的UI上显示的总是10秒
+                    try avplayer.add10Seconds()
+                    return .success
+                } catch {
+                    if let error = error as? NowPlaySeekError {
+                        return error.toMPRemoteCommandHandlerStatus()
+                    } else {
+                        #if DEBUG
+                        fatalError("不应该跑这里来")
+                        #endif
+                        return .commandFailed
+                    }
+                }
+            } else {
+                return .noSuchContent
+            }
         }
         commandCenter.skipBackwardCommand.isEnabled = true
-        commandCenter.skipBackwardCommand.addTarget { [self] event in
-            avplayer.seek(to: avplayer.currentTime() - CMTime(value: 15, timescale: 60), toleranceBefore: .zero, toleranceAfter: .zero)
-            return .success
+        commandCenter.skipBackwardCommand.addTarget { [weak self] event in
+            if let self {
+                do {
+                    //因为Now Play的UI上显示的总是10秒
+                    try avplayer.subtract10Seconds()
+                    return .success
+                } catch {
+                    if let error = error as? NowPlaySeekError {
+                        return error.toMPRemoteCommandHandlerStatus()
+                    } else {
+                        #if DEBUG
+                        fatalError("不应该跑这里来")
+                        #endif
+                        return .commandFailed
+                    }
+                }
+            } else {
+                return .noSuchContent
+            }
         }
         
-        commandCenter.ratingCommand.isEnabled = true
+        //“博客”app里也有倍速的控件
+        commandCenter.changePlaybackRateCommand.isEnabled = true
+        commandCenter.changePlaybackRateCommand.supportedPlaybackRates = [0.5,0.75,1,1.25,1.5,2,3,4,5]
+        //目前仅对这首歌有效，切换音乐的时候会重置为1.0的
+        commandCenter.skipBackwardCommand.addTarget { [weak self] event in
+            if let self {
+                if let rater = event as? MPChangePlaybackRateCommandEvent {
+                    avplayer.defaultRate = rater.playbackRate
+                    avplayer.rate = rater.playbackRate
+                    return .success
+                } else {
+                    return .commandFailed
+                }
+            } else {
+                return .noSuchContent
+            }
+        }
     }
     enum ItemInsertError:Error,LocalizedError {
         case noMusicURL
@@ -124,6 +192,7 @@ class MusicPlayerHolder {
             }
         }
     }
+    
     func updateError() {
         var errorMessage = ""
         //一行一条错误信息

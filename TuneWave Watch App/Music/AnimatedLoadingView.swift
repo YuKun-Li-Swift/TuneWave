@@ -16,17 +16,36 @@ struct AnimatedLoadingView: View {
     }
 }
 
-class CachedSceneKit {
-    static
-    let shared = CachedSceneKit()
-    var scene = SCNScene(named: "YiMusicLogo.usdz")!
+@Observable
+class SceneModelShip {
+    var sceneModel:SceneModel = SceneModel()
+}
+actor SceneModel {
+    var scene:SCNScene?
+    func load() throws {
+        if let scene = SCNScene(named: "YiMusicLogo.usdz") {
+            self.scene = scene
+        } else {
+            throw SceneLoadError.noFile
+        }
+    }
+    enum SceneLoadError:Error,LocalizedError {
+    case noFile
+        var errorDescription: String? {
+            switch self {
+            case .noFile:
+                "找不到3D文件"
+            }
+        }
+    }
 }
 
 //省电模式：不开动画效果
 //视障人士：不喜欢动画效果
 //在设置里增加这个动画选项
-//关于页面（首页就放在入口）增加：网易云及其商标、图形均归属网易云有限公司所有，本app与网易云有限公司没有任何关系，app的源代码依照GPL许可证开源，此app仅供个人技术验证使用，不进行任何商业行为行为。本app由闪电狮个人进行分发并承担法律责任。如有任何法律问题，请递交邮件到。闪电狮不对本app的功能或者代码质量作任何保证，您因为引用本app的源代码造成的任何损失和后果均由自己承担。
 struct Model3DView: View {
+    @Environment(SceneModelShip.self)
+    var sceneModelShip
     @State
     var scene:SCNScene?
     @State
@@ -35,24 +54,36 @@ struct Model3DView: View {
     var blurDone = false
     @State
     var scaleDone = false
+    @State
+    var loadingError = false
     var body: some View {
-        SceneKit.SceneView(scene: scene, pointOfView: nil, options: [.allowsCameraControl,.autoenablesDefaultLighting,.jitteringEnabled,.temporalAntialiasingEnabled], preferredFramesPerSecond: 60, antialiasingMode: .multisampling4X, delegate: nil, technique: nil)
-        //allowsCameraControl：拖曳手势
-        //autoenablesDefaultLighting：光源
-        //temporalAntialiasingEnabled：时序抗锯齿
-        //jitteringEnabled：得到更高质量的渲染效果，起着防抖动防锯齿的效果。
-        //multisampling4X：4倍抗锯齿
-            .scaleEffect(scaleDone ? 1 : 2, anchor: .center)
-//            .opacity(loaded ? 1 : 0)
-            .blur(radius: blurDone ? 0 : 23)
-        //加载完成后淡入效果
-            .task {
-                await loadScene()
+        VStack {
+            if !loadingError {
+                SceneKit.SceneView(scene: scene, pointOfView: nil, options: [.allowsCameraControl,.autoenablesDefaultLighting,.jitteringEnabled,.temporalAntialiasingEnabled], preferredFramesPerSecond: 60, antialiasingMode: .multisampling4X, delegate: nil, technique: nil)
+                //allowsCameraControl：拖曳手势
+                //autoenablesDefaultLighting：光源
+                //temporalAntialiasingEnabled：时序抗锯齿
+                //jitteringEnabled：得到更高质量的渲染效果，起着防抖动防锯齿的效果。
+                //multisampling4X：4倍抗锯齿
+                    .scaleEffect(scaleDone ? 1 : 2, anchor: .center)
+                //            .opacity(loaded ? 1 : 0)
+                    .blur(radius: blurDone ? 0 : 23)
+                //加载完成后淡入效果
+                    .task {
+                        await loadScene()
+                    }
+            } else {
+                HomeMakeSlashSymbol(symbolName: "view.3d", accessibilityLabel: "3D模型不可用")
+                    .imageScale(.large).bold()
             }
+        }
     }
     func loadScene() async {
         //缓存一下，不然每点一首歌就加载一次那还得了？
-        let scene = CachedSceneKit.shared.scene
+        guard let scene = await sceneModelShip.sceneModel.scene else {
+            self.loadingError = true
+            return
+        }
         //因为默认的viewport尺寸会刚好让物品填满整个viewport，这太大了，但直接缩小viewport会让手势触发范围也缩小，所以还是缩小物体吧
         scene.rootNode.scale = .init(x: 0.75, y: 0.75, z: 0.75)
         //scene在SwiftUI中不支持透明背景，因此设为黑色

@@ -69,6 +69,9 @@
 		7CB3D2832C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */; };
 		7CB3D2852C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */; };
 		7CCC3AA12C482B000014AA37 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
+		7CDA978E2C4A08D7009BD0E5 /* AVPlayerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */; };
+		7CDA97932C4A1609009BD0E5 /* ChangeVolumeVideo.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */; };
+		7CFE33CD2C4B84E700BA77F4 /* DeveloperContactGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -197,6 +200,9 @@
 		7CB3D27E2C1A6E44004A186D /* TuneWave Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TuneWave Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITests.swift; sourceTree = "<group>"; };
 		7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerExtension.swift; sourceTree = "<group>"; };
+		7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ChangeVolumeVideo.MP4; sourceTree = "<group>"; };
+		7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperContactGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -408,6 +414,7 @@
 		7CB3D2662C1A6E43004A186D /* TuneWave Watch App */ = {
 			isa = PBXGroup;
 			children = (
+				7CFE33CB2C4B84D200BA77F4 /* DeveloperContactGenerator */,
 				7C310ED02C456F4700E9143F /* TuneWave-Watch-App-Info.plist */,
 				7C0F33CA2C480CBF0055F4B7 /* Disclaimer */,
 				7C310ECF2C45633C00E9143F /* Login */,
@@ -434,11 +441,13 @@
 				7C310E7C2C454FAB00E9143F /* SearchModel.swift */,
 				7C310E832C454FAB00E9143F /* SearchPage.swift */,
 				7C310E862C454FAB00E9143F /* SwiftUIExtension.swift */,
+				7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */,
 				7C310E8A2C454FAB00E9143F /* TuneWaveApp.swift */,
 				7C310E872C454FAB00E9143F /* UserInfoPage.swift */,
 				7C44BA1D2C1C86C4008DB511 /* Environments.swift */,
 				7CB3D26B2C1A6E44004A186D /* Assets.xcassets */,
 				7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */,
+				7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */,
 				7CB3D26D2C1A6E44004A186D /* Preview Content */,
 			);
 			path = "TuneWave Watch App";
@@ -467,6 +476,14 @@
 				7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */,
 			);
 			path = "TuneWave Watch AppUITests";
+			sourceTree = "<group>";
+		};
+		7CFE33CB2C4B84D200BA77F4 /* DeveloperContactGenerator */ = {
+			isa = PBXGroup;
+			children = (
+				7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */,
+			);
+			path = DeveloperContactGenerator;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -681,6 +698,7 @@
 				7CB18B3D2C490EB30042DB8B /* YiMusicLogo.usdz in Resources */,
 				7CB3D26F2C1A6E44004A186D /* Preview Assets.xcassets in Resources */,
 				7CB3D26C2C1A6E44004A186D /* Assets.xcassets in Resources */,
+				7CDA97932C4A1609009BD0E5 /* ChangeVolumeVideo.MP4 in Resources */,
 				7C0F33CF2C480D770055F4B7 /* DisclaimerContent.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -747,6 +765,7 @@
 				7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */,
 				7C310ECB2C455C7200E9143F /* TempURLCreator.swift in Sources */,
 				7C310EA22C454FBA00E9143F /* MusicLoadingPage.swift in Sources */,
+				7CDA978E2C4A08D7009BD0E5 /* AVPlayerExtension.swift in Sources */,
 				7C310E972C454FAB00E9143F /* UserInfoPage.swift in Sources */,
 				7C310EB32C45503900E9143F /* YiUserContainer.swift in Sources */,
 				7C310EA82C454FBE00E9143F /* MyPlayListPage.swift in Sources */,
@@ -775,6 +794,7 @@
 				7CB18B412C491FA80042DB8B /* URLRequestExtension.swift in Sources */,
 				7C310EAA2C454FBE00E9143F /* PlaylistModel.swift in Sources */,
 				7C310E952C454FAB00E9143F /* AlertButton.swift in Sources */,
+				7CFE33CD2C4B84E700BA77F4 /* DeveloperContactGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1033,7 +1053,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1070,7 +1090,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

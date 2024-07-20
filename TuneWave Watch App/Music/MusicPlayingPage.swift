@@ -9,6 +9,7 @@ import SwiftUI
 
 import WatchKit
 struct NowPlayView: View {
+    var dismissMe:()->()
     @Environment(MusicPlayerHolder.self)
     var playerHolder:MusicPlayerHolder
     @State
@@ -51,15 +52,29 @@ struct NowPlayView: View {
                                     isAutoScrolling.toggle()
                                 }
                             } label: {
-                                Label(isAutoScrolling ? "点此关闭歌词自动滚动" : "点此打开歌词自动滚动", systemImage: isAutoScrolling ? "hand.raised" : "hand.raised.slash")
-                                    .transition(.symbolEffect(.automatic))
+                                Label(isAutoScrolling ? "点此关闭歌词自动滚动" : "点此打开歌词自动滚动", systemImage: "digitalcrown.arrow.counterclockwise.fill")
+                                    .transition(.blurReplace)
                             }
                             
                         }
                     }
                 }
                 .navigationDestination(isPresented: $showMorePage, destination: {
-                    Text("更多操作")
+                    NowPlayMoreActionPage(dismissMe: {
+                        showMorePage = false
+                        dismissMe()
+                    }, showLyricPage: {
+                        showMorePage = false
+                            Task {
+                                //等待页面关闭的动画完成，不然Tab切换没效果
+                                try? await Task.sleep(nanoseconds:300000000)//0.3s
+                                withAnimation(.smooth) {
+                                    selectedTab = 1
+                                }
+                            }
+                        
+                        
+                    })
                 })
                 
                 .onReceive(errorCheckTimer, perform: { _ in
@@ -82,11 +97,61 @@ struct NowPlayView: View {
                 }
             }
         }
+        .onAppear {
+            //在第三方app中播放过别的内容，再切回这里，NowPlay会停留在第三方app的内容，需要主动刷新一下。
+            playerHolder.updateNowPlay()
+        }
         .animation(.smooth, value: playerHolder.playingError)
     }
     
     
 }
+struct NowPlayMoreActionPage: View {
+    var dismissMe:()->()
+    @State
+    private var tutorialFailed = false
+    @State
+    private var haptic = UUID()
+    var showLyricPage:()->()
+    var body: some View {
+        ScrollViewOrNot {
+            VStack {
+                Button(action: {
+                    //触发触感，告诉用户是点到了的，因为接下来的动画可能让人迷惑
+                    haptic = UUID()
+                    dismissMe()
+                    Task {
+                        //需要等待sheet关闭的动画完成，否则会无法正确弹出视频
+                        try? await Task.sleep(nanoseconds: 3000000000)//0.3s
+                        playTutorialVideo()
+                    }
+                }, label: {
+                    Label("调节音量", systemImage: "volume.3.fill")
+                })
+                .sensoryFeedback(.impact, trigger: haptic)
+                Button(action: {
+                    showLyricPage()
+                }, label: {
+                    Label("查看歌词", systemImage: "note.text")
+                        .symbolEffect(.pulse, options: .repeating)
+                })
+            }
+            .alert("调节音量教程视频播放失败，"+DeveloperContactGenerator.generate(), isPresented: $tutorialFailed, actions: {})
+        }
+    }
+    func playTutorialVideo() {
+        //没声音的视频，可以直接开始播放
+        WKExtension.shared().visibleInterfaceController?.presentMediaPlayerController(with: Bundle.main.url(forResource: "ChangeVolumeVideo", withExtension: "MP4")!, options: [WKMediaPlayerControllerOptionsAutoplayKey:true,WKMediaPlayerControllerOptionsVideoGravityKey:WKVideoGravity.resizeAspect.rawValue,WKMediaPlayerControllerOptionsLoopsKey:true], completion: { _, _, error in
+            if error != nil {
+                self.tutorialFailed = true
+            }
+        })
+    }
+}
+
+
+
+
 
 // MARK: 切换自动滚动开关的时候显示一个小横幅
 struct ShowAutoScrollTip: ViewModifier {
@@ -150,6 +215,8 @@ struct LyricsView: View {
     var enableLyricsTranslate = false
     @State
     var haveLyric = true
+    @State
+    var rawLyric:String? = nil
     var body: some View {
         VStack {
             if let music = playerHolder.yiMusic {
@@ -158,42 +225,47 @@ struct LyricsView: View {
                         //在常亮状态下，要求30帧刷新歌词。否则会停止滚动（静止在一行）。
                         //常见：写作业，手表戴在手腕上，想看滚动歌词的时候瞟一眼。
                         //骑车听歌，想看歌词的时候瞟一眼。
-                        TimelineView(.periodic(from: .now, by: 1/30), content: { _ in
-                            VStack {
-                                ScrollView(.vertical) {
-                                    VStack(alignment: .leading,spacing:23.3) {
-                                        ForEach(vm.parsedLyrics) { lyric in
-                                            LyricsLineView(lyric: lyric,focusLyrics:$focusLyrics)
-                                                .transition(.blurReplace)
-                                                .id(lyric)
+                        ZStack(content: {
+                          Rectangle()
+                            //占位，填充满整个页面，即便歌词只有一行或两行
+                                .fill(Color.clear)
+                            
+                            if vm.parsedLyrics.isEmpty {//要么是歌词解析还没有完成，要么是歌词不是空的，但是解析出来是空的（可能是未正确解析）
+                                Zero3Delay {//给0.3秒的时间来解析歌词，如果0.3秒后还是空的，则说明解析出来的歌词确实是空的，那就显示原始歌词（未解析的）
+                                    LyricUnormalView(rawLyric: $rawLyric)
+                                }
+                            } else {
+                                TimelineView(.periodic(from: .now, by: 1/30), content: { _ in
+                                    VStack {
+                                        ScrollView(.vertical) {
+                                            VStack(alignment: .leading,spacing:23.3) {
+                                                ForEach(vm.parsedLyrics) { lyric in
+                                                    LyricsLineView(lyric: lyric,focusLyrics:$focusLyrics)
+                                                        .transition(.blurReplace)
+                                                        .id(lyric)
+                                                }
+                                            }
+                                            .scenePadding(.horizontal)
+                                            .scrollTargetLayout()
+                                            .padding(.vertical,67)
                                         }
+                                        .scrollPosition(id: $focusLyrics, anchor: .center)
                                     }
-                                    .scenePadding(.horizontal)
-                                    .scrollTargetLayout()
-                                    .padding(.vertical,67)
-                                }
-                                .scrollPosition(id: $focusLyrics, anchor: .center)
+                                })
                             }
                         })
-                        .overlay(alignment: .center, content: {
-                            if vm.parsedLyrics.isEmpty {
-                                Zero3Delay {
-                                    Text("歌词为空")
-                                }
-                                //给0.3秒的时间来解析歌词，如果0.3秒后还是空的，说明解析歌词的函数出错了
-                            }
-                        })
+                    
                         .navigationTitle("歌词")
                         .onLoad {
                             Task {
-                                await loadLyric(music: music, translate: enableLyricsTranslate)
+                                await loadLyric(music: music, translate: enableLyricsTranslate,animation: nil)
                                 //歌词加载完成需要主动滚动一次，但是不用延迟
-                                enableAutoScroll(.onLoad)
+                                enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
                             }
                         }
                         .onAppear {
                             //页面onAppear需要主动滚动一次，但是要延迟
-                            enableAutoScroll(.onAppear)
+                            enableAutoScroll(.onAppear,isEnable: isAutoScrolling)
                         }
                         .onDisappear {
                             disableAutoScroll()
@@ -201,7 +273,7 @@ struct LyricsView: View {
                         .onChange(of: isAutoScrolling, initial: false) {  oldValue, newValue in
                             if newValue {
                                 //isAutoScrolling打开时需要主动滚动一次（此时歌词在的，需要有动画）
-                                enableAutoScroll(.withAnimation)
+                                enableAutoScroll(.withAnimation,isEnable: newValue)
                             } else {
                                 disableAutoScroll()
                             }
@@ -212,18 +284,17 @@ struct LyricsView: View {
                             Text("这首音乐没有歌词")
                                 .transition(.blurReplace)
                         } else {
-                            Text("这首歌没有翻译歌词")
+                            Text("这首音乐没有歌词翻译")
                                 .transition(.blurReplace)
                         }
                     }
                 }
                 .onChange(of: enableLyricsTranslate, initial: false) { oldValue, newValue in
-                    updateHaveLyricState(music: music)
                     //重新加载歌词+重新滚动
                     Task {
-                        await loadLyric(music: music, translate: newValue)
+                        await loadLyric(music: music, translate: newValue, animation: .smooth)
                         //歌词加载完成需要主动滚动一次，但是不用延迟
-                        enableAutoScroll(.onLoad)
+                        enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
                     }
                 }
                 .animation(.smooth, value: haveLyric)
@@ -239,28 +310,30 @@ struct LyricsView: View {
                 Rectangle()
                     .frame(width: 1, height: 1, alignment: .center)
                     .hidden()
-                Button {
-                    enableLyricsTranslate.toggle()
-                } label: {
-                    Label("歌词翻译", systemImage: "translate")
+                LightToolbarButton(symbolName: "translate", accessbilityLabel: enableLyricsTranslate ? "查看歌词原文" : "查看歌词翻译") {
+                        enableLyricsTranslate.toggle()
                 }
             }
         }
         .animation(.smooth, value: enableLyricsTranslate)
         .animation(.smooth, value: haveLyric)
-        
     }
     func updateHaveLyricState(music:YiMusic) {
         if self.enableLyricsTranslate {
+            self.rawLyric = music.tlyric
             self.haveLyric = !music.tlyric.isEmpty
         } else {
+            self.rawLyric = music.lyric
             self.haveLyric = !music.lyric.isEmpty
         }
     }
-    func loadLyric(music:YiMusic,translate:Bool) async {
+    func loadLyric(music:YiMusic,translate:Bool,animation:Animation?) async {
         vm.parseError = nil
         do {
-            try await vm.parseLyricsWithCustomAnimation(translate ? music.tlyric : music.lyric, duration: playerHolder.queryDuration())
+            withAnimation(animation) {
+                updateHaveLyricState(music: music)
+            }
+            try await vm.parseLyricsWithCustomAnimation(translate ? music.tlyric : music.lyric, musicDuration: playerHolder.queryDuration(),animation: animation)
             print("歌词加载完成")
         } catch {
             vm.parseError = error.localizedDescription
@@ -274,36 +347,38 @@ struct LyricsView: View {
         //不迟疑、有动画滚动
         case withAnimation
     }
-    func enableAutoScroll(_ type:ScrollType) {
-        switch type {
-        case .onLoad:
-            //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
-            let time = playerHolder.currentTime()
-            updateCurrentLyric(time: time, animation: nil,onLoad:true)
-            //后续更新歌词滚动需要动画
-            playerHolder.startToUpdateLyrics { time in
-                Task { @MainActor in
-                    updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+    func enableAutoScroll(_ type:ScrollType,isEnable:Bool) {
+        if isEnable {
+            switch type {
+            case .onLoad:
+                //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
+                let time = playerHolder.currentTime()
+                updateCurrentLyric(time: time, animation: nil,onLoad:true)
+                //后续更新歌词滚动需要动画
+                playerHolder.startToUpdateLyrics { time in
+                    Task { @MainActor in
+                        updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+                    }
                 }
-            }
-        case .onAppear:
-            //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
-            let time = playerHolder.currentTime()
-            updateCurrentLyric(time: time, animation: nil,onLoad:false)
-            //后续更新歌词滚动需要动画
-            playerHolder.startToUpdateLyrics { time in
-                Task { @MainActor in
-                    updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+            case .onAppear:
+                //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
+                let time = playerHolder.currentTime()
+                updateCurrentLyric(time: time, animation: nil,onLoad:false)
+                //后续更新歌词滚动需要动画
+                playerHolder.startToUpdateLyrics { time in
+                    Task { @MainActor in
+                        updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+                    }
                 }
-            }
-        case .withAnimation:
-            //主动滚动一次，并且需要动画
-            let time = playerHolder.currentTime()
-            updateCurrentLyric(time: time, animation: .easeOut)
-            //后续更新歌词滚动需要动画
-            playerHolder.startToUpdateLyrics { time in
-                Task { @MainActor in
-                    updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+            case .withAnimation:
+                //主动滚动一次，并且需要动画
+                let time = playerHolder.currentTime()
+                updateCurrentLyric(time: time, animation: .easeOut)
+                //后续更新歌词滚动需要动画
+                playerHolder.startToUpdateLyrics { time in
+                    Task { @MainActor in
+                        updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+                    }
                 }
             }
         }
@@ -317,7 +392,7 @@ struct LyricsView: View {
     func updateCurrentLyric(time:CMTime,animation:Animation?,onLoad:Bool = true) {
         let matched:LyricsModel.LyricsLine? = vm.updateLineAtTime(date: playerHolder.currentTime())
         if let animation {
-            print("触发有动画滚动")
+//            print("触发有动画滚动")
             withAnimation(animation) {
                 self.focusLyrics = matched
             }
@@ -337,6 +412,35 @@ struct LyricsView: View {
     }
 }
 
+struct LyricUnormalView: View {
+    @Binding
+    var rawLyric:String?
+    @State
+    var rawLyricCopy:String? = nil
+    var body: some View {
+        VStack(content: {
+            if let rawLyricCopy {
+                ScrollViewOrNot {
+                        Text(rawLyricCopy)
+                            .scenePadding(.horizontal)
+                }
+            } else {
+                Text("歌词为空")
+            }
+        })
+        .onAppear {
+            //不要直接使用传入的rawLyric，因为在视图即将消失的时候，传入的rawLyric已经变成新的歌词了（这会导致闪烁），但实际上我们还是希望它保持旧的的，所以我们在视图onAppear的时候copy一份
+            self.rawLyricCopy = rawLyric
+        }
+        .onChange(of: rawLyric, initial: false) { _, newValue in
+            #if DEBUG
+            fatalError("这不应该发生，调查一下")
+            #endif
+        }
+    }
+}
+
+
 struct Zero3Delay<V:View>: View {
     var content:()->(V)
     @State
@@ -351,6 +455,7 @@ struct Zero3Delay<V:View>: View {
                 .task {
                     if showMe == false {
                         try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                        print("0.3秒之期已到！")
                         withAnimation(.smooth) {
                             showMe = true
                         }
@@ -408,14 +513,11 @@ class LyricsViewModel {
     var parseError:String? = nil
     var parsedLyrics: [LyricsModel.LyricsLine] = []
     let actor = LyricsModel()
-    func parseLyricsWithCustomAnimation(_ text:String,duration:CMTime) async {
-        let result = await actor.parseLyrics(text, duration: duration)
-        if self.parsedLyrics.isEmpty {
+    func parseLyricsWithCustomAnimation(_ text:String,musicDuration:CMTime,animation:Animation?) async {
+        
+        let result = await actor.parseLyrics(text, duration: musicDuration)
+        withAnimation(animation) {
             self.parsedLyrics = result
-        } else {
-            withAnimation(.smooth) {
-                self.parsedLyrics = result
-            }
         }
     }
     //可能会有多行在同一个时间点，怎么处理看外界函数
@@ -483,8 +585,15 @@ actor LyricsModel {
             
             for time in timeTags {
                 if let prevContent = previousContent {
-                    let timeRange = previousTime...(time - CMTime(seconds: 0.01, preferredTimescale: 600))
-                    lyricsLines.append(LyricsLine(content: prevContent, time: timeRange))
+                    let endTime = (time - CMTime(seconds: 0.01, preferredTimescale: 600))
+                    //避免结束时间小于开始时间导致闪退
+                    if endTime >= previousTime {
+                        let timeRange = previousTime...endTime
+                        lyricsLines.append(LyricsLine(content: prevContent, time: timeRange))
+                    } else {
+                            let timeRange = previousTime...previousTime
+                            lyricsLines.append(LyricsLine(content: prevContent, time: timeRange))
+                    }
                 }
                 previousTime = time
                 previousContent = content
@@ -493,8 +602,15 @@ actor LyricsModel {
         
         // 处理最后一行的时间范围
         if let lastContent = previousContent {
-            let lastRange = previousTime...duration
-            lyricsLines.append(LyricsLine(content: lastContent, time: lastRange))
+            //避免duration小于最后一行歌词的开始时间导致闪退，比如说试听片段的时候会出现这种情况
+            if duration >= previousTime {
+                let lastRange = previousTime...duration
+                lyricsLines.append(LyricsLine(content: lastContent, time: lastRange))
+            } else {
+                let lastRange = previousTime...previousTime
+                lyricsLines.append(LyricsLine(content: lastContent, time: lastRange))
+            }
+          
         }
         
         return lyricsLines

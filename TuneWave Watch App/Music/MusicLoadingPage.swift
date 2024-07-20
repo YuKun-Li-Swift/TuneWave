@@ -29,6 +29,7 @@ struct PlayMusicPage: View {
     var artist:String
     var converImgURL:URL
     var showPlayPage:()->()
+    var cancelAction:()->()
     @State
     var downloadMod:MusicLoader?
     @State
@@ -41,6 +42,8 @@ struct PlayMusicPage: View {
     var modelContext
     @State
     var cachedMusic:YiMusic? = nil
+    @State
+    private var scrollPosition:String? = nil
     var body: some View {
         ScrollView {
             VStack {
@@ -49,67 +52,77 @@ struct PlayMusicPage: View {
                     Label("音乐正在加载", systemImage: "arrow.triangle.2.circlepath.icloud")
                         .font(.headline)
                     Divider()
-                    VStack(content: {
-                        if let downloadMod {
-                            if let cachedMusic {
-                                if let error = vm.playError {
-                                    ScrollViewOrNot {
-                                        ErrorView(errorText: error.localizedDescription)
-                                    }
-                                } else {
-                                    Text("从缓存的音乐开始播放")
-                                        .transition(.blurReplace)
-                                        .task {
-                                            vm.playMusicWithCached(yiMusic: cachedMusic, playerHolder: playerHolder)
-                                        }
-                                }
-                            } else {
-                                if !vm.step1Done {
-                                    PlayMusicStepView(loadongText: "正在获取音乐完整信息", errorTitle: "获取音乐完整信息失败",error:vm.step1Error)
-                                }
-                                if !vm.step2Done {
-                                    PlayMusicStepView(loadongText: "正在获取音乐封面图", errorTitle:"获取音乐封面图失败",error:vm.step2Error)
-                                }
-                                if !vm.step3Done {
-                                    PlayMusicStepView(loadongText: "正在获取歌词", errorTitle:"获取歌词失败",error:vm.step3Error)
-                                }
-                                if !vm.step4Done {
-                                    PlayMusicStepView(loadongText: "正在缓存音频", errorTitle:"缓存音频失败",error:vm.step4Error)
-                                    if vm.step4Error == nil {
-                                        if let totalSize = vm.audioDataSize {
-                                            VStack(content: {
-                                                ProgressView(value: vm.audioDownloadProgress, total: 1)
-                                                let doneMB:String = String(format: "%.2f", (vm.audioDownloadProgress * totalSize) / 1024576)
-                                                let totalMB:String = String(format: "%.2f", (totalSize) / 1024576)
-                                                Text("\(doneMB)/\(totalMB)MB")
-                                            })
-                                            .transition(.blurReplace)
-                                            .animation(.smooth, value: vm.audioDownloadProgress)
-                                        } else {
-                                            NeverErrorView(remoteControlTag: "PlayMusicPage")
-                                        }
-                                    }
-                                }
-                                if vm.step1Done && vm.step2Done && vm.step3Done && vm.step4Done {
+                    ZStack {
+                        //这个组件用来保证最小高度
+                        FourLineHeightPlaceholder()
+                            .padding(.vertical)
+                        //如果显示内容不足最小高度，以最小高度显示；如果显示内容超过最小高度，以内容高度显示
+                        VStack(content: {
+                            if let downloadMod {
+                                if let cachedMusic {
                                     if let error = vm.playError {
                                         ScrollViewOrNot {
                                             ErrorView(errorText: error.localizedDescription)
                                         }
                                     } else {
-                                        Text("步骤已完成，关闭页面，开始播放")
+                                        Text("从缓存的音乐开始播放")
                                             .transition(.blurReplace)
                                             .task {
-                                                await vm.playMusic(downloadMod: downloadMod, modelContext: modelContext, playerHolder: playerHolder)
+                                                vm.playMusicWithCached(yiMusic: cachedMusic, playerHolder: playerHolder)
                                             }
                                     }
+                                } else {
+                                    if !vm.step1Done {
+                                        PlayMusicStepView(loadongText: "正在获取音乐完整信息", errorTitle: "获取音乐完整信息失败",error:vm.step1Error)
+                                    }
+                                    if !vm.step2Done {
+                                        PlayMusicStepView(loadongText: "正在获取音乐封面图", errorTitle:"获取音乐封面图失败",error:vm.step2Error)
+                                    }
+                                    if !vm.step3Done {
+                                        PlayMusicStepView(loadongText: "正在获取歌词", errorTitle:"获取歌词失败",error:vm.step3Error)
+                                    }
+                                    if vm.step1Done {
+                                        //步骤1没出错才会去做步骤4
+                                        if !vm.step4Done {
+                                            PlayMusicStepView(loadongText: "正在缓存音频", errorTitle:"缓存音频失败",error:vm.step4Error)
+                                            if vm.step4Error == nil {
+                                                if let totalSize = vm.audioDataSize {
+                                                    VStack(content: {
+                                                        ProgressView(value: vm.audioDownloadProgress, total: 1)
+                                                        let doneMB:String = String(format: "%.2f", (vm.audioDownloadProgress * totalSize) / 1024576)
+                                                        let totalMB:String = String(format: "%.2f", (totalSize) / 1024576)
+                                                        Text("\(doneMB)/\(totalMB)MB")
+                                                    })
+                                                    .transition(.blurReplace)
+                                                    .animation(.smooth, value: vm.audioDownloadProgress)
+                                                } else {
+                                                    NeverErrorView(remoteControlTag: "PlayMusicPage")
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if vm.step1Done && vm.step2Done && vm.step3Done && vm.step4Done {
+                                        if let error = vm.playError {
+                                            ScrollViewOrNot {
+                                                ErrorView(errorText: error.localizedDescription)
+                                            }
+                                        } else {
+                                            Text("步骤已完成，关闭页面，开始播放")
+                                                .transition(.blurReplace)
+                                                .task {
+                                                    await vm.playMusic(downloadMod: downloadMod, modelContext: modelContext, playerHolder: playerHolder)
+                                                }
+                                        }
+                                    }
                                 }
+                            } else {
+                                Text("初始化加载器")
+                                    .transition(.blurReplace)
                             }
-                        } else {
-                            Text("初始化加载器")
-                                .transition(.blurReplace)
-                        }
-                    })
-                    .scenePadding(.horizontal)
+                        })
+                        .id("Status")
+                        .scenePadding(.horizontal)
+                    }
                     .animation(.smooth, value: vm.step1Done)
                     .animation(.smooth, value: vm.step1Error)
                     .animation(.smooth, value: vm.step2Done)
@@ -138,20 +151,31 @@ struct PlayMusicPage: View {
                 }
                 .scenePadding(.horizontal)
             }
+            .scrollTargetLayout()
             .toolbar(.hidden, for: .navigationBar)
            
         }
+        .scrollPosition(id: $scrollPosition, anchor: .bottom)
         //SceneKit在SwiftUI中不支持透明背景，因此设为黑色
         .background(Color.black)
            
             .overlay(alignment: .topLeading) {
-                LightCancelButton(symbolName: "chevron.backward", accessbilityLabel: "返回")
+                LightCancelButton(symbolName: "chevron.backward", accessbilityLabel: "返回", action: {
+                    vm.isCanceledPlay = true
+                    cancelAction()
+                })
             } .ignoresSafeArea(edges: .top)
     }
     
 }
 
 extension PlayMusicPage {
+    //不然用户一直傻傻的等待在3DLogo，需要主动往下滚动
+    func scrollToError() {
+        withAnimation(.smooth) {
+            scrollPosition = "Status"
+        }
+    }
     func requestMusicTask(downloadMod:MusicLoader) async {
         vm.step1Error = nil
         vm.step2Error = nil
@@ -159,53 +183,42 @@ extension PlayMusicPage {
         vm.step4Error = nil
         let _: [Void] = await withTaskGroup(of: Void.self) { group in
             //步骤1需要在步骤4前
-            group.addTask {
+            group.addTask { @MainActor in
                 do {
                     try await downloadMod.step1()
-                    Task { @MainActor in
-                        vm.step1Done = true
-                    }
-                } catch {
-                    Task { @MainActor in
-                        vm.step1Error = error.localizedDescription
-                    }
-                }
-                do {
-                    try await downloadMod.step4()
-                    Task { @MainActor in
+                    vm.step1Done = true
+                    //步骤1没出错才能做步骤4
+                    do {
+                        try await downloadMod.step4()
                         vm.step4Done = true
+                    } catch {
+                        vm.step4Error = error.localizedDescription
+                        scrollToError()
                     }
                 } catch {
-                    Task { @MainActor in
-                        vm.step4Error = error.localizedDescription
-                    }
+                    vm.step1Error = error.localizedDescription
+                    scrollToError()
                 }
                 return ()
             }
             //其余步骤并行化
-            group.addTask {
+            group.addTask { @MainActor in
                 do {
                     try await downloadMod.step2()
-                    Task { @MainActor in
-                        vm.step2Done = true
-                    }
+                    vm.step2Done = true
                 } catch {
-                    Task { @MainActor in
-                        vm.step2Error = error.localizedDescription
-                    }
+                    vm.step2Error = error.localizedDescription
+                    scrollToError()
                 }
             }
             //其余步骤并行化
-            group.addTask {
+            group.addTask { @MainActor in
                 do {
                     try await downloadMod.step3()
-                    Task { @MainActor in
-                        vm.step3Done = true
-                    }
+                    vm.step3Done = true
                 } catch {
-                    Task { @MainActor in
-                        vm.step3Error = error.localizedDescription
-                    }
+                    vm.step3Error = error.localizedDescription
+                    scrollToError()
                 }
             }
             return []

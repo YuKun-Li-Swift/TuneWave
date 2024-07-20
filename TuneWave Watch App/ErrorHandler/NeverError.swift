@@ -12,7 +12,7 @@ enum NeverError:Error,LocalizedError {
     var errorDescription: String? {
         switch self {
         case .neverError:
-            "APP遇到了未知错误，此错误没有已知的原因和解决方法，请联系开发者"
+            "APP遇到了未知错误，此错误没有已知的原因和解决方法，"+DeveloperContactGenerator.generate()
         }
     }
 }

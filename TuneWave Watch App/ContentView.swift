@@ -187,24 +187,38 @@ struct MusicPlayerCover: ViewModifier {
     var ship:MusicPlayShip? = nil
     @Binding
     var showNowPlayView:Bool
+    @State
+    private var sceneVM = SceneModelShip()
     func body(content: Content) -> some View {
         content
             .sheet(item: $ship) { ship in
                 PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.converImgURL,showPlayPage:{
                     self.ship = nil
                     self.showNowPlayView = true
+                },cancelAction: {
+                    self.ship = nil
                 })
                     .environment(playerHolder)
+                    .environment(sceneVM)
             }
             .onReceive(playMusic, perform: {
                 self.ship = $0
             })
             .sheet(isPresented: $showNowPlayView, content: {
                 NavigationStack {
-                    NowPlayView()
+                    NowPlayView(dismissMe:{
+                        showNowPlayView = false
+                    })
                 }
                     .environment(playerHolder)
             })
+            .task(priority: .background) {
+                do {
+                    try await sceneVM.sceneModel.load()
+                } catch {
+                    print("3D场景加载失败\(error.localizedDescription)")
+                }
+            }
     }
 }
 

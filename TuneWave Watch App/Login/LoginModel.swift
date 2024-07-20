@@ -232,18 +232,7 @@ struct APIErrorDisplay: View {
                     .font(.footnote)
             }
         }
-        .sheet(isPresented: $showSheet) {
-            qrSheet()
-        }
-    }
-    @ViewBuilder
-    func qrSheet() -> some View {
-       
-            Image(.contactQR)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .navigationTitle("手机扫码联系开发者")
-        
+        .alert(DeveloperContactGenerator.generate(), isPresented: $showSheet) { }
     }
 }
 

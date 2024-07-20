@@ -22,6 +22,7 @@ class MusicLoadingViewModel {
     var step3Error:String? = nil
     var step4Done = false
     var step4Error:String? = nil
+    var isCanceledPlay = false
     var playError:Error? = nil
     
     //0到1之间的值
@@ -29,9 +30,11 @@ class MusicLoadingViewModel {
     var audioDataSize:Double? = nil
     func playMusicWithCached(yiMusic: YiMusic, playerHolder: MusicPlayerHolder) {
         do {
-            try playerHolder.playMusic(yiMusic)
-            //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
-            showPlayPage()
+            if !isCanceledPlay {
+                try playerHolder.playMusic(yiMusic)
+                //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
+                showPlayPage()
+            }
         } catch {
             self.playError = error
         }
@@ -42,9 +45,11 @@ class MusicLoadingViewModel {
             let yiMusic = try await downloadMod.generateFinalMusicObject()
             modelContext.insert(yiMusic)
             try modelContext.save()
-            try playerHolder.playMusic(yiMusic)
-            withAnimation(.smooth) {
-                showPlayPage()
+            if !isCanceledPlay {
+                try playerHolder.playMusic(yiMusic)
+                withAnimation(.smooth) {
+                    showPlayPage()
+                }
             }
         } catch {
             self.playError = error

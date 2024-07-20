@@ -62,6 +62,27 @@ actor MusicLoader {
         }()).LSAsyncJSON()
         try json.errorCheck()
         print("请求到音乐链接\(json)")
+        //可能是只能听试听版（那不播放了，不然之后开了VIP还要重新缓存音乐）
+        //也可能是完全听不了，比如专辑是付费专辑
+        if let cantNormallyListen = json["data"].array?.first?["freeTrialPrivilege"]["cannotListenReason"].int64 {
+            let code:Int64? = json["data"].array?.first?["code"].int64
+            //如果这个字段不是null，就说明有问题了
+            switch cantNormallyListen {
+            case 1:
+                switch code {
+                case -110:
+                    throw Step1Error.noPaidAlbum
+                case 200://只能听试听版导致的播放异常
+                    throw Step1Error.noVIP
+                default:
+                    //可能是IP不对，比如海外无法听大陆的音乐
+                    throw Step1Error.cannotListen
+                }
+            default:
+                //可能是IP不对，比如海外无法听大陆的音乐
+                throw Step1Error.cannotListen
+            }
+        }
         guard let link = json["data"].array?.first?["url"].url else {
             throw Step1Error.noLink
         }
@@ -88,8 +109,17 @@ actor MusicLoader {
         case noSize
         case noFileExtension
         case noLevel
+        case noVIP
+        case noPaidAlbum
+        case cannotListen
         var errorDescription: String? {
             switch self {
+            case .cannotListen:
+                "目前无法播放这首音乐，" + DeveloperContactGenerator.generate()
+            case .noPaidAlbum:
+                "您的网易云账号没有权限听这首音乐（没有购买该音乐所属的数字专辑）"
+            case .noVIP:
+                "您的网易云账号没有权限听这首音乐（没有网易云黑胶会员）"
             case .noLink:
                 "找不到音乐的播放链接"
             case .noSize:
