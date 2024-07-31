@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7C0F33CC2C480CF10055F4B7 /* DisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0F33CB2C480CF10055F4B7 /* DisclaimerView.swift */; };
-		7C0F33CE2C480D770055F4B7 /* DisclaimerContent.md in Resources */ = {isa = PBXBuildFile; fileRef = 7C0F33CD2C480D770055F4B7 /* DisclaimerContent.md */; };
-		7C0F33CF2C480D770055F4B7 /* DisclaimerContent.md in Resources */ = {isa = PBXBuildFile; fileRef = 7C0F33CD2C480D770055F4B7 /* DisclaimerContent.md */; };
 		7C310E8C2C454FAB00E9143F /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7C2C454FAB00E9143F /* SearchModel.swift */; };
 		7C310E8D2C454FAB00E9143F /* OpenSourcePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7D2C454FAB00E9143F /* OpenSourcePage.swift */; };
 		7C310E8E2C454FAB00E9143F /* LoginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7E2C454FAB00E9143F /* LoginPage.swift */; };
@@ -50,6 +47,10 @@
 		7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7C44BA172C1C7DDC008DB511 /* SwiftyJSON */; };
 		7C44BA1E2C1C86C4008DB511 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
 		7C80A2B52C4686A700A8807C /* UserInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C80A2B42C4686A700A8807C /* UserInfoView.swift */; };
+		7C8F5CA22C4FB29E0068D739 /* DisclaimerContent.md in Resources */ = {isa = PBXBuildFile; fileRef = 7C8F5CA02C4FB29E0068D739 /* DisclaimerContent.md */; };
+		7C8F5CA32C4FB29E0068D739 /* DisclaimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8F5CA12C4FB29E0068D739 /* DisclaimerView.swift */; };
+		7C94F1F92C4FE18900D05579 /* NetworkTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C94F1F82C4FE18900D05579 /* NetworkTester.swift */; };
+		7C94F1FB2C4FE6C700D05579 /* PlayListCachedPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C94F1FA2C4FE6C700D05579 /* PlayListCachedPage.swift */; };
 		7CB18B3B2C490DD90042DB8B /* AnimatedLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */; };
 		7CB18B3D2C490EB30042DB8B /* YiMusicLogo.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */; };
 		7CB18B412C491FA80042DB8B /* URLRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */; };
@@ -71,6 +72,8 @@
 		7CCC3AA12C482B000014AA37 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
 		7CDA978E2C4A08D7009BD0E5 /* AVPlayerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */; };
 		7CDA97932C4A1609009BD0E5 /* ChangeVolumeVideo.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */; };
+		7CEB292A2C59D91800E2A3D8 /* OnlineToLocalConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */; };
+		7CEB292C2C59E77F00E2A3D8 /* MusciPlayingListPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */; };
 		7CFE33CD2C4B84E700BA77F4 /* DeveloperContactGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */; };
 /* End PBXBuildFile section */
 
@@ -137,8 +140,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7C0F33CB2C480CF10055F4B7 /* DisclaimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DisclaimerView.swift; path = "../../../../../Downloads/WatchBrowserSide/WatchBrowserSide Watch App/Abilities/HomePage/DisclaimerView.swift"; sourceTree = "<group>"; };
-		7C0F33CD2C480D770055F4B7 /* DisclaimerContent.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = DisclaimerContent.md; path = "../../../../../Downloads/WatchBrowserSide/WatchBrowserSide Watch App/Abilities/HomePage/DisclaimerContent.md"; sourceTree = "<group>"; };
 		7C310E7C2C454FAB00E9143F /* SearchModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		7C310E7D2C454FAB00E9143F /* OpenSourcePage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenSourcePage.swift; sourceTree = "<group>"; };
 		7C310E7E2C454FAB00E9143F /* LoginPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginPage.swift; sourceTree = "<group>"; };
@@ -177,6 +178,10 @@
 		7C310ED12C46439300E9143F /* MusicPlayingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayingPage.swift; sourceTree = "<group>"; };
 		7C44BA1D2C1C86C4008DB511 /* Environments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environments.swift; sourceTree = SOURCE_ROOT; };
 		7C80A2B42C4686A700A8807C /* UserInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoView.swift; sourceTree = "<group>"; };
+		7C8F5CA02C4FB29E0068D739 /* DisclaimerContent.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = DisclaimerContent.md; sourceTree = "<group>"; };
+		7C8F5CA12C4FB29E0068D739 /* DisclaimerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisclaimerView.swift; sourceTree = "<group>"; };
+		7C94F1F82C4FE18900D05579 /* NetworkTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTester.swift; sourceTree = "<group>"; };
+		7C94F1FA2C4FE6C700D05579 /* PlayListCachedPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListCachedPage.swift; sourceTree = "<group>"; };
 		7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatedLoadingView.swift; sourceTree = "<group>"; };
 		7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = YiMusicLogo.usdz; sourceTree = "<group>"; };
 		7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
@@ -202,6 +207,8 @@
 		7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerExtension.swift; sourceTree = "<group>"; };
 		7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ChangeVolumeVideo.MP4; sourceTree = "<group>"; };
+		7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineToLocalConverter.swift; sourceTree = "<group>"; };
+		7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusciPlayingListPage.swift; sourceTree = "<group>"; };
 		7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperContactGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -257,8 +264,8 @@
 		7C0F33CA2C480CBF0055F4B7 /* Disclaimer */ = {
 			isa = PBXGroup;
 			children = (
-				7C0F33CB2C480CF10055F4B7 /* DisclaimerView.swift */,
-				7C0F33CD2C480D770055F4B7 /* DisclaimerContent.md */,
+				7C8F5CA02C4FB29E0068D739 /* DisclaimerContent.md */,
+				7C8F5CA12C4FB29E0068D739 /* DisclaimerView.swift */,
 			);
 			path = Disclaimer;
 			sourceTree = "<group>";
@@ -269,6 +276,7 @@
 				7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */,
 				7C310E9E2C454FBA00E9143F /* MusicLoadingPage.swift */,
 				7C310ED12C46439300E9143F /* MusicPlayingPage.swift */,
+				7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */,
 				7C310EB72C45518B00E9143F /* MusicLoader.swift */,
 				7C310EB92C4551AC00E9143F /* MusicLoadingViewModel.swift */,
 				7C310E9D2C454FBA00E9143F /* MusicModel.swift */,
@@ -283,6 +291,8 @@
 			children = (
 				7C310EA42C454FBE00E9143F /* MyPlayListPage.swift */,
 				7C310EA52C454FBE00E9143F /* PlayListDetailPage.swift */,
+				7C94F1FA2C4FE6C700D05579 /* PlayListCachedPage.swift */,
+				7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */,
 				7C310EA62C454FBE00E9143F /* PlaylistModel.swift */,
 			);
 			path = PlayList;
@@ -438,6 +448,7 @@
 				7C310E892C454FAB00E9143F /* ErrorExtension.swift */,
 				7C310E8B2C454FAB00E9143F /* ImageExtension.swift */,
 				7C310E7D2C454FAB00E9143F /* OpenSourcePage.swift */,
+				7C94F1F82C4FE18900D05579 /* NetworkTester.swift */,
 				7C310E7C2C454FAB00E9143F /* SearchModel.swift */,
 				7C310E832C454FAB00E9143F /* SearchPage.swift */,
 				7C310E862C454FAB00E9143F /* SwiftUIExtension.swift */,
@@ -673,7 +684,6 @@
 			files = (
 				7CB3D2472C1A6E43004A186D /* Preview Assets.xcassets in Resources */,
 				7CB3D2442C1A6E43004A186D /* Assets.xcassets in Resources */,
-				7C0F33CE2C480D770055F4B7 /* DisclaimerContent.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,7 +709,7 @@
 				7CB3D26F2C1A6E44004A186D /* Preview Assets.xcassets in Resources */,
 				7CB3D26C2C1A6E44004A186D /* Assets.xcassets in Resources */,
 				7CDA97932C4A1609009BD0E5 /* ChangeVolumeVideo.MP4 in Resources */,
-				7C0F33CF2C480D770055F4B7 /* DisclaimerContent.md in Resources */,
+				7C8F5CA22C4FB29E0068D739 /* DisclaimerContent.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -753,6 +763,7 @@
 			files = (
 				7C310E9A2C454FAB00E9143F /* TuneWaveApp.swift in Sources */,
 				7C310ED22C46439300E9143F /* MusicPlayingPage.swift in Sources */,
+				7CEB292A2C59D91800E2A3D8 /* OnlineToLocalConverter.swift in Sources */,
 				7CB18B3B2C490DD90042DB8B /* AnimatedLoadingView.swift in Sources */,
 				7C310EBA2C4551AC00E9143F /* MusicLoadingViewModel.swift in Sources */,
 				7C310EC62C45555F00E9143F /* ErrorView.swift in Sources */,
@@ -769,6 +780,7 @@
 				7C310E972C454FAB00E9143F /* UserInfoPage.swift in Sources */,
 				7C310EB32C45503900E9143F /* YiUserContainer.swift in Sources */,
 				7C310EA82C454FBE00E9143F /* MyPlayListPage.swift in Sources */,
+				7CEB292C2C59E77F00E2A3D8 /* MusciPlayingListPage.swift in Sources */,
 				7C310E9B2C454FAB00E9143F /* ImageExtension.swift in Sources */,
 				7C310E992C454FAB00E9143F /* ErrorExtension.swift in Sources */,
 				7C80A2B52C4686A700A8807C /* UserInfoView.swift in Sources */,
@@ -778,12 +790,14 @@
 				7C310E8F2C454FAB00E9143F /* DateExtension.swift in Sources */,
 				7C310EB82C45518B00E9143F /* MusicLoader.swift in Sources */,
 				7C310EB62C4550D000E9143F /* CacheableAlamofire.swift in Sources */,
-				7C0F33CC2C480CF10055F4B7 /* DisclaimerView.swift in Sources */,
+				7C8F5CA32C4FB29E0068D739 /* DisclaimerView.swift in Sources */,
 				7C310EC82C45577100E9143F /* NeverError.swift in Sources */,
 				7C310E962C454FAB00E9143F /* SwiftUIExtension.swift in Sources */,
 				7C310E8C2C454FAB00E9143F /* SearchModel.swift in Sources */,
 				7C310EC12C45542F00E9143F /* YiResponseError.swift in Sources */,
+				7C94F1F92C4FE18900D05579 /* NetworkTester.swift in Sources */,
 				7C310EA32C454FBA00E9143F /* MusicRow.swift in Sources */,
+				7C94F1FB2C4FE6C700D05579 /* PlayListCachedPage.swift in Sources */,
 				7C44BA1E2C1C86C4008DB511 /* Environments.swift in Sources */,
 				7C310E932C454FAB00E9143F /* SearchPage.swift in Sources */,
 				7CB3D2682C1A6E43004A186D /* TuneWaveApp.swift in Sources */,

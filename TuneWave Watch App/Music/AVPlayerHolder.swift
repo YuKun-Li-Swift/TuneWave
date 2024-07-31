@@ -10,14 +10,19 @@ import SwiftUI
 import AVFoundation
 import Combine
 
+
 @Observable
 class MusicPlayerHolder {
     let avplayer = AVPlayer()
     var musicURL:URL? = nil
-    var yiMusic:YiMusic? = nil
+    //正在播放的歌单
+    var playingList:[YiMusic] = []
+    var currentMusic:YiMusic? = nil
     var cancellable:AnyCancellable?
     var lyricsCancellable:Any?
     var playingError:String = ""
+    var playingMode:PlayingMode = .singleLoop
+    var switchMusicError:String? = nil
     //如果视频在播放，每帧触发一次
     func startToUpdateLyrics(onTimeUpdate:@escaping (CMTime)->()) {
         //先销毁先前的再设置新的，免得先前的内存泄露了
@@ -33,9 +38,25 @@ class MusicPlayerHolder {
             self.lyricsCancellable = nil
         }
     }
-    //AVQueuePlayer支持耳机线控切歌
-    func playMusic(_ yiMusic:YiMusic) throws {
-        self.yiMusic = yiMusic
+    enum PlayMusicError:Error,LocalizedError {
+    case notRightPlayingList
+        var errorDescription: String? {
+            switch self {
+            case .notRightPlayingList:
+                "歌单出现异常，请换一个歌单播放"
+            }
+        }
+    }
+    //playingList是当前歌曲的上下文，目前的策略是，当前歌曲从哪一个歌单里来的，就把播放列表替换为那个歌单。
+    //如果播放的这首歌已经被缓存了，那么playingList就会包含这首歌
+    //如果播放的这首歌，在点击音乐Row时尚未被缓存，那么playingList就不包含这首歌
+    func playMusic(_ yiMusic:YiMusic,playingList:[YiMusic]) throws {
+  
+        if !playingList.contains(yiMusic) {
+            throw PlayMusicError.notRightPlayingList
+        }
+        self.playingList = playingList
+        self.currentMusic = yiMusic
         let url:URL = try yiMusic.audioData.createTemporaryURL(extension: yiMusic.audioDataFileExtension)
         print("音乐链接\(url)")
         self.musicURL = url
@@ -50,21 +71,14 @@ class MusicPlayerHolder {
         avplayer.playImmediately(atRate: 1.0)
         cancellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
             .sink(receiveValue: { [weak self] _ in
-                print("播放到结尾了，从头继续")
-                if let self {
-                    avplayer.seek(to: CMTime.zero)
-                    //可能被通过Now Play更改了，不是1.0
-                    let currentRate = avplayer.defaultRate
-                    avplayer.playImmediately(atRate: currentRate)
-                } else {
-                    print("self已经销毁了")
-                }
+                Self.handleDidPlayToEndTime(self: self)
             })
     }
+    var playedItems:[YiMusic] = []
     func updateNowPlay() {
-        if let yiMusic {
+        if let currentMusic {
             configureRemoteCommandCenter()
-            NowPlayHelper.updateNowPlayingInfoWith(yiMusic)
+            NowPlayHelper.updateNowPlayingInfoWith(currentMusic)
         } else {
             print("Now Play不用刷新，因为没在播放")
         }
@@ -231,6 +245,173 @@ class MusicPlayerHolder {
     }
 }
 
+enum PlayingMode {
+    case singleLoop
+    case playingListLoop
+    case random
+    func humanReadbleName() -> String {
+        switch self {
+        case .singleLoop:
+            "单曲循环"
+        case .playingListLoop:
+            "列表循环"
+        case .random:
+            "随机"
+        }
+    }
+}
+
+extension MusicPlayerHolder {
+    func updateCurrentMusic() {
+        if let exsist = self.playingList.first(where: { music in
+            music.musicID == self.currentMusic?.musicID
+        }) {
+            //正常的，什么都不做
+        } else {
+            //可能是用户从歌单里删除了当前正在播放的音乐，应该要停止播放
+            stopPlaying()
+        }
+    }
+    func stopPlaying() {
+        avplayer.pause()
+        self.currentMusic = nil
+        avplayer.replaceCurrentItem(with: nil)
+        NowPlayHelper.cleanNowPlayingInfo()
+    }
+}
+
+// MARK: 切歌支持
+extension MusicPlayerHolder {
+    func switchMusic(to yiMusic:YiMusic) throws {
+        self.currentMusic = yiMusic
+        let url:URL = try yiMusic.audioData.createTemporaryURL(extension: yiMusic.audioDataFileExtension)
+        print("音乐链接\(url)")
+        self.musicURL = url
+        let item = AVPlayerItem(url: url)
+        avplayer.replaceCurrentItem(with: item)
+     
+        NowPlayHelper.updateNowPlayingInfoWith(yiMusic)
+
+        let currentRate = self.avplayer.defaultRate
+        avplayer.playImmediately(atRate: currentRate)//保持播放速率不变
+        
+        //因为AVPlayerItemDidPlayToEndTime是基于AVPlayerItem的，AVPlayerItem变了AVPlayerItemDidPlayToEndTime也要变
+        cancellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
+            .sink(receiveValue: { [weak self] _ in
+                Self.handleDidPlayToEndTime(self: self)
+            })
+    }
+    static
+    func handleDidPlayToEndTime(self:MusicPlayerHolder?) {
+        if let self {
+            self.switchMusicError = nil
+            do {
+                switch self.playingMode {
+                case .singleLoop:
+                    print("播放到结尾了，从头继续")
+                    self.avplayer.seek(to: CMTime.zero)
+                    //可能被通过Now Play更改了，不是1.0
+                    let currentRate = self.avplayer.defaultRate
+                    self.avplayer.playImmediately(atRate: currentRate)
+                case .playingListLoop:
+                    print("播放到结尾了，切下一首")
+                    try self.switchMusic(to:try self.getNextMusic())
+                case .random:
+                    print("播放到结尾了，切随机一首")
+                    try self.switchMusic(to:try self.getRandomMusic())
+                }
+            } catch {
+                self.switchMusicError = error.localizedDescription
+            }
+           
+        } else {
+            print("self已经销毁了")
+        }
+    }
+    enum GetNextMusicError:Error,LocalizedError {
+        case emptyPlayingList
+        case currentMusicNotInPlayingList
+        case noItemInAnonEmptyArray
+        var errorDescription: String? {
+            switch self {
+            case .noItemInAnonEmptyArray:
+                "播放列表出现异常，请换一个歌单播放"
+            case .currentMusicNotInPlayingList:
+                "播放列表内容异常，请换一个歌单播放"
+            case .emptyPlayingList:
+                "播放列表中没有音乐了，请换一个歌单播放"
+                
+            }
+        }
+    }
+    //不要真随机，不然前一首是这个，下一首随机出来又是这个就尴尬了
+    func getRandomMusic() throws -> YiMusic {
+        if let currentMusic {
+            playedItems.append(currentMusic)
+        }
+        let pickFrom:[YiMusic] = playingList.filter { music in
+            !playedItems.contains(music)
+        }
+        if pickFrom.isEmpty {
+            //那说明歌单里每首歌都已经播放过了，那就随机选吧
+            guard let randomOne = playingList.randomElement() else {
+                throw GetNextMusicError.emptyPlayingList
+            }
+            return randomOne
+        } else {
+            //从歌单里还没有播放过的音乐中抽取
+            guard let randomOne = pickFrom.randomElement() else {
+                throw GetNextMusicError.noItemInAnonEmptyArray
+            }
+            return randomOne
+        }
+    }
+    func getNextMusic() throws -> YiMusic {
+        if self.playingList.isEmpty {
+            //比如说用户播放过程中进行了垃圾清理？导致当前播放的这首歌都没了
+            throw GetNextMusicError.emptyPlayingList
+        } else if self.playingList.count == 1 {
+            //比如说用户播放过程中进行了垃圾清理？导致当前播放的这首歌都没了
+            if let currentMusic {
+                return currentMusic
+            } else {
+                throw GetNextMusicError.emptyPlayingList
+            }
+        } else {
+            guard let currentMusic else { throw GetNextMusicError.currentMusicNotInPlayingList }
+            guard let currentCount = playingList.firstIndex(of: currentMusic) else { throw GetNextMusicError.currentMusicNotInPlayingList }
+            let nextIndex = currentCount + 1
+            if nextIndex <= playingList.count-1 {
+                let nextOne = playingList[nextIndex]
+                return nextOne
+            } else {
+                //该从头开始循环播放列表里
+                if let firstMusic = playingList.first {
+                    return firstMusic
+                } else {
+                    throw GetNextMusicError.emptyPlayingList
+                }
+            }
+        }
+    }
+}
+
+//管理正在播放的播放列表
+struct ManagerPlayingList: ViewModifier {
+    @Environment(MusicPlayerHolder.self)
+    var playerHolder
+    func body(content: Content) -> some View {
+        content
+        //初始打开不操作，万一用户在别的app也正在播放，一下给人家清空了多难受啊
+            .onChange(of: playerHolder.playingList, initial: false) { oldValue, newValue in
+                print("正在播放列表已更新")
+                playerHolder.updateCurrentMusic()
+            }
+    }
+}
+
+
+
 extension MusicPlayerHolder {
     func currentTime() -> CMTime {
         avplayer.currentTime()
@@ -280,4 +461,15 @@ struct NowPlayHelper {
         // 将信息传递给MPNowPlayingInfoCenter
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
+    static
+    func cleanNowPlayingInfo() {
+        // 更新Now Playing信息
+        var nowPlayingInfo = [String: Any]()
+        nowPlayingInfo[MPMediaItemPropertyTitle] = nil  // 设置歌曲名
+        nowPlayingInfo[MPMediaItemPropertyArtist] = nil // 设置艺术家名
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = nil // 设置封面图片
+        // 将信息传递给MPNowPlayingInfoCenter
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
 }
+

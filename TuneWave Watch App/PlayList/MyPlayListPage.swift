@@ -11,19 +11,25 @@ let screen = WKInterfaceDevice.current().screenBounds
 @MainActor
 struct MyPlayList: View {
     @Environment(YiUserContainer.self)
-    var userContainer:YiUserContainer
+    private var userContainer:YiUserContainer
+    @Environment(GoPlayListAndPickAMsuicAction.self)
+    private var actionExcuter:GoPlayListAndPickAMsuicAction
     @State
-    var mod = UserPlayListModel()
+    private var mod = UserPlayListModel()
     @State
-    var vm :MyPlayListViewModel? = nil
+    private var vm :MyPlayListViewModel? = nil
     @State
-    var leftColumn:[UserPlayListModel.PlayListObj] = []
+    private var leftColumn:[UserPlayListModel.PlayListObj] = []
     @State
-    var rightColumn:[UserPlayListModel.PlayListObj] = []
+    private var rightColumn:[UserPlayListModel.PlayListObj] = []
     @State
-    var selected:UserPlayListModel.PlayListObj?
+    private var selected:UserPlayListModel.PlayListObj?
     @State
-    var whereIsModTimer = Timer.publish(every: 0.1, on: .main, in: .default).autoconnect()
+    private var whereIsModTimer = Timer.publish(every: 0.1, on: .main, in: .default).autoconnect()
+    @State
+    private var initLayout = true
+    @State
+    private var scrollProxy:ScrollViewProxy?
     var body: some View {
         LoadingSkelton {
             ProgressView()
@@ -33,34 +39,62 @@ struct MyPlayList: View {
                     if vm.playListContainer.playlists.isEmpty {
                         Text("该账号下没有歌单")
                     } else {
-                        ScrollView {
-                            VStack {
-                                HStack(alignment: .center, spacing: 16.7/3) {
-                                    VStack(alignment: .center, spacing: 16.7/3) {
-                                        ForEach(leftColumn) { i in
-                                            PlayListGrid(playList: i,selected:$selected)
-                                                .id(i.playListID)
-                                        }
-                                    }
-                                    VStack(alignment: .center, spacing: 16.7/3) {
-                                        if !rightColumn.isEmpty {
-                                            ForEach(rightColumn) { i in
+                        ScrollViewReader { proxy in
+                            ScrollView {
+                                if actionExcuter.showPleasePickBanner {
+                                    HStack(content: {
+                                        Text("请在下方歌单中选择你上次听的")
+                                            .multilineTextAlignment(.leading)
+                                            .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
+                                        .padding()
+                                        Spacer()
+                                    })
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                                .fill(Color.accentColor.gradient))
+                                }
+                                VStack {
+                                    HStack(alignment: .center, spacing: 16.7/3) {
+                                        VStack(alignment: .center, spacing: 16.7/3) {
+                                            ForEach(leftColumn) { i in
                                                 PlayListGrid(playList: i,selected:$selected)
                                                     .id(i.playListID)
                                             }
-                                        } else {
-                                            //如果新号只有一个歌单
-                                            //占位，不然布局不对了
-                                            PlayListGrid(playList: .placeholder(),selected:$selected)
-                                                .hidden()
+                                        }
+                                        VStack(alignment: .center, spacing: 16.7/3) {
+                                            if !rightColumn.isEmpty {
+                                                ForEach(rightColumn) { i in
+                                                    PlayListGrid(playList: i,selected:$selected)
+                                                        .id(i.playListID)
+                                                }
+                                            } else {
+                                                //如果新号只有一个歌单
+                                                //占位，不然布局不对了
+                                                PlayListGrid(playList: .placeholder(),selected:$selected)
+                                                    .hidden()
+                                            }
                                         }
                                     }
+                                    IgnoreCacheLoadingView(vm: vm)
                                 }
-                                IgnoreCacheLoadingView(vm: vm)
                             }
-                        }
-                        .onChange(of: vm.playListContainer, initial: true) { oldValue, newValue in
-                            (leftColumn,rightColumn) = vm.rebuildPlayList(origin: newValue.playlists)
+                            .onChange(of: vm.playListContainer, initial: true) { oldValue, newValue in
+                                //首次打开页面，不要动画；后续歌单增减了（比如AJAX请求到了新的歌单）需要有动画
+                                let animation:Animation? = {
+                                    if initLayout {
+                                        initLayout = false
+                                        return nil
+                                    } else {
+                                        return .smooth
+                                    }
+                                }()
+                                withAnimation(animation) {
+                                    (leftColumn,rightColumn) = vm.rebuildPlayList(origin: newValue.playlists)
+                                }
+                            }   
+                            .onAppear {
+                                self.scrollProxy = proxy
+                            }
                         }
                     }
                 } else {
@@ -69,6 +103,7 @@ struct MyPlayList: View {
             }
             .navigationDestination(item: $selected) { playlist in
                 PlayListDetailPage(playList: playlist)
+                    .environment(actionExcuter)
             }
         } errorView: { error in
             APIErrorDisplay(remoteControlTag: "myPlayListPage", error: error)
@@ -80,8 +115,17 @@ struct MyPlayList: View {
             //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表
             vm?.loadingByNoCache(mod: mod, user: user, cachedPlayList: cachedPlayList)
         }
+        .onChange(of: actionExcuter.showPleasePickBanner, initial: true) { _, showPleasePickBanner in
+            if showPleasePickBanner {
+                scrollToPleasePickBanner()
+            }
+        }
     }
-   
+    func scrollToPleasePickBanner() {
+        withAnimation(.smooth) {
+            self.scrollProxy?.scrollTo("showPleasePickBanner", anchor: .top)
+        }
+    }
 }
 
 struct IgnoreCacheLoadingView: View {

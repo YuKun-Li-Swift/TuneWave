@@ -9,12 +9,34 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct MusicRowSingleLine: View {
-    var tapAction:()->()
+    var tapAction:() async throws ->()
     var imageURL:URL?
     var name:String
+    var hightlight:Bool = false
+    @State
+    private var loading = false
+    @State
+    private var errorText:String? = nil
+    @State
+    private var loadingTask:Task<Void,Never>?
     var body: some View {
         Button {
-            tapAction()
+            //如果上一次点击还没加载完，不允许下一次
+            if !loading {
+                loadingTask = Task {
+                    loading = true
+                    errorText = nil
+                    do {
+                        try await tapAction()
+                    } catch {
+                        //离屏了就不要弹出错误了
+                        if !Task.isCancelled {
+                            errorText = error.localizedDescription
+                        }
+                    }
+                    loading = false
+                }
+            }
         } label: {
             HStack(alignment: .center, spacing: 13) {
            
@@ -30,7 +52,7 @@ struct MusicRowSingleLine: View {
                                     .aspectRatio(contentMode: .fit)
                                     .transition(.blurReplace.animation(.smooth))
                                     .clipShape(RoundedRectangle(cornerRadius: 16.7/3, style: .continuous))
-                            case .failure(let error):
+                            case .failure( _):
                                 FixSizeImage(systemName: "wifi.exclamationmark")
                             }
                         }
@@ -40,13 +62,49 @@ struct MusicRowSingleLine: View {
                 
                 }
                 .frame(height: 40)
-                
-                Text(name)
-                    .padding(.vertical, 16.7/3)
+                if hightlight {
+                    
+                    Text(name)
+                        .shadow(radius: 5, x: 3, y: 3)
+                        .padding(.vertical, 16.7/3)
+                } else {
+                    
+                    Text(name)
+                        .padding(.vertical, 16.7/3)
+                }
                 Spacer()
             }
+            .opacity(loading ? 0 : 1)
+            .overlay(alignment: .center) {
+                if loading {
+                    ProgressView()
+                }
+            }
+            .animation(.smooth, value: loading)
         }
-
+        .onDisappear {
+            //离屏了就不要加载了
+            loading = false
+            errorText = nil
+            loadingTask?.cancel()
+        }
+        .alert(errorText ?? "未知错误", isPresented: Binding<Bool>(get:{
+            errorText != nil
+        },set: { show in
+            if show {
+                //不需要操作，保持打开
+            } else {
+                //关闭
+                self.errorText = nil
+            }
+        }), actions: {})
+        .listRowBackground({
+            if hightlight {
+                return RoundedRectangle(cornerRadius: 13, style: .continuous) .fill(Color.accentColor.gradient)
+            } else {
+                return nil
+            }
+        }())
     }
 }
 

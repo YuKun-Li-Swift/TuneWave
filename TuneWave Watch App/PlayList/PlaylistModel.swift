@@ -105,6 +105,7 @@ actor UserPlayListModel {
         }
     }
 }
+
 actor PlayListModel {
     struct PlayListDeatil {
         var id = UUID()
@@ -133,7 +134,7 @@ actor PlayListModel {
     }
     
     //可能还有服务器端缓存
-    func getPlaylistDetail(playlist:UserPlayListModel.PlayListObj,useCache:Bool) async throws -> (PlayListDeatil,haveMore:Bool) {
+    func getPlaylistDetail(playlist:UserPlayListModel.PlayListObj,useCache:Bool) async throws -> (PlayListDeatil,haveMore:Bool,haveMoreCount:Int) {
         let playlistID = playlist.playListID
         let route = "/playlist/detail"
         let fullURL = baseAPI + route
@@ -151,6 +152,7 @@ actor PlayListModel {
                 }
             }
         }()
+        print("歌单内容\(json)")
         try json.errorCheck()
 //        guard let trackCount = json["playlist"]["trackCount"].int64 else {
 //            throw getPlaylistDetailError.noTrackCount
@@ -164,6 +166,7 @@ actor PlayListModel {
         print("歌单内一共有\(trackIDs.count)首歌")
         print("需要处理\(tracks.count)首歌")
         let haveMore = trackIDs.count > tracks.count
+        let haveMoreCount:Int = trackIDs.count-tracks.count
         //使用TaskGroup并行化处理，在歌单内歌曲数量很多的时候可以显著提升速度
         let mappedSongs: [PlayListSong] = try await withThrowingTaskGroup(of: PlayListSong?.self) { group in
             for item in tracks {
@@ -180,7 +183,7 @@ actor PlayListModel {
             }
             return results
         }
-        return (.init(basic: playlist, songs: mappedSongs),haveMore)
+        return (.init(basic: playlist, songs: mappedSongs),haveMore,haveMoreCount)
     }
     func parseSong(item: JSON) throws -> PlayListSong {
         guard let name = item["name"].string else {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct PlayListDetailPage: View {
     var playList:UserPlayListModel.PlayListObj
@@ -13,22 +14,15 @@ struct PlayListDetailPage: View {
     var vm:PlayListDetailPageModel?
     @State
     var reqMod = PlayListModel()
-    
+    @Environment(\.modelContext)
+    private var modelContext
     var body: some View {
         LoadingSkelton {
             PlayListDetailLoadingView()
         } successView: {
             VStack {
                 if let vm {
-                    PlayListDetailList(vm: vm) {
-                        let result = try await reqMod.getPlaylistDetail(playlist: playList,useCache: false)
-                        let newVM = PlayListDetailPageModel(data: result.0, haveMore: result.1)
-                        Task { @MainActor in
-                            if !Task.isCancelled {
-                                self.vm = newVM
-                            }
-                        }
-                    }
+                    PlayListDetailList(vm: vm)
                     .id(vm)
                 } else {
                     NeverErrorView(remoteControlTag: "playListDetailPageNeverError")
@@ -38,9 +32,10 @@ struct PlayListDetailPage: View {
             APIErrorDisplay(remoteControlTag: "playListDetailPage", error: error)
         } loadingAction: {
             let cachedPlayList =  try await reqMod.getPlaylistDetail(playlist: playList,useCache: true)
-            let newVM = PlayListDetailPageModel(data:cachedPlayList.0, haveMore: cachedPlayList.1)
+            let localMusic = try await OnlineToLocalConverter.convert(onlineSongs: cachedPlayList.0.songs, modelContext: modelContext)
+            let newVM = PlayListDetailPageModel(data:cachedPlayList.0, haveMore: cachedPlayList.1, haveMoreCount: cachedPlayList.2)
             self.vm = newVM
-            vm?.loadingByNoCache(cachedPlayList: cachedPlayList, playList: playList, reqMod: reqMod)
+            vm?.loadingByNoCache(playList: playList, reqMod: reqMod, modelContext: modelContext)
         }
         .navigationTitle(playList.name)
     }
@@ -48,7 +43,7 @@ struct PlayListDetailPage: View {
 
 struct PlayListDetailLoadingView: View {
     @State
-    var showLine2 = false
+    private var showLine2 = false
     var body: some View {
         VStack {
             ProgressView()
@@ -69,33 +64,63 @@ struct PlayListDetailLoadingView: View {
     }
 }
 
-
+@MainActor
 struct PlayListDetailList: View {
     @State
     var vm:PlayListDetailPageModel
     @State
     private var showNoCacheLoadingError = false
-    //忽略缓存
-    var focrceReload:() async throws -> ()
+    @State
+    private var cacheRowVM = CachedMusicOnlyRowModel()
+    @Environment(\.modelContext)
+    private var modelContext
+    @Environment(GoPlayListAndPickAMsuicAction.self)
+    private var actionExcuter:GoPlayListAndPickAMsuicAction
+    @State
+    private var scrollProxy:ScrollViewProxy?
     var body: some View {
         VStack {
             if vm.data.songs.isEmpty {
                 NoMusicInPlayList()
             } else {
-                List {
-                    if vm.haveMore {
-                        PlayListDetailListHaveMoreBanner()
+                ScrollViewReader { proxy in
+                    List {
+                        if actionExcuter.showPleasePickBanner {
+                            HStack(content: {
+                                Text("请在下方音乐中选择你想加入播放列表的")
+                                    .multilineTextAlignment(.leading)
+                                
+                                    .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
+                                .padding()
+                                Spacer()
+                            })
+                                .background(
+                                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                        .fill(Color.accentColor.gradient))
+                                .id("showPleasePickBanner")
+                        }
+                        if vm.haveMore {
+                            PlayListDetailListHaveMoreBanner(count:vm.data.songs.count,notAvailableCount: vm.haveMoreCount)
+                        }
+                        CachedMusicOnly(vm:cacheRowVM,songs:vm.data.songs)
+                        ForEach(vm.data.songs) { song in
+                            MusicRowSingleLine(tapAction:{
+                                playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: vm.data.songs))
+                            },imageURL: song.imageURL, name: song.name)
+                            //因为静默刷新，为了避免刷新的时候导致批量重载，我们需要显式添加id
+                            .id(song.id)
+                        }
                     }
-                    ForEach(vm.data.songs) { song in
-                        MusicRowSingleLine(tapAction:{
-                            playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, converImgURL: song.imageURL))
-                        },imageURL: song.imageURL, name: song.name)
-                        //因为静默刷新，为了避免刷新的时候导致批量重载，我们需要显式添加id
-                        .id(song.id)
+                    .onAppear {
+                        self.scrollProxy = proxy
                     }
+                  
                 }
             }
         }
+        .navigationDestination(isPresented: $cacheRowVM.pushPage, destination: {
+            PlayListCachedMusicPage(vm:cacheRowVM, songs: vm.data.songs)
+        })
         .toolbar {
             ToolbarItemGroup(placement: .bottomBar) {
                 Rectangle()
@@ -123,19 +148,33 @@ struct PlayListDetailList: View {
                 }
             }
         }
+        .onAppear {
+            cacheRowVM.checkNetworkConnect()
+        }
         .sheet(isPresented: $vm.showMoreActionPage, content: {
             PlayListDetailActionsSheet(vm: vm)
         })
         .alert("未能从云端同步最新歌单\n"+(vm.forceIgnoreCacheLoadError ?? "未知错误"), isPresented: $showNoCacheLoadingError, actions: {
             
         })
+        .onChange(of: actionExcuter.showPleasePickBanner, initial: true) { _, showPleasePickBanner in
+            if showPleasePickBanner {
+                scrollToPleasePickBanner()
+            }
+        }
+    }
+    func scrollToPleasePickBanner() {
+        withAnimation(.smooth) {
+            self.scrollProxy?.scrollTo("showPleasePickBanner", anchor: .top)
+        }
     }
 }
 
 struct PlayListDetailActionsSheet: View {
     @State
     var vm:PlayListDetailPageModel
-    
+    @Environment(\.modelContext)
+    private var modelContext
     var body: some View {
         NavigationStack {
             ScrollViewOrNot {
@@ -154,7 +193,7 @@ struct PlayListDetailActionsSheet: View {
                                 vm.showMoreActionPage = false
                                 try? await Task.sleep(nanoseconds:300000000)//0.3s，等自己所处的sheet先收回去
                                 if let song = vm.data.songs.randomElement() {
-                                    playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, converImgURL: song.imageURL))
+                                    playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: vm.data.songs))
                                 } else {
                                     #if DEBUG
                                     fatalError("我也不知道出什么错了")
@@ -175,12 +214,26 @@ struct PlayListDetailActionsSheet: View {
 
 
 struct PlayListDetailListHaveMoreBanner: View {
+    var count:Int
+    var notAvailableCount:Int
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("歌单内还有更多歌曲，但受限于性能原因，暂不显示。")
-            Label("建议您为Apple Watch单独创建一个小歌单。", systemImage: "lightbulb.fill")
+        if count >= 1000 {//超过一千首歌只会显示前1000首
+            VStack(alignment: .leading) {
+                Text("歌单内还有更多歌曲，但受限于性能原因，暂不显示。")
+                Label("建议您为Apple Watch单独创建一个小歌单。", systemImage: "lightbulb.fill")
+            }
+            .font(.footnote)
+        } else {
+            VStack(alignment: .leading) {
+                Text("歌单内还有更多歌曲，但受限于版权原因，无法播放。")
+                Text("（缺少\(notAvailableCount)首音乐）")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                Label("建议您在iPhone上的网易云中检查一下这个歌单", systemImage: "lightbulb.fill")
+                    .font(.footnote)
+            }
+            .font(.footnote)
         }
-        .font(.footnote)
     }
 }
 
@@ -233,7 +286,7 @@ struct PlayListDetailSearchResultPage: View {
                     List {
                         ForEach(vm.searchedRes) { song in
                             MusicRowSingleLine(tapAction:{
-                                playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, converImgURL: song.imageURL))
+                                playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: allSongs))
                             },imageURL: song.imageURL, name: song.name)
                         }
                     }
@@ -358,28 +411,31 @@ class PlayListDetailPageModel:Hashable {
     }
     var data:PlayListModel.PlayListDeatil
     var haveMore:Bool
-    init(data: PlayListModel.PlayListDeatil,haveMore:Bool) {
+    var haveMoreCount:Int
+    init(data: PlayListModel.PlayListDeatil,haveMore:Bool,haveMoreCount:Int) {
         self.data = data
         self.haveMore = haveMore
+        self.haveMoreCount = haveMoreCount
     }
     
     
     var forceIgnoreCacheLoadProgressing = true
     var forceIgnoreCacheLoadError:String? = nil
-    func update(data: PlayListModel.PlayListDeatil,haveMore:Bool) {
+    func update(data: PlayListModel.PlayListDeatil,haveMore:Bool,haveMoreCount:Int) {
         self.data = data
         self.haveMore = haveMore
+        self.haveMoreCount = haveMoreCount
     }
-    
+  
     //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表
-    func loadingByNoCache(cachedPlayList:(PlayListModel.PlayListDeatil,haveMore:Bool),playList:UserPlayListModel.PlayListObj,reqMod:PlayListModel) {
+    func loadingByNoCache(playList:UserPlayListModel.PlayListObj,reqMod:PlayListModel,modelContext:ModelContext) {
         Task {
             forceIgnoreCacheLoadError = nil
             forceIgnoreCacheLoadProgressing = true
             
             do {
                 let forceedPlayListParsed = try await reqMod.getPlaylistDetail(playlist: playList, useCache: false)
-                update(data:  forceedPlayListParsed.0, haveMore: forceedPlayListParsed.1)
+                update(data:  forceedPlayListParsed.0, haveMore: forceedPlayListParsed.1,haveMoreCount:forceedPlayListParsed.2)
             } catch {
                 forceIgnoreCacheLoadError = error.localizedDescription
             }

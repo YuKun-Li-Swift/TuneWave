@@ -28,10 +28,11 @@ class MusicLoadingViewModel {
     //0到1之间的值
     var audioDownloadProgress:Double = 0
     var audioDataSize:Double? = nil
-    func playMusicWithCached(yiMusic: YiMusic, playerHolder: MusicPlayerHolder) {
+    func playMusicWithCached(yiMusic: YiMusic,playList:[PlayListModel.PlayListSong], playerHolder: MusicPlayerHolder,modelContext: ModelContext) async {
         do {
             if !isCanceledPlay {
-                try playerHolder.playMusic(yiMusic)
+                let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
+                try playerHolder.playMusic(yiMusic,playingList:playingList)
                 //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
                 showPlayPage()
             }
@@ -40,13 +41,14 @@ class MusicLoadingViewModel {
         }
     }
     
-    func playMusic(downloadMod: MusicLoader, modelContext: ModelContext, playerHolder: MusicPlayerHolder) async {
+    func playMusic(downloadMod: MusicLoader, modelContext: ModelContext, playerHolder: MusicPlayerHolder,playList:[PlayListModel.PlayListSong]) async {
         do {
             let yiMusic = try await downloadMod.generateFinalMusicObject()
             modelContext.insert(yiMusic)
             try modelContext.save()
             if !isCanceledPlay {
-                try playerHolder.playMusic(yiMusic)
+                let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
+                try playerHolder.playMusic(yiMusic,playingList:playingList)
                 withAnimation(.smooth) {
                     showPlayPage()
                 }

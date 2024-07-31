@@ -45,6 +45,8 @@ struct LoginView: View {
     private var phonePasswordShip:PhonePasswordLogin? = nil
     @State
     var showLoginView = false
+    @State
+    var scrollPosition:String? = nil
     var body: some View {
         VStack(content: {
             if !showLoginView {
@@ -55,12 +57,13 @@ struct LoginView: View {
                        
                         switch selectedLoginMethod {
                         case .password:
-                            PhonePasswordLoginView(mod: mod)
+                            PhonePasswordLoginView(mod: mod,scrollPosition:$scrollPosition)
                         case .verificationCode:
-                            PhoneVerificationCodeLoginView(mod: mod)
+                            PhoneVerificationCodeLoginView(mod: mod,scrollPosition:$scrollPosition)
                         }
                         
                     }
+                    .scrollTargetLayout()
                     .toolbar {
                         ToolbarItemGroup(placement: .automatic) {
                             Picker("选择登录方式", selection: $selectedLoginMethod, content: {
@@ -75,6 +78,7 @@ struct LoginView: View {
                     }
                     
                 }
+                .scrollPosition(id: $scrollPosition, anchor: .top)
             }
         })
         .navigationDestination(item: $phonePasswordShip, destination: { ship in
@@ -109,6 +113,8 @@ struct PhonePasswordLogin:Identifiable,Hashable {
 struct PhonePasswordLoginView: View {
     @State
     var mod:YiLoginModel
+    @Binding
+    var scrollPosition:String?
     @Environment(\.modelContext)
     var modelContext
     @AppStorage("PhoneNumberInPhonePasswordLoginView")
@@ -124,7 +130,7 @@ struct PhonePasswordLoginView: View {
     var showloginErrorSheet = false
     var body: some View {
         VStack(content: {
-            PhoneNumberEnter(ctCode: $ctCode, text: $phoneNumber)
+            PhoneNumberEnter(ctCode: $ctCode, text: $phoneNumber, scrollPosition: $scrollPosition)
             SecureField("请输入密码", text: $password)
             if !phoneNumber.isEmpty && !password.isEmpty {
                 AsyncButton(buttonText: "确认登录", action: {
@@ -155,15 +161,19 @@ struct PhoneNumberEnter: View {
     var ctCode:String
     @Binding
     var text:String
+    @Binding
+    var scrollPosition:String?
+    @State
+    private var showCtPage = false
+    @State
+    private var showCtPageDeep = false
+    @State
+    private var large = false
     var body: some View {
         VStack(alignment: .leading) {
-            NavigationLink {
-                    ScrollViewOrNot {
-                        VStack {
-                            Text("如果您的手机号不是中国大陆手机号，请在下方输入手机号国家区号")
-                            TextField("手机号国家区号", text: $ctCode)
-                        }
-                    }
+          
+            Button {
+                showCtPage = true
             } label: {
                 if ctCode == "86" {
                     Text("🇨🇳中国大陆手机号")
@@ -171,7 +181,64 @@ struct PhoneNumberEnter: View {
                     Text("国家区号：+"+ctCode)
                 }
             }
-            TextField("请输入手机号", text: $text)
+            .navigationDestination(isPresented: $showCtPage) {
+                List {
+                    Section("请选择您的手机号国家和地区") {
+                        Button {
+                            ctCode = "86"
+                            Task {
+                                scrollPosition = nil//不然在第二次的时候，可能不会触发滚动了
+                                showCtPage = false
+                                try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                                withAnimation(.smooth) {
+                                    scrollPosition = "PhoneInput"
+                                }
+                                doFocusAnimation()
+                            }
+                        } label: {
+                            Text("🇨🇳中国大陆")
+                        }
+                        NavigationLink(isActive:$showCtPageDeep) {
+                            ScrollViewOrNot {
+                                VStack {
+                                    Text("如果您的手机号不是中国大陆手机号，请在下方输入国家区号")
+                                    TextField("手机号国家区号", text: $ctCode)
+                                        .onSubmit {
+                                            if !ctCode.isEmpty {
+                                                Task {
+                                                    scrollPosition = nil
+                                                    showCtPageDeep = false
+                                                    try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                                                    showCtPage = false
+                                                    try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                                                    withAnimation(.smooth) {
+                                                        scrollPosition = "PhoneInput"
+                                                    }
+                                                    doFocusAnimation()
+                                                }
+                                            }
+                                        }
+                                }
+                            }
+                        } label: {
+                            Text("其他国家和地区")
+                        }
+                    }
+                }
+            }
+
+            TextField("点此输入手机号", text: $text)
+                .scaleEffect(x: large ? 2 : 1, y: large ? 2 : 1, anchor: .leading)
+                .id("PhoneInput")
+        }
+    }
+    func doFocusAnimation() {
+        withAnimation(.smooth) {
+            large = true
+        } completion: {
+            withAnimation(.smooth) {
+                large = false
+            }
         }
     }
 }
@@ -182,6 +249,8 @@ struct PhoneNumberEnter: View {
 struct PhoneVerificationCodeLoginView: View {
     @State
     var mod:YiLoginModel
+    @Binding
+    var scrollPosition:String?
     @Environment(\.modelContext)
     var modelContext
     @AppStorage("PhoneNumberInPhoneVerificationCodeLoginView")
@@ -202,7 +271,7 @@ struct PhoneVerificationCodeLoginView: View {
     var showloginErrorSheet = false
     var body: some View {
         VStack(alignment: .leading) {
-            PhoneNumberEnter(ctCode: $ctCode, text: $phoneNumber)
+            PhoneNumberEnter(ctCode: $ctCode, text: $phoneNumber, scrollPosition: $scrollPosition)
             if !phoneNumber.isEmpty {
                 VerificationCodeSendButton(showVerificationCodeSendErrorSheet: $showVerificationCodeSendErrorSheet, verificationCodeSendError: $verificationCodeSendError, mod: mod, verificationCodeSendSuccessfully: $verificationCodeSendSuccessfully, phoneNumber: $phoneNumber, ctCode: $ctCode)
                     .buttonStyle(.bordered)

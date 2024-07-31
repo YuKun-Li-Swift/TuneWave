@@ -28,12 +28,45 @@
 		<key>TuneWave Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 		<key>TuneWave.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>7CB3D23B2C1A6E41004A186D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7CB3D24B2C1A6E43004A186D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7CB3D2552C1A6E43004A186D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7CB3D2612C1A6E43004A186D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7CB3D2732C1A6E44004A186D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>7CB3D27D2C1A6E44004A186D</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

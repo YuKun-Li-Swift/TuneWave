@@ -9,11 +9,16 @@ import SwiftUI
 
 import WatchKit
 struct NowPlayView: View {
+    enum Page {
+        case playingListPage
+        case nowPlayPage
+        case lyricsPage
+    }
     var dismissMe:()->()
     @Environment(MusicPlayerHolder.self)
     var playerHolder:MusicPlayerHolder
     @State
-    private var selectedTab = 0
+    private var selectedTab = Page.nowPlayPage
     @State
     private var showMorePage = false
     @State
@@ -32,15 +37,17 @@ struct NowPlayView: View {
                 
                 VStack(content: {
                     TabView(selection: $selectedTab, content: {
+                        MusciPlayingListPage()
+                            .tag(Page.playingListPage)
                         NowPlayingView()
-                            .tag(0)
+                            .tag(Page.nowPlayPage)
                         LyricsView(isAutoScrolling: $isAutoScrolling)
-                            .tag(1)
+                            .tag(Page.lyricsPage)
                     })
                 })
                 .toolbar {
                     ToolbarItemGroup(placement: .topBarTrailing) {
-                        if selectedTab == 0 {
+                        if selectedTab == Page.nowPlayPage {
                             Button {
                                 showMorePage = true
                             } label: {
@@ -63,17 +70,10 @@ struct NowPlayView: View {
                     NowPlayMoreActionPage(dismissMe: {
                         showMorePage = false
                         dismissMe()
+                    },showPlayingListPage:{
+                        slideToPage(.playingListPage)
                     }, showLyricPage: {
-                        showMorePage = false
-                            Task {
-                                //等待页面关闭的动画完成，不然Tab切换没效果
-                                try? await Task.sleep(nanoseconds:300000000)//0.3s
-                                withAnimation(.smooth) {
-                                    selectedTab = 1
-                                }
-                            }
-                        
-                        
+                        slideToPage(.lyricsPage)
                     })
                 })
                 
@@ -104,18 +104,40 @@ struct NowPlayView: View {
         .animation(.smooth, value: playerHolder.playingError)
     }
     
-    
+    func slideToPage(_ page:Page) {
+        showMorePage = false
+        Task {
+            //等待页面关闭的动画完成，不然Tab切换没效果
+            try? await Task.sleep(nanoseconds:300000000)//0.3s
+            withAnimation(.smooth) {
+                selectedTab = page
+            }
+        }
+    }
 }
+
 struct NowPlayMoreActionPage: View {
     var dismissMe:()->()
     @State
     private var tutorialFailed = false
     @State
     private var haptic = UUID()
+    
+    @Environment(MusicPlayerHolder.self)
+    private var playerHolder:MusicPlayerHolder
+    var showPlayingListPage:()->()
     var showLyricPage:()->()
     var body: some View {
         ScrollViewOrNot {
             VStack {
+                @Bindable var playerHolderBinding = playerHolder
+                TuneWavePicker(selected: $playerHolderBinding.playingMode)
+                Button(action: {
+                    showPlayingListPage()
+                }, label: {
+                    Label("播放列表", systemImage: "music.note.list")
+                        .symbolEffect(.pulse, options: .repeating)
+                })
                 Button(action: {
                     //触发触感，告诉用户是点到了的，因为接下来的动画可能让人迷惑
                     haptic = UUID()
@@ -127,6 +149,7 @@ struct NowPlayMoreActionPage: View {
                     }
                 }, label: {
                     Label("调节音量", systemImage: "volume.3.fill")
+                        .symbolEffect(.pulse, options: .repeating)
                 })
                 .sensoryFeedback(.impact, trigger: haptic)
                 Button(action: {
@@ -135,6 +158,7 @@ struct NowPlayMoreActionPage: View {
                     Label("查看歌词", systemImage: "note.text")
                         .symbolEffect(.pulse, options: .repeating)
                 })
+                
             }
             .alert("调节音量教程视频播放失败，"+DeveloperContactGenerator.generate(), isPresented: $tutorialFailed, actions: {})
         }
@@ -149,8 +173,73 @@ struct NowPlayMoreActionPage: View {
     }
 }
 
-
-
+//原生的Picker会出现背景毛玻璃丢失、返回按钮消失的问题。
+struct TuneWavePicker: View {
+    @Binding
+    var selected:PlayingMode
+    @State
+    private var showSheet = false
+    var body: some View {
+        Button {
+            showSheet = true
+        } label: {
+            VStack(alignment: .leading, content: {
+                Text("当前播放模式")
+                Text(selected.humanReadbleName())
+                    .contentTransition(.numericText())
+                    .foregroundStyle(.secondary)
+                    .font(.footnote)
+            })
+        }
+        .navigationDestination(isPresented: $showSheet, destination: {
+            List {
+                Button(action: {
+                    itemPicked(PlayingMode.singleLoop, name: "单曲循环")
+                }, label: {
+                    HStack(content: {
+                        Text("单曲循环")
+                        Spacer()
+                        if selected == PlayingMode.singleLoop {
+                            Image(systemName: "checkmark")
+                        }
+                    })
+                })
+                Button(action: {
+                    itemPicked(PlayingMode.playingListLoop, name:"顺序播放")
+                }, label: {
+                    
+                    HStack(content: {
+                        Text("顺序播放")
+                        Spacer()
+                        if selected == PlayingMode.playingListLoop {
+                            Image(systemName: "checkmark")
+                        }
+                    })
+                })
+                Button(action: {
+                    itemPicked(PlayingMode.random, name: "随机")
+                }, label: {
+                    
+                    HStack(content: {
+                        Text("随机")
+                        Spacer()
+                        if selected == PlayingMode.random {
+                            Image(systemName: "checkmark")
+                        }
+                    })
+                })
+            }
+            .listStyle(.carousel)
+            .transition(.opacity.animation(.smooth))
+        })
+    }
+    func itemPicked(_ item:PlayingMode,name:String) {
+        showSheet = false
+        withAnimation(.smooth) {
+            self.selected = item
+        }
+    }
+}
 
 
 // MARK: 切换自动滚动开关的时候显示一个小横幅
@@ -219,85 +308,105 @@ struct LyricsView: View {
     var rawLyric:String? = nil
     var body: some View {
         VStack {
-            if let music = playerHolder.yiMusic {
-                VStack {
-                    if haveLyric {
-                        //在常亮状态下，要求30帧刷新歌词。否则会停止滚动（静止在一行）。
-                        //常见：写作业，手表戴在手腕上，想看滚动歌词的时候瞟一眼。
-                        //骑车听歌，想看歌词的时候瞟一眼。
-                        ZStack(content: {
-                          Rectangle()
-                            //占位，填充满整个页面，即便歌词只有一行或两行
-                                .fill(Color.clear)
-                            
-                            if vm.parsedLyrics.isEmpty {//要么是歌词解析还没有完成，要么是歌词不是空的，但是解析出来是空的（可能是未正确解析）
-                                Zero3Delay {//给0.3秒的时间来解析歌词，如果0.3秒后还是空的，则说明解析出来的歌词确实是空的，那就显示原始歌词（未解析的）
+            if let music = playerHolder.currentMusic {
+                if music.musicID == vm.currentShowingLyricBelongMuic {
+                    VStack {
+                        if haveLyric {
+                            //在常亮状态下，要求30帧刷新歌词。否则会停止滚动（静止在一行）。
+                            //常见：写作业，手表戴在手腕上，想看滚动歌词的时候瞟一眼。
+                            //骑车听歌，想看歌词的时候瞟一眼。
+                            ZStack(content: {
+                                Rectangle()
+                                //占位，填充满整个页面，即便歌词只有一行或两行
+                                    .fill(Color.clear)
+                                
+                                if vm.parsedLyrics.isEmpty {//要么是歌词解析还没有完成，要么是歌词不是空的，但是解析出来是空的（可能是未正确解析）
+                                    //说明解析出来的歌词确实是空的，那就显示原始歌词（未解析的）
                                     LyricUnormalView(rawLyric: $rawLyric)
+                                } else {
+                                    TimelineView(.periodic(from: .now, by: 1/30), content: { _ in
+                                        VStack {
+                                            ScrollView(.vertical) {
+                                                VStack(alignment: .leading,spacing:23.3) {
+                                                    ForEach(vm.parsedLyrics) { lyric in
+                                                        LyricsLineView(lyric: lyric,focusLyrics:$focusLyrics)
+                                                            .transition(.blurReplace)
+                                                            .id(lyric)
+                                                    }
+                                                }
+                                                .scenePadding(.horizontal)
+                                                .scrollTargetLayout()
+                                                .padding(.vertical,67)
+                                            }
+                                            .scrollPosition(id: $focusLyrics, anchor: .center)
+                                        }
+                                    })
+                                }
+                            })
+                            
+                            .navigationTitle("歌词")
+                           
+                            .onAppear {
+                                //因为页面不在屏幕上的时候，是不更新歌词位置以省电的，因此页面onAppear需要主动无动画滚动一次
+                                enableAutoScroll(.onAppear,isEnable: isAutoScrolling)
+                            }
+                            .onDisappear {
+                                disableAutoScroll()
+                            }
+                            .onChange(of: isAutoScrolling, initial: false) {  oldValue, newValue in
+                                if newValue {
+                                    //isAutoScrolling打开时需要主动滚动一次（此时歌词在的，需要有动画）
+                                    enableAutoScroll(.withAnimation,isEnable: newValue)
+                                } else {
+                                    disableAutoScroll()
+                                }
+                            }
+                            .transition(.blurReplace)
+                        } else {
+                            if !enableLyricsTranslate {
+                                //因为在从歌词翻译切回歌词的时候，会不可避免的在动画期间出现此View，这不行
+                                Zero3Delay {
+                                    Text("这首音乐没有歌词")
+                                        .transition(.blurReplace)
                                 }
                             } else {
-                                TimelineView(.periodic(from: .now, by: 1/30), content: { _ in
-                                    VStack {
-                                        ScrollView(.vertical) {
-                                            VStack(alignment: .leading,spacing:23.3) {
-                                                ForEach(vm.parsedLyrics) { lyric in
-                                                    LyricsLineView(lyric: lyric,focusLyrics:$focusLyrics)
-                                                        .transition(.blurReplace)
-                                                        .id(lyric)
-                                                }
-                                            }
-                                            .scenePadding(.horizontal)
-                                            .scrollTargetLayout()
-                                            .padding(.vertical,67)
-                                        }
-                                        .scrollPosition(id: $focusLyrics, anchor: .center)
-                                    }
-                                })
-                            }
-                        })
-                    
-                        .navigationTitle("歌词")
-                        .onLoad {
-                            Task {
-                                await loadLyric(music: music, translate: enableLyricsTranslate,animation: nil)
-                                //歌词加载完成需要主动滚动一次，但是不用延迟
-                                enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
+                                Text("这首音乐没有歌词翻译")
+                                    .transition(.blurReplace)
                             }
                         }
+                    }
+                    .onChange(of: enableLyricsTranslate, initial: false) { oldValue, newValue in
+                        //重新加载歌词+重新滚动
+                        Task {
+                            await loadLyric(music: music, translate: newValue, animation: .smooth)
+                            //歌词加载完成需要主动滚动一次，但是不用延迟
+                            enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
+                        }
+                    }
+                    .animation(.smooth, value: haveLyric)
+                    .transition(.blurReplace)
+                } else {
+                    ProgressView()
                         .onAppear {
-                            //页面onAppear需要主动滚动一次，但是要延迟
-                            enableAutoScroll(.onAppear,isEnable: isAutoScrolling)
-                        }
-                        .onDisappear {
-                            disableAutoScroll()
-                        }
-                        .onChange(of: isAutoScrolling, initial: false) {  oldValue, newValue in
-                            if newValue {
-                                //isAutoScrolling打开时需要主动滚动一次（此时歌词在的，需要有动画）
-                                enableAutoScroll(.withAnimation,isEnable: newValue)
-                            } else {
-                                disableAutoScroll()
+                            Task {
+                                if vm.currentShowingLyricBelongMuic.isEmpty {
+                                    //是页面打开的歌词加载，此时不需要动画，感觉就像歌词一直在这儿，没有重新加载过
+                                    await loadLyric(music: music, translate: enableLyricsTranslate,animation: nil)
+                                    //歌词加载完成需要主动滚动一次
+                                    Task {//产生一帧的等待，让ScrollView绘制出来
+                                        //然后无动画立即更新滚动位置
+                                        enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
+                                    }
+                                } else {
+                                    //切歌的歌词加载，需要动画
+                                    await loadLyric(music: music, translate: enableLyricsTranslate,animation: .smooth)
+                                    //歌词加载完成不需要滚动，因为结果这一波页面切换，本来ScrollView就在最顶上了
+                                }
                             }
                         }
                         .transition(.blurReplace)
-                    } else {
-                        if !enableLyricsTranslate {
-                            Text("这首音乐没有歌词")
-                                .transition(.blurReplace)
-                        } else {
-                            Text("这首音乐没有歌词翻译")
-                                .transition(.blurReplace)
-                        }
-                    }
                 }
-                .onChange(of: enableLyricsTranslate, initial: false) { oldValue, newValue in
-                    //重新加载歌词+重新滚动
-                    Task {
-                        await loadLyric(music: music, translate: newValue, animation: .smooth)
-                        //歌词加载完成需要主动滚动一次，但是不用延迟
-                        enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
-                    }
-                }
-                .animation(.smooth, value: haveLyric)
+                
             } else {
                 Text("当前没有播放的音乐")
             }
@@ -311,10 +420,11 @@ struct LyricsView: View {
                     .frame(width: 1, height: 1, alignment: .center)
                     .hidden()
                 LightToolbarButton(symbolName: "translate", accessbilityLabel: enableLyricsTranslate ? "查看歌词原文" : "查看歌词翻译") {
-                        enableLyricsTranslate.toggle()
+                    enableLyricsTranslate.toggle()
                 }
             }
         }
+        .animation(.smooth, value: playerHolder.currentMusic)
         .animation(.smooth, value: enableLyricsTranslate)
         .animation(.smooth, value: haveLyric)
     }
@@ -334,6 +444,9 @@ struct LyricsView: View {
                 updateHaveLyricState(music: music)
             }
             try await vm.parseLyricsWithCustomAnimation(translate ? music.tlyric : music.lyric, musicDuration: playerHolder.queryDuration(),animation: animation)
+            withAnimation(animation) {
+                vm.currentShowingLyricBelongMuic = music.musicID
+            }
             print("歌词加载完成")
         } catch {
             vm.parseError = error.localizedDescription
@@ -350,20 +463,10 @@ struct LyricsView: View {
     func enableAutoScroll(_ type:ScrollType,isEnable:Bool) {
         if isEnable {
             switch type {
-            case .onLoad:
+            case .onLoad,.onAppear:
                 //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
                 let time = playerHolder.currentTime()
                 updateCurrentLyric(time: time, animation: nil,onLoad:true)
-                //后续更新歌词滚动需要动画
-                playerHolder.startToUpdateLyrics { time in
-                    Task { @MainActor in
-                        updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
-                    }
-                }
-            case .onAppear:
-                //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
-                let time = playerHolder.currentTime()
-                updateCurrentLyric(time: time, animation: nil,onLoad:false)
                 //后续更新歌词滚动需要动画
                 playerHolder.startToUpdateLyrics { time in
                     Task { @MainActor in
@@ -392,7 +495,7 @@ struct LyricsView: View {
     func updateCurrentLyric(time:CMTime,animation:Animation?,onLoad:Bool = true) {
         let matched:LyricsModel.LyricsLine? = vm.updateLineAtTime(date: playerHolder.currentTime())
         if let animation {
-//            print("触发有动画滚动")
+            //            print("触发有动画滚动")
             withAnimation(animation) {
                 self.focusLyrics = matched
             }
@@ -421,8 +524,8 @@ struct LyricUnormalView: View {
         VStack(content: {
             if let rawLyricCopy {
                 ScrollViewOrNot {
-                        Text(rawLyricCopy)
-                            .scenePadding(.horizontal)
+                    Text(rawLyricCopy)
+                        .scenePadding(.horizontal)
                 }
             } else {
                 Text("歌词为空")
@@ -433,9 +536,9 @@ struct LyricUnormalView: View {
             self.rawLyricCopy = rawLyric
         }
         .onChange(of: rawLyric, initial: false) { _, newValue in
-            #if DEBUG
+#if DEBUG
             fatalError("这不应该发生，调查一下")
-            #endif
+#endif
         }
     }
 }
@@ -510,6 +613,7 @@ import Combine
 @MainActor
 @Observable
 class LyricsViewModel {
+    var currentShowingLyricBelongMuic:String = ""//音乐ID
     var parseError:String? = nil
     var parsedLyrics: [LyricsModel.LyricsLine] = []
     let actor = LyricsModel()
@@ -591,8 +695,8 @@ actor LyricsModel {
                         let timeRange = previousTime...endTime
                         lyricsLines.append(LyricsLine(content: prevContent, time: timeRange))
                     } else {
-                            let timeRange = previousTime...previousTime
-                            lyricsLines.append(LyricsLine(content: prevContent, time: timeRange))
+                        let timeRange = previousTime...previousTime
+                        lyricsLines.append(LyricsLine(content: prevContent, time: timeRange))
                     }
                 }
                 previousTime = time
@@ -610,7 +714,7 @@ actor LyricsModel {
                 let lastRange = previousTime...previousTime
                 lyricsLines.append(LyricsLine(content: lastContent, time: lastRange))
             }
-          
+            
         }
         
         return lyricsLines

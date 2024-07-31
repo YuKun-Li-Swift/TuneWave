@@ -12,11 +12,19 @@ let playMusic = PassthroughSubject<MusicPlayShip,Never>()
 
 
 struct MusicPlayShip:Identifiable,Equatable {
+    static func == (lhs: MusicPlayShip, rhs: MusicPlayShip) -> Bool {
+        lhs.id == rhs.id
+    }
+    
     var id = UUID()
     var musicID:String
     var name:String
     var artist:String
-    var converImgURL:URL
+    
+    var coverImgURL:URL
+    //本音乐属于的播放列表
+    //会用这个播放列表作为音乐播放时负一屏的播放列表
+    var playList:[PlayListModel.PlayListSong]
 }
 
 //音乐很小，不需要流播。在搜索列表中点击一首歌曲先缓存完成再播放，避免封面图片异步加载、歌词异步加载、后台网络连接缓存歌曲等困难。
@@ -28,20 +36,21 @@ struct PlayMusicPage: View {
     var name:String
     var artist:String
     var converImgURL:URL
+    var playList:[PlayListModel.PlayListSong]
     var showPlayPage:()->()
     var cancelAction:()->()
     @State
-    var downloadMod:MusicLoader?
+    private var downloadMod:MusicLoader?
     @State
-    var vm:MusicLoadingViewModel = .init()
+    private var vm:MusicLoadingViewModel = .init()
     @Environment(YiUserContainer.self)
-    var user:YiUserContainer
+    private var user:YiUserContainer
     @Environment(MusicPlayerHolder.self)
-    var playerHolder:MusicPlayerHolder
+    private var playerHolder:MusicPlayerHolder
     @Environment(\.modelContext)
-    var modelContext
+    private var modelContext
     @State
-    var cachedMusic:YiMusic? = nil
+    private var cachedMusic:YiMusic? = nil
     @State
     private var scrollPosition:String? = nil
     var body: some View {
@@ -68,7 +77,7 @@ struct PlayMusicPage: View {
                                         Text("从缓存的音乐开始播放")
                                             .transition(.blurReplace)
                                             .task {
-                                                vm.playMusicWithCached(yiMusic: cachedMusic, playerHolder: playerHolder)
+                                                await vm.playMusicWithCached(yiMusic: cachedMusic, playList: playList, playerHolder: playerHolder, modelContext: modelContext)
                                             }
                                     }
                                 } else {
@@ -110,7 +119,7 @@ struct PlayMusicPage: View {
                                             Text("步骤已完成，关闭页面，开始播放")
                                                 .transition(.blurReplace)
                                                 .task {
-                                                    await vm.playMusic(downloadMod: downloadMod, modelContext: modelContext, playerHolder: playerHolder)
+                                                    await vm.playMusic(downloadMod: downloadMod, modelContext: modelContext, playerHolder: playerHolder, playList: playList)
                                                 }
                                         }
                                     }

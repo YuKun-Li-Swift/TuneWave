@@ -10,17 +10,21 @@ import SwiftData
 
 struct ContentView: View {
     @State
-    var userContainer:YiUserContainer?
+    private var userContainer:YiUserContainer?
     @Environment(\.modelContext)
-    var modelContext
+    private var modelContext
     @State
-    var recoveryLoginError:String? = nil
+    private var recoveryLoginError:String? = nil
     @Query(FetchDescriptor<YiUser>())
-    var users:[YiUser]
+    private var users:[YiUser]
     @State
-    var showNowPlayView = false
+    private var showNowPlayView = false
     @State
-    var playerHolder = MusicPlayerHolder()
+    private var playerHolder = MusicPlayerHolder()
+    @State
+    private var actionExcuter = GoPlayListAndPickAMsuicAction()
+    @State
+    private var showMyPlayListPage = false
     var body: some View {
         VStack {
             NavigationStack {
@@ -29,7 +33,7 @@ struct ContentView: View {
                         if let recoveryLoginError {
                             ErrorViewWithListInlineStyle(title: "恢复登录状态时出错了", errorText: recoveryLoginError)
                         }
-                        if let nowPlay = playerHolder.yiMusic {
+                        if let nowPlay = playerHolder.currentMusic {
                             Button {
                                 showNowPlayView = true
                             } label: {
@@ -40,6 +44,8 @@ struct ContentView: View {
                                 }
                             }
                         }
+                      
+
                         NavigationLink(destination: {
                             LoginPage()
                                 .environment(userContainer)
@@ -50,10 +56,10 @@ struct ContentView: View {
                                 Label("登录网易云账号", systemImage: "person.fill.badge.plus")
                             }
                         }
+                       
                         if let userContainer {
-                            NavigationLink {
-                                MyPlayList()
-                                .environment(userContainer)
+                            Button {
+                                showMyPlayListPage = true
                             } label: {
                                 Label("歌单", systemImage: "star.fill")
                             }
@@ -66,8 +72,18 @@ struct ContentView: View {
                         DisclaimerView()
                     }
                 }
-                .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView)).environment(playerHolder)
+                .navigationDestination(isPresented: $showMyPlayListPage, destination: {
+                    MyPlayList()
+                        .environment(actionExcuter)
+                    .environment(userContainer)
+                })
+                .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView))
+                .modifier(ManagerPlayingList())
+                .environment(playerHolder)
+                .modifier(GoPlayListAndPickAMsuicActionModifier(showNowPlayView: $showNowPlayView, showMyPlayListPage: $showMyPlayListPage))
+                .environment(actionExcuter)
                 .environment(userContainer)
+                
                 .onChange(of: users, initial: true, { oldValue, newValue in
                     do {
                         //默认选择最近一次登录的用户
@@ -84,9 +100,28 @@ struct ContentView: View {
                 .modifier(RefreshCookie(userContainer: $userContainer))
                 .modifier(ShowDisclaimer())
                 .navigationTitle("悦音音乐")
-                
             }
         }
+    }
+}
+
+struct GoPlayListAndPickAMsuicActionModifier: ViewModifier {
+    @Environment(GoPlayListAndPickAMsuicAction.self)
+    private var actionExcuter:GoPlayListAndPickAMsuicAction
+    @Binding
+    var showNowPlayView:Bool
+    @Binding
+    var showMyPlayListPage:Bool
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                actionExcuter.closePlayerCover = {
+                    showNowPlayView = false
+                }
+                actionExcuter.openMyPlayListPage = {
+                    showMyPlayListPage = true
+                }
+            }
     }
 }
 
@@ -189,10 +224,12 @@ struct MusicPlayerCover: ViewModifier {
     var showNowPlayView:Bool
     @State
     private var sceneVM = SceneModelShip()
+    @Environment(GoPlayListAndPickAMsuicAction.self)
+    private var actionExcuter:GoPlayListAndPickAMsuicAction
     func body(content: Content) -> some View {
         content
             .sheet(item: $ship) { ship in
-                PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.converImgURL,showPlayPage:{
+                PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.coverImgURL, playList: ship.playList,showPlayPage:{
                     self.ship = nil
                     self.showNowPlayView = true
                 },cancelAction: {
@@ -202,6 +239,7 @@ struct MusicPlayerCover: ViewModifier {
                     .environment(sceneVM)
             }
             .onReceive(playMusic, perform: {
+                actionExcuter.showPleasePickBanner = false
                 self.ship = $0
             })
             .sheet(isPresented: $showNowPlayView, content: {

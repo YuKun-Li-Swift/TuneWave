@@ -64,25 +64,32 @@ actor MusicLoader {
         print("请求到音乐链接\(json)")
         //可能是只能听试听版（那不播放了，不然之后开了VIP还要重新缓存音乐）
         //也可能是完全听不了，比如专辑是付费专辑
-        if let cantNormallyListen = json["data"].array?.first?["freeTrialPrivilege"]["cannotListenReason"].int64 {
-            let code:Int64? = json["data"].array?.first?["code"].int64
-            //如果这个字段不是null，就说明有问题了
-            switch cantNormallyListen {
-            case 1:
-                switch code {
-                case -110:
-                    throw Step1Error.noPaidAlbum
-                case 200://只能听试听版导致的播放异常
-                    throw Step1Error.noVIP
-                default:
-                    //可能是IP不对，比如海外无法听大陆的音乐
-                    throw Step1Error.cannotListen
+        if let code:Int64? = json["data"].array?.first?["code"].int64 {
+            switch code {
+             case -110:
+                 throw Step1Error.noPaidAlbum
+             case 200:
+                if let cantNormallyListen = json["data"].array?.first?["freeTrialPrivilege"]["cannotListenReason"].int64 {
+                    //如果这个字段不是null，就说明有问题了
+                    switch cantNormallyListen {
+                        case 1:
+                        //只能听试听版导致的播放异常
+                         throw Step1Error.noVIP
+                    default:
+                        //可能是IP不对，比如海外无法听大陆的音乐
+                        throw Step1Error.cannotListen
+                    }
+                } else {
+                    //这是一切正常的情况
                 }
-            default:
+            case 404:
+                throw Step1Error.noMusicSource
+             default:
                 //可能是IP不对，比如海外无法听大陆的音乐
                 throw Step1Error.cannotListen
-            }
+           }
         }
+
         guard let link = json["data"].array?.first?["url"].url else {
             throw Step1Error.noLink
         }
@@ -110,10 +117,13 @@ actor MusicLoader {
         case noFileExtension
         case noLevel
         case noVIP
+        case noMusicSource
         case noPaidAlbum
         case cannotListen
         var errorDescription: String? {
             switch self {
+            case .noMusicSource:
+                "这首音乐在网易云音乐没有音源，您可以在网易云音乐手机端检查该音乐能否正常播放"
             case .cannotListen:
                 "目前无法播放这首音乐，" + DeveloperContactGenerator.generate()
             case .noPaidAlbum:
@@ -186,7 +196,8 @@ actor MusicLoader {
             return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         try await withCheckedThrowingContinuation { (continuation:CheckedContinuation<Void,Error>) -> Void in
-            AF.download(audioURL, to: destination)
+            //永远不要超时，因为音乐云盘里的音乐会很大
+            AF.download(URLRequest(url: audioURL,timeoutInterval: 3600), to: destination)
                     .downloadProgress { progress in
                         Task { @MainActor in
                             await self.vm.audioDownloadProgress = progress.fractionCompleted
