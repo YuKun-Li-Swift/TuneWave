@@ -81,46 +81,48 @@ struct PlayMusicPage: View {
                                             }
                                     }
                                 } else {
-                                    if !vm.step1Done {
-                                        PlayMusicStepView(loadongText: "正在获取音乐完整信息", errorTitle: "获取音乐完整信息失败",error:vm.step1Error)
-                                    }
-                                    if !vm.step2Done {
-                                        PlayMusicStepView(loadongText: "正在获取音乐封面图", errorTitle:"获取音乐封面图失败",error:vm.step2Error)
-                                    }
-                                    if !vm.step3Done {
-                                        PlayMusicStepView(loadongText: "正在获取歌词", errorTitle:"获取歌词失败",error:vm.step3Error)
-                                    }
-                                    if vm.step1Done {
-                                        //步骤1没出错才会去做步骤4
-                                        if !vm.step4Done {
-                                            PlayMusicStepView(loadongText: "正在缓存音频", errorTitle:"缓存音频失败",error:vm.step4Error)
-                                            if vm.step4Error == nil {
-                                                if let totalSize = vm.audioDataSize {
-                                                    VStack(content: {
-                                                        ProgressView(value: vm.audioDownloadProgress, total: 1)
-                                                        let doneMB:String = String(format: "%.2f", (vm.audioDownloadProgress * totalSize) / 1024576)
-                                                        let totalMB:String = String(format: "%.2f", (totalSize) / 1024576)
-                                                        Text("\(doneMB)/\(totalMB)MB")
-                                                    })
-                                                    .transition(.blurReplace)
-                                                    .animation(.smooth, value: vm.audioDownloadProgress)
-                                                } else {
-                                                    NeverErrorView(remoteControlTag: "PlayMusicPage")
+                                    VStack(alignment: .leading,spacing:16.7) {
+                                        if !vm.step1Done {
+                                            PlayMusicStepView(loadongText: "正在获取音乐完整信息",symbolName: "list.bullet.clipboard.fill", errorTitle: "获取音乐完整信息失败",error:vm.step1Error)
+                                        }
+                                        if !vm.step2Done {
+                                            PlayMusicStepView(loadongText: "正在获取音乐封面图",symbolName: "photo.badge.arrow.down.fill", errorTitle:"获取音乐封面图失败",error:vm.step2Error)
+                                        }
+                                        if !vm.step3Done {
+                                            PlayMusicStepView(loadongText: "正在获取歌词",symbolName: "text.word.spacing", errorTitle:"获取歌词失败",error:vm.step3Error)
+                                        }
+                                        if vm.step1Done {
+                                            //步骤1没出错才会去做步骤4
+                                            if !vm.step4Done {
+                                                PlayMusicStepView(loadongText: "正在缓存音频",symbolName: "arrow.triangle.2.circlepath.icloud.fill", errorTitle:"缓存音频失败",error:vm.step4Error)
+                                                if vm.step4Error == nil {
+                                                    if let totalSize = vm.audioDataSize {
+                                                        VStack(content: {
+                                                            ProgressView(value: vm.audioDownloadProgress, total: 1)
+                                                            let doneMB:String = String(format: "%.2f", (vm.audioDownloadProgress * totalSize) / 1024576)
+                                                            let totalMB:String = String(format: "%.2f", (totalSize) / 1024576)
+                                                            Text("\(doneMB)/\(totalMB)MB")
+                                                        })
+                                                        .transition(.blurReplace)
+                                                        .animation(.smooth, value: vm.audioDownloadProgress)
+                                                    } else {
+                                                        NeverErrorView(remoteControlTag: "PlayMusicPage")
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    if vm.step1Done && vm.step2Done && vm.step3Done && vm.step4Done {
-                                        if let error = vm.playError {
-                                            ScrollViewOrNot {
-                                                ErrorView(errorText: error.localizedDescription)
-                                            }
-                                        } else {
-                                            Text("步骤已完成，关闭页面，开始播放")
-                                                .transition(.blurReplace)
-                                                .task {
-                                                    await vm.playMusic(downloadMod: downloadMod, modelContext: modelContext, playerHolder: playerHolder, playList: playList)
+                                        if vm.step1Done && vm.step2Done && vm.step3Done && vm.step4Done {
+                                            if let error = vm.playError {
+                                                ScrollViewOrNot {
+                                                    ErrorView(errorText: error.localizedDescription)
                                                 }
+                                            } else {
+                                                Text("步骤已完成，关闭页面，开始播放")
+                                                    .transition(.blurReplace)
+                                                    .task {
+                                                        await vm.playMusic(downloadMod: downloadMod, modelContext: modelContext, playerHolder: playerHolder, playList: playList)
+                                                    }
+                                            }
                                         }
                                     }
                                 }
@@ -238,6 +240,7 @@ extension PlayMusicPage {
 
 struct PlayMusicStepView: View {
     var loadongText:String
+    var symbolName:String
     var errorTitle:String
     var error:String?
     var body: some View {
@@ -250,7 +253,8 @@ struct PlayMusicStepView: View {
             }
             .transition(.blurReplace)
         } else {
-            Text(loadongText)
+            Label(loadongText, systemImage: symbolName)
+                .symbolRenderingMode(.multicolor)
                 .transition(.blurReplace)
         }
     }

@@ -32,16 +32,16 @@ struct AboutPage: View {
             } label: {
                 Label("第三方软件包引用", systemImage: "cube.box")
             }
-
         }
+        .navigationDestination(isPresented: $showThridLibraryPage, destination: {
+            ThirdPartPackage()
+        })
         .sheet(isPresented: $showGitHubQR, content: {
             Image(.githubQR)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
         })
-        .navigationDestination(isPresented: $showThridLibraryPage, destination: {
-            ThirdPartPackage()
-        })
+        
     }
 }
 struct ThirdPartPackage: View {

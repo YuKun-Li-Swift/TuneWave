@@ -42,16 +42,7 @@ struct MyPlayList: View {
                         ScrollViewReader { proxy in
                             ScrollView {
                                 if actionExcuter.showPleasePickBanner {
-                                    HStack(content: {
-                                        Text("请在下方歌单中选择你上次听的")
-                                            .multilineTextAlignment(.leading)
-                                            .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
-                                        .padding()
-                                        Spacer()
-                                    })
-                                        .background(
-                                            RoundedRectangle(cornerRadius: 13, style: .continuous)
-                                                .fill(Color.accentColor.gradient))
+                                    PleasePickBannerMyPlayList()
                                 }
                                 VStack {
                                     HStack(alignment: .center, spacing: 16.7/3) {
@@ -91,7 +82,7 @@ struct MyPlayList: View {
                                 withAnimation(animation) {
                                     (leftColumn,rightColumn) = vm.rebuildPlayList(origin: newValue.playlists)
                                 }
-                            }   
+                            }
                             .onAppear {
                                 self.scrollProxy = proxy
                             }
@@ -127,6 +118,25 @@ struct MyPlayList: View {
         }
     }
 }
+
+struct PleasePickBannerMyPlayList: View {
+    var body: some View {
+        HStack(content: {
+            Text("请在下方歌单中选择你上次听的")
+                .multilineTextAlignment(.leading)
+                .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
+                .padding()
+            Spacer()
+        })
+        .background(
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .fill(Color.accentColor.gradient))
+        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .id("showPleasePickBanner")
+    }
+}
+
+
 
 struct IgnoreCacheLoadingView: View {
     @State

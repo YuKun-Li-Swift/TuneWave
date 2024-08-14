@@ -44,8 +44,8 @@ struct ContentView: View {
                                 }
                             }
                         }
-                      
-
+                        
+                        
                         NavigationLink(destination: {
                             LoginPage()
                                 .environment(userContainer)
@@ -56,7 +56,7 @@ struct ContentView: View {
                                 Label("登录网易云账号", systemImage: "person.fill.badge.plus")
                             }
                         }
-                       
+                        
                         if let userContainer {
                             Button {
                                 showMyPlayListPage = true
@@ -75,10 +75,11 @@ struct ContentView: View {
                 .navigationDestination(isPresented: $showMyPlayListPage, destination: {
                     MyPlayList()
                         .environment(actionExcuter)
-                    .environment(userContainer)
+                        .environment(userContainer)
                 })
                 .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView))
                 .modifier(ManagerPlayingList())
+                .modifier(SavePlayingModeChange())
                 .environment(playerHolder)
                 .modifier(GoPlayListAndPickAMsuicActionModifier(showNowPlayView: $showNowPlayView, showMyPlayListPage: $showMyPlayListPage))
                 .environment(actionExcuter)
@@ -136,48 +137,48 @@ struct ShowDisclaimer: ViewModifier {
         content
             .fullScreenCover(isPresented: $showAlert, content: {
                 //虽然根本不需要Navigation，但为了navigationBarBackButtonHidden能工作，所以放一个NavigationStack
-                    ScrollView {
-                        VStack(content: {
-                            VStack(alignment: .center, content: {
-                                Text(alertText)
-                                    .font(.headline)
-                                    .multilineTextAlignment(.center)
-                            })
-                            .scenePadding(.horizontal)
-                            Button("同意") {
-                                showAlert = false
-                                disclaimerAccepted = true
-                            }
-                            Button("拒绝",role:.destructive) {
-                                exit(0)
-                            }
+                ScrollView {
+                    VStack(content: {
+                        VStack(alignment: .center, content: {
+                            Text(alertText)
+                                .font(.headline)
+                                .multilineTextAlignment(.center)
                         })
-                    }
-                 
-                    .toolbar {
-                        //不允许关闭
-                        ToolbarItem(placement: .cancellationAction) {
-                            Text("")
+                        .scenePadding(.horizontal)
+                        Button("同意") {
+                            showAlert = false
+                            disclaimerAccepted = true
                         }
+                        Button("拒绝",role:.destructive) {
+                            exit(0)
+                        }
+                    })
+                }
+                
+                .toolbar {
+                    //不允许关闭
+                    ToolbarItem(placement: .cancellationAction) {
+                        Text("")
                     }
+                }
             })
-            .onLoad { 
+            .onLoad {
                 if disclaimerAccepted == false {
-                if let url = Bundle.main.url(forResource: "DisclaimerContent", withExtension: "md") {
-                    if let text = try? String(contentsOf: url) {
-                        print("免责声明\(alertText)")
-                        showAlert = true
-                       
-                        Task {
-                            try? await Task.sleep(nanoseconds:100000000)//0.1s
-                            withAnimation(.snappy) {
-                                alertText = text
+                    if let url = Bundle.main.url(forResource: "DisclaimerContent", withExtension: "md") {
+                        if let text = try? String(contentsOf: url) {
+                            print("免责声明\(alertText)")
+                            showAlert = true
+                            
+                            Task {
+                                try? await Task.sleep(nanoseconds:100000000)//0.1s
+                                withAnimation(.snappy) {
+                                    alertText = text
+                                }
                             }
                         }
                     }
                 }
-            }
-               
+                
             }
     }
 }
@@ -207,7 +208,7 @@ struct RefreshCookie: ViewModifier {
                             let refresher = LoginRefresher()
                             try await refresher.refreshLogin(for: user, modelContext: modelContext)
                         } catch {
-                            print("刷新登录状态失败，这可能是用户没联网，但是不用提示，用户总会有一次联网的")
+                            print("刷新登录状态失败\(error.localizedDescription)")
                         }
                     }
                 }
@@ -235,11 +236,14 @@ struct MusicPlayerCover: ViewModifier {
                 },cancelAction: {
                     self.ship = nil
                 })
-                    .environment(playerHolder)
-                    .environment(sceneVM)
+                .environment(playerHolder)
+                .environment(sceneVM)
             }
             .onReceive(playMusic, perform: {
-                actionExcuter.showPleasePickBanner = false
+                //play cover sheet弹出过程中这个动画是能看到的
+                withAnimation(.smooth) {
+                    actionExcuter.showPleasePickBanner = false
+                }
                 self.ship = $0
             })
             .sheet(isPresented: $showNowPlayView, content: {
@@ -248,7 +252,7 @@ struct MusicPlayerCover: ViewModifier {
                         showNowPlayView = false
                     })
                 }
-                    .environment(playerHolder)
+                .environment(playerHolder)
             })
             .task(priority: .background) {
                 do {
@@ -256,6 +260,10 @@ struct MusicPlayerCover: ViewModifier {
                 } catch {
                     print("3D场景加载失败\(error.localizedDescription)")
                 }
+            }
+            .onLoad {
+                //APP启动，先激活正确的音频会话
+                playerHolder.setupAVAudioSession()
             }
     }
 }

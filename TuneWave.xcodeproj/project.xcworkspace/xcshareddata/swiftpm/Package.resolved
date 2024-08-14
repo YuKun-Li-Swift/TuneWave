@@ -1,5 +1,5 @@
 {
-  "originHash" : "6612c488f68d060e3b4eaf51ba018a3c04107ae4b6771ec2249231399946462a",
+  "originHash" : "3e29d0efa97281cfd71e97713d1c35bb3c87f499d70b015b5ee4ea67fb00faa7",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
         "version" : "5.9.1"
+      }
+    },
+    {
+      "identity" : "efqrcode",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/EFPrefix/EFQRCode",
+      "state" : {
+        "revision" : "2991c2f318ad9529d93b2a73a382a3f9c72c64ce",
+        "version" : "6.2.2"
       }
     },
     {
@@ -26,6 +35,15 @@
       "state" : {
         "revision" : "5d462f7530677ae0c2b9510c26383aa25ba48751",
         "version" : "3.1.1"
+      }
+    },
+    {
+      "identity" : "swift_qrcodejs",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ApolloZhu/swift_qrcodejs.git",
+      "state" : {
+        "revision" : "374dc7f7b9e76c6aeb393f6a84590c6d387e1ecb",
+        "version" : "2.2.2"
       }
     },
     {

@@ -42,20 +42,7 @@ struct MusicRowSingleLine: View {
            
                 VStack {
                     if let imageURL {
-                        WebImage(url: imageURL.lowRes(xy2x: 80), transaction: .init(animation: .smooth)) { phase in
-                            switch phase {
-                            case .empty:
-                                FixSizeImage(systemName: "photo.badge.arrow.down")
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .transition(.blurReplace.animation(.smooth))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16.7/3, style: .continuous))
-                            case .failure( _):
-                                FixSizeImage(systemName: "wifi.exclamationmark")
-                            }
-                        }
+                        ImageViewForMusicRowSingleLine(imageURL: imageURL)
                     } else {
                         FixSizeImage(systemName: "photo")
                     }
@@ -107,6 +94,29 @@ struct MusicRowSingleLine: View {
         }())
     }
 }
+
+//通过将WebImage拆分到单独的View，并且将imageURL作为@State，避免了在MusicRowSingleLine的hightlight切换时需要刷新视图，导致不美观的动画效果
+struct ImageViewForMusicRowSingleLine: View {
+    @State
+    var imageURL:URL
+    var body: some View {
+        WebImage(url: imageURL.lowRes(xy2x: 80), transaction: .init(animation: .smooth)) { phase in
+            switch phase {
+            case .empty:
+                FixSizeImage(systemName: "photo.badge.arrow.down")
+            case .success(let image):
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .transition(.blurReplace.animation(.smooth))
+                    .clipShape(RoundedRectangle(cornerRadius: 16.7/3, style: .continuous))
+            case .failure( _):
+                FixSizeImage(systemName: "wifi.exclamationmark")
+            }
+        }
+    }
+}
+
 
 struct FixSizeImage: View {
     var systemName:String

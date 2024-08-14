@@ -25,6 +25,7 @@ class YiUserContainer:Equatable {
 @Model
 class YiUser {
     var id = UUID()
+    //这个字段登录以外的地方没用到，并且在（少数）验证码登录和（多数）二维码登录的时候，是空字符串
     @Attribute(.allowsCloudEncryption)
     var token:String
     @Attribute(.allowsCloudEncryption)
@@ -42,5 +43,11 @@ class YiUser {
         self.token = token
         self.cookie = cookie
     }
-    
+    func refreshInfo(nickname: String, avatarUrl: String, vipType: Int64,token:String,cookie:String) {
+        self.nickname = nickname
+        self.avatarUrl = avatarUrl
+        self.vipType = vipType
+        self.token = token
+        self.cookie = cookie
+    }
 }

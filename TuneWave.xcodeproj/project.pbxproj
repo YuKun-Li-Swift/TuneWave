@@ -71,9 +71,12 @@
 		7CB3D2852C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */; };
 		7CCC3AA12C482B000014AA37 /* Environments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C44BA1D2C1C86C4008DB511 /* Environments.swift */; };
 		7CDA978E2C4A08D7009BD0E5 /* AVPlayerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */; };
-		7CDA97932C4A1609009BD0E5 /* ChangeVolumeVideo.MP4 in Resources */ = {isa = PBXBuildFile; fileRef = 7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */; };
+		7CE67AB92C64CA2E00979669 /* QRLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE67AB82C64CA2E00979669 /* QRLoginView.swift */; };
+		7CE67ABB2C64CA3500979669 /* QRLoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE67ABA2C64CA3500979669 /* QRLoginViewModel.swift */; };
+		7CE67ABE2C64CFEE00979669 /* EFQRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 7CE67ABD2C64CFEE00979669 /* EFQRCode */; };
 		7CEB292A2C59D91800E2A3D8 /* OnlineToLocalConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */; };
 		7CEB292C2C59E77F00E2A3D8 /* MusciPlayingListPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */; };
+		7CEB29302C5A0A4300E2A3D8 /* ChangeVolumeVideo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 7CEB292F2C5A0A4300E2A3D8 /* ChangeVolumeVideo.mp4 */; };
 		7CFE33CD2C4B84E700BA77F4 /* DeveloperContactGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */; };
 /* End PBXBuildFile section */
 
@@ -206,9 +209,11 @@
 		7CB3D2822C1A6E44004A186D /* TuneWave_Watch_AppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITests.swift; sourceTree = "<group>"; };
 		7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuneWave_Watch_AppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		7CDA978D2C4A08D7009BD0E5 /* AVPlayerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerExtension.swift; sourceTree = "<group>"; };
-		7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ChangeVolumeVideo.MP4; sourceTree = "<group>"; };
+		7CE67AB82C64CA2E00979669 /* QRLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRLoginView.swift; sourceTree = "<group>"; };
+		7CE67ABA2C64CA3500979669 /* QRLoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRLoginViewModel.swift; sourceTree = "<group>"; };
 		7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineToLocalConverter.swift; sourceTree = "<group>"; };
 		7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusciPlayingListPage.swift; sourceTree = "<group>"; };
+		7CEB292F2C5A0A4300E2A3D8 /* ChangeVolumeVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ChangeVolumeVideo.mp4; sourceTree = "<group>"; };
 		7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperContactGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -239,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C310EB02C454FD600E9143F /* SDWebImageSwiftUI in Frameworks */,
+				7CE67ABE2C64CFEE00979669 /* EFQRCode in Frameworks */,
 				7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */,
 				7C44BA132C1C7DC7008DB511 /* Alamofire in Frameworks */,
 			);
@@ -353,6 +359,7 @@
 			isa = PBXGroup;
 			children = (
 				7C310E7E2C454FAB00E9143F /* LoginPage.swift */,
+				7CE67AB72C64CA2400979669 /* QRLogin */,
 				7C80A2B42C4686A700A8807C /* UserInfoView.swift */,
 				7C310E822C454FAB00E9143F /* LoginModel.swift */,
 			);
@@ -458,7 +465,7 @@
 				7C44BA1D2C1C86C4008DB511 /* Environments.swift */,
 				7CB3D26B2C1A6E44004A186D /* Assets.xcassets */,
 				7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */,
-				7CDA97922C4A1608009BD0E5 /* ChangeVolumeVideo.MP4 */,
+				7CEB292F2C5A0A4300E2A3D8 /* ChangeVolumeVideo.mp4 */,
 				7CB3D26D2C1A6E44004A186D /* Preview Content */,
 			);
 			path = "TuneWave Watch App";
@@ -487,6 +494,15 @@
 				7CB3D2842C1A6E44004A186D /* TuneWave_Watch_AppUITestsLaunchTests.swift */,
 			);
 			path = "TuneWave Watch AppUITests";
+			sourceTree = "<group>";
+		};
+		7CE67AB72C64CA2400979669 /* QRLogin */ = {
+			isa = PBXGroup;
+			children = (
+				7CE67AB82C64CA2E00979669 /* QRLoginView.swift */,
+				7CE67ABA2C64CA3500979669 /* QRLoginViewModel.swift */,
+			);
+			path = QRLogin;
 			sourceTree = "<group>";
 		};
 		7CFE33CB2C4B84D200BA77F4 /* DeveloperContactGenerator */ = {
@@ -573,6 +589,7 @@
 				7C44BA122C1C7DC7008DB511 /* Alamofire */,
 				7C44BA172C1C7DDC008DB511 /* SwiftyJSON */,
 				7C310EAF2C454FD600E9143F /* SDWebImageSwiftUI */,
+				7CE67ABD2C64CFEE00979669 /* EFQRCode */,
 			);
 			productName = "TuneWave Watch App";
 			productReference = 7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */;
@@ -662,6 +679,7 @@
 				7C44BA112C1C7DC7008DB511 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				7C310EAE2C454FD600E9143F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				7CE67ABC2C64CFEE00979669 /* XCRemoteSwiftPackageReference "EFQRCode" */,
 			);
 			productRefGroup = 7CB3D23D2C1A6E41004A186D /* Products */;
 			projectDirPath = "";
@@ -708,8 +726,8 @@
 				7CB18B3D2C490EB30042DB8B /* YiMusicLogo.usdz in Resources */,
 				7CB3D26F2C1A6E44004A186D /* Preview Assets.xcassets in Resources */,
 				7CB3D26C2C1A6E44004A186D /* Assets.xcassets in Resources */,
-				7CDA97932C4A1609009BD0E5 /* ChangeVolumeVideo.MP4 in Resources */,
 				7C8F5CA22C4FB29E0068D739 /* DisclaimerContent.md in Resources */,
+				7CEB29302C5A0A4300E2A3D8 /* ChangeVolumeVideo.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -772,6 +790,7 @@
 				7C310EBF2C45535800E9143F /* NeverErrorView.swift in Sources */,
 				7C310EA12C454FBA00E9143F /* MusicModel.swift in Sources */,
 				7C310E942C454FAB00E9143F /* ContentView.swift in Sources */,
+				7CE67ABB2C64CA3500979669 /* QRLoginViewModel.swift in Sources */,
 				7C310E8E2C454FAB00E9143F /* LoginPage.swift in Sources */,
 				7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */,
 				7C310ECB2C455C7200E9143F /* TempURLCreator.swift in Sources */,
@@ -786,6 +805,7 @@
 				7C80A2B52C4686A700A8807C /* UserInfoView.swift in Sources */,
 				7C310EC32C4554D000E9143F /* AVPlayerHolder.swift in Sources */,
 				7C310EAD2C454FC200E9143F /* SettingPage.swift in Sources */,
+				7CE67AB92C64CA2E00979669 /* QRLoginView.swift in Sources */,
 				7C310E982C454FAB00E9143F /* AlamofireCacheExtension.swift in Sources */,
 				7C310E8F2C454FAB00E9143F /* DateExtension.swift in Sources */,
 				7C310EB82C45518B00E9143F /* MusicLoader.swift in Sources */,
@@ -1391,6 +1411,14 @@
 				minimumVersion = 5.0.2;
 			};
 		};
+		7CE67ABC2C64CFEE00979669 /* XCRemoteSwiftPackageReference "EFQRCode" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/EFPrefix/EFQRCode";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.2.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1408,6 +1436,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
+		};
+		7CE67ABD2C64CFEE00979669 /* EFQRCode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7CE67ABC2C64CFEE00979669 /* XCRemoteSwiftPackageReference "EFQRCode" */;
+			productName = EFQRCode;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

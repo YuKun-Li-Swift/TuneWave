@@ -29,6 +29,7 @@ struct UserInfoView: View {
     var modelContext
     @State
     var vm = UserInfoViewModel()
+    
     var body: some View {
         TabView(content: {
             VStack(spacing: 12.3) {
@@ -58,6 +59,9 @@ struct UserInfoView: View {
                 })
             }
         })
+        .task {
+            vm.refreshInfo(for: userContainer.activedUser, modelContext: modelContext)
+        }
         .tabViewStyle(.verticalPage)
         .navigationTitle("已登录账号")
     }
@@ -146,7 +150,7 @@ struct UserInfoVIPBadge: View {
 @MainActor
 @Observable
 class UserInfoViewModel {
-    
+    let refersher = PersonInfoRefresher()
     var logOutSheet = false
     var logOutError:String? = nil
     var logOutErrorSheet = false
@@ -159,6 +163,18 @@ class UserInfoViewModel {
         } catch {
             self.logOutError = error.localizedDescription
             self.logOutErrorSheet = true
+        }
+    }
+    func refreshInfo(for user: YiUser,modelContext: ModelContext) {
+        Task {
+            do {
+                try await refersher.refreshLogin(for: user, modelContext: modelContext)
+            } catch {
+                //刷新是静默操作，失败了不用提示，除非在调试
+                #if DEBUG
+                fatalError("请调查错误："+error.localizedDescription)
+                #endif
+            }
         }
     }
 }

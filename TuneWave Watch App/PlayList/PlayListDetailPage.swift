@@ -86,18 +86,7 @@ struct PlayListDetailList: View {
                 ScrollViewReader { proxy in
                     List {
                         if actionExcuter.showPleasePickBanner {
-                            HStack(content: {
-                                Text("请在下方音乐中选择你想加入播放列表的")
-                                    .multilineTextAlignment(.leading)
-                                
-                                    .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
-                                .padding()
-                                Spacer()
-                            })
-                                .background(
-                                    RoundedRectangle(cornerRadius: 13, style: .continuous)
-                                        .fill(Color.accentColor.gradient))
-                                .id("showPleasePickBanner")
+                            PleasePickBannerPlayListDetail()
                         }
                         if vm.haveMore {
                             PlayListDetailListHaveMoreBanner(count:vm.data.songs.count,notAvailableCount: vm.haveMoreCount)
@@ -169,6 +158,24 @@ struct PlayListDetailList: View {
         }
     }
 }
+
+struct PleasePickBannerPlayListDetail: View {
+    var body: some View {
+        HStack(content: {
+            Text("请在下方音乐中选择你想加入播放列表的")
+                .multilineTextAlignment(.leading)
+                .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
+            .padding()
+            Spacer()
+        })
+            .background(
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .fill(Color.accentColor.gradient))
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .id("showPleasePickBanner")
+    }
+}
+
 
 struct PlayListDetailActionsSheet: View {
     @State

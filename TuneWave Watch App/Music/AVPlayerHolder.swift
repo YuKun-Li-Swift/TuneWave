@@ -10,6 +10,18 @@ import SwiftUI
 import AVFoundation
 import Combine
 
+//既然ContentView持有MusicPlayerHolder，那我就附加在ContentView上
+struct SavePlayingModeChange: ViewModifier {
+    @Environment(MusicPlayerHolder.self)
+    var musicHolder
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: musicHolder.playingMode, initial: false) { oldValue, newValue in
+                UserDefaults.standard.setValue(newValue.rawValue, forKey: "TuneWavePlayingMode")
+            }
+    }
+}
+
 
 @Observable
 class MusicPlayerHolder {
@@ -20,8 +32,18 @@ class MusicPlayerHolder {
     var currentMusic:YiMusic? = nil
     var cancellable:AnyCancellable?
     var lyricsCancellable:Any?
+    
     var playingError:String = ""
+    var waitingPlayingReason:String = ""
     var playingMode:PlayingMode = .singleLoop
+    init() {
+        //每次变化了就由SavePlayingModeChange来保存
+        if let hasRemember = UserDefaults.standard.value(forKey: "TuneWavePlayingMode") as? Int,let rememberMode = PlayingMode(rawValue: hasRemember) {
+            self.playingMode = rememberMode
+        } else {
+            //没有记忆，默认使用单曲循环
+        }
+    }
     var switchMusicError:String? = nil
     //如果视频在播放，每帧触发一次
     func startToUpdateLyrics(onTimeUpdate:@escaping (CMTime)->()) {
@@ -64,6 +86,7 @@ class MusicPlayerHolder {
         avplayer.replaceCurrentItem(with: item)
         avplayer.audiovisualBackgroundPlaybackPolicy = .continuesIfPossible
         avplayer.actionAtItemEnd = .none
+
         configureRemoteCommandCenter()
         NowPlayHelper.updateNowPlayingInfoWith(yiMusic)
         avplayer.defaultRate = 1.0
@@ -75,9 +98,23 @@ class MusicPlayerHolder {
             })
     }
     var playedItems:[YiMusic] = []
+    func setupAVAudioSession() {
+        //默认是soloAmbient，在大多数手表上可以在后台继续播放，但是有少部分手表不行；所以我们设置playback，在全部手表上都能正常后台播放。
+        let targetCategories:AVAudioSession.Category = .playback
+        do {
+            try AVAudioSession.sharedInstance().setCategory(targetCategories, options: [])
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("✅AV Session configured: \(targetCategories.rawValue)")
+        } catch {
+            print("❌Failed to configure AV Session: \(error.localizedDescription)")
+        }
+    }
+
     func updateNowPlay() {
         if let currentMusic {
+            //设置NowPlay控件响应
             configureRemoteCommandCenter()
+            //再开启NowPlay
             NowPlayHelper.updateNowPlayingInfoWith(currentMusic)
         } else {
             print("Now Play不用刷新，因为没在播放")
@@ -224,37 +261,39 @@ class MusicPlayerHolder {
         if let error = avplayer.currentItem?.error {
             addError("音乐："+error.localizedDescription)
         }
+        self.playingError = errorMessage
         
         if avplayer.timeControlStatus == .waitingToPlayAtSpecifiedRate {
             if let reason = avplayer.reasonForWaitingToPlay {
-                switch reason {
-                case .evaluatingBufferingRate:
-                    addError("正在检测网速。")
-                case .interstitialEvent:
-                    addError("播放器正在等待间隙事件完成。")
-                case .noItemToPlay:
-                    addError("播放器闲置，因为没有音乐可以播放了。")
-                case .toMinimizeStalls:
-                    addError("正在缓冲。")
-                default:
-                    addError("无法播放，但不明原因。")
-                }
+                self.waitingPlayingReason = {
+                    switch reason {
+                    case .evaluatingBufferingRate://很快，要么变为toMinimizeStalls要么就开始播放了。
+                        return ("正在加载中")
+                    case .interstitialEvent:
+                        return ("播放刚刚被打断了")
+                    case .noItemToPlay:
+                        return ("但没有音乐可以播放了，建议您换一首歌")
+                    case .toMinimizeStalls:
+                        return ("正在缓冲")
+                    default:
+                        return ("正在准备")
+                    }
+                }()
             }
         }
-        self.playingError = errorMessage
     }
 }
 
-enum PlayingMode {
-    case singleLoop
-    case playingListLoop
-    case random
+enum PlayingMode:Int {
+    case singleLoop = 0
+    case playingListLoop = 1
+    case random = 2
     func humanReadbleName() -> String {
         switch self {
         case .singleLoop:
             "单曲循环"
         case .playingListLoop:
-            "列表循环"
+            "顺序播放"
         case .random:
             "随机"
         }
@@ -344,7 +383,7 @@ extension MusicPlayerHolder {
             }
         }
     }
-    //不要真随机，不然前一首是这个，下一首随机出来又是这个就尴尬了
+    //不要真随机，不然前一首是A，下一首随机出来又是A，就尴尬了
     func getRandomMusic() throws -> YiMusic {
         if let currentMusic {
             playedItems.append(currentMusic)
@@ -352,6 +391,7 @@ extension MusicPlayerHolder {
         let pickFrom:[YiMusic] = playingList.filter { music in
             !playedItems.contains(music)
         }
+        print("歌单一共有\(playingList.count)，还剩\(pickFrom.count)首可以随机的")
         if pickFrom.isEmpty {
             //那说明歌单里每首歌都已经播放过了，那就随机选吧
             guard let randomOne = playingList.randomElement() else {

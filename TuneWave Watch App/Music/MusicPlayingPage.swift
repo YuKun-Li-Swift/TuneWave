@@ -29,6 +29,8 @@ struct NowPlayView: View {
     var isAutoScrolling = true
     @State
     var showAutoScrollTip = false
+    @State
+    private var showInformation = false
     var body: some View {
         
         ZStack {
@@ -37,7 +39,7 @@ struct NowPlayView: View {
                 
                 VStack(content: {
                     TabView(selection: $selectedTab, content: {
-                        MusciPlayingListPage()
+                        MusciPlayingListPagePack()
                             .tag(Page.playingListPage)
                         NowPlayingView()
                             .tag(Page.nowPlayPage)
@@ -47,13 +49,16 @@ struct NowPlayView: View {
                 })
                 .toolbar {
                     ToolbarItemGroup(placement: .topBarTrailing) {
-                        if selectedTab == Page.nowPlayPage {
+                        switch selectedTab {
+                        case .playingListPage:
+                            EmptyView()
+                        case .nowPlayPage:
                             Button {
                                 showMorePage = true
                             } label: {
                                 Label("更多操作", systemImage: "ellipsis")
                             }
-                        } else {
+                        case .lyricsPage:
                             Button {
                                 withAnimation(.easeOut) {
                                     isAutoScrolling.toggle()
@@ -62,7 +67,6 @@ struct NowPlayView: View {
                                 Label(isAutoScrolling ? "点此关闭歌词自动滚动" : "点此打开歌词自动滚动", systemImage: "digitalcrown.arrow.counterclockwise.fill")
                                     .transition(.blurReplace)
                             }
-                            
                         }
                     }
                 }
@@ -84,16 +88,31 @@ struct NowPlayView: View {
                 .modifier(ShowAutoScrollTip(isAutoScrolling: isAutoScrolling, showTip: showTip))
                 
             }
-            .opacity((playerHolder.playingError.isEmpty) ? 1 : 0)
-            .allowsHitTesting((playerHolder.playingError.isEmpty) ? true : false)
+            .opacity(showInformation ? 0 : 1)
+            .allowsHitTesting(showInformation ? false : true)
             
             AutoScrollTipView(isAutoScrolling:$isAutoScrolling,showAutoScrollTip: $showAutoScrollTip)
             
             VStack {
-                if !playerHolder.playingError.isEmpty {
-                    ScrollViewOrNot {
-                        ErrorView(errorText: playerHolder.playingError)
+                if showInformation {
+                    //优先显示错误信息
+                    if !playerHolder.playingError.isEmpty {
+                        ScrollViewOrNot {
+                            ErrorView(errorText: playerHolder.playingError)
+                        }
+                    } else if !playerHolder.waitingPlayingReason.isEmpty {
+                        ScrollViewOrNot {
+                            VStack {
+                                Text("即将开始播放")
+                                    .font(.headline)
+                                Divider()
+                                Text(playerHolder.waitingPlayingReason)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .transition(.blurReplace)
+                        }
                     }
+                    
                 }
             }
         }
@@ -101,9 +120,21 @@ struct NowPlayView: View {
             //在第三方app中播放过别的内容，再切回这里，NowPlay会停留在第三方app的内容，需要主动刷新一下。
             playerHolder.updateNowPlay()
         }
-        .animation(.smooth, value: playerHolder.playingError)
+        .animation(.smooth, value: showInformation)
+        .onChange(of: playerHolder.playingError, initial: true) { oldValue, newValue in
+            updateShowInformation()
+        }
+        .onChange(of: playerHolder.waitingPlayingReason, initial: true) { oldValue, newValue in
+            updateShowInformation()
+        }
     }
-    
+    func updateShowInformation() {
+        if playerHolder.playingError.isEmpty && playerHolder.waitingPlayingReason.isEmpty {
+            self.showInformation = false
+        } else {
+            self.showInformation = true
+        }
+    }
     func slideToPage(_ page:Page) {
         showMorePage = false
         Task {
@@ -122,20 +153,30 @@ struct NowPlayMoreActionPage: View {
     private var tutorialFailed = false
     @State
     private var haptic = UUID()
-    
+    @State
+    private var showNeedMoreMusicAlert = false
     @Environment(MusicPlayerHolder.self)
     private var playerHolder:MusicPlayerHolder
+    @State
+    private var enlargeButton = false
     var showPlayingListPage:()->()
     var showLyricPage:()->()
     var body: some View {
         ScrollViewOrNot {
             VStack {
                 @Bindable var playerHolderBinding = playerHolder
-                TuneWavePicker(selected: $playerHolderBinding.playingMode)
+                TuneWavePicker(selected: $playerHolderBinding.playingMode, showNeedMoreMusicAlert: $showNeedMoreMusicAlert,playerHolder:playerHolder)
                 Button(action: {
                     showPlayingListPage()
                 }, label: {
                     Label("播放列表", systemImage: "music.note.list")
+                        .symbolEffect(.pulse, options: .repeating)
+                })
+                .scaleEffect(x: enlargeButton ? 2 : 1, y: enlargeButton ? 2 : 1, anchor: .bottom)
+                Button(action: {
+                    showLyricPage()
+                }, label: {
+                    Label("查看歌词", systemImage: "note.text")
                         .symbolEffect(.pulse, options: .repeating)
                 })
                 Button(action: {
@@ -152,20 +193,33 @@ struct NowPlayMoreActionPage: View {
                         .symbolEffect(.pulse, options: .repeating)
                 })
                 .sensoryFeedback(.impact, trigger: haptic)
-                Button(action: {
-                    showLyricPage()
-                }, label: {
-                    Label("查看歌词", systemImage: "note.text")
-                        .symbolEffect(.pulse, options: .repeating)
-                })
+              
                 
             }
             .alert("调节音量教程视频播放失败，"+DeveloperContactGenerator.generate(), isPresented: $tutorialFailed, actions: {})
+            .alert("当前播放列表中只有一首歌，只能单曲循环，请先查看您的播放列表", isPresented: $showNeedMoreMusicAlert, actions: {
+                Button("我去看看", action: {
+                    focusToPlayListButton()
+                })
+            })
+            
         }
+    }
+    func focusToPlayListButton() {
+        withAnimation(.smooth.delay(0.5)) {
+                enlargeButton = true
+            } completion: {
+                Task {
+                    try? await Task.sleep(nanoseconds: 200000000)//0.2s
+                    withAnimation(.smooth) {
+                        enlargeButton = false
+                    }
+                }
+            }
     }
     func playTutorialVideo() {
         //没声音的视频，可以直接开始播放
-        WKExtension.shared().visibleInterfaceController?.presentMediaPlayerController(with: Bundle.main.url(forResource: "ChangeVolumeVideo", withExtension: "MP4")!, options: [WKMediaPlayerControllerOptionsAutoplayKey:true,WKMediaPlayerControllerOptionsVideoGravityKey:WKVideoGravity.resizeAspect.rawValue,WKMediaPlayerControllerOptionsLoopsKey:true], completion: { _, _, error in
+        WKExtension.shared().visibleInterfaceController?.presentMediaPlayerController(with: Bundle.main.url(forResource: "ChangeVolumeVideo", withExtension: "mp4")!, options: [WKMediaPlayerControllerOptionsAutoplayKey:true,WKMediaPlayerControllerOptionsVideoGravityKey:WKVideoGravity.resizeAspect.rawValue,WKMediaPlayerControllerOptionsLoopsKey:true], completion: { _, _, error in
             if error != nil {
                 self.tutorialFailed = true
             }
@@ -177,6 +231,10 @@ struct NowPlayMoreActionPage: View {
 struct TuneWavePicker: View {
     @Binding
     var selected:PlayingMode
+    @Binding
+    var showNeedMoreMusicAlert:Bool
+    @State
+    var playerHolder:MusicPlayerHolder
     @State
     private var showSheet = false
     var body: some View {
@@ -194,7 +252,7 @@ struct TuneWavePicker: View {
         .navigationDestination(isPresented: $showSheet, destination: {
             List {
                 Button(action: {
-                    itemPicked(PlayingMode.singleLoop, name: "单曲循环")
+                    itemPicked(PlayingMode.singleLoop, name: "单曲循环", needMoreThanOneSong: false)
                 }, label: {
                     HStack(content: {
                         Text("单曲循环")
@@ -204,10 +262,10 @@ struct TuneWavePicker: View {
                         }
                     })
                 })
+                
                 Button(action: {
-                    itemPicked(PlayingMode.playingListLoop, name:"顺序播放")
+                    itemPicked(PlayingMode.playingListLoop, name:"顺序播放", needMoreThanOneSong: true)
                 }, label: {
-                    
                     HStack(content: {
                         Text("顺序播放")
                         Spacer()
@@ -217,7 +275,7 @@ struct TuneWavePicker: View {
                     })
                 })
                 Button(action: {
-                    itemPicked(PlayingMode.random, name: "随机")
+                    itemPicked(PlayingMode.random, name: "随机", needMoreThanOneSong: true)
                 }, label: {
                     
                     HStack(content: {
@@ -230,13 +288,21 @@ struct TuneWavePicker: View {
                 })
             }
             .listStyle(.carousel)
-            .transition(.opacity.animation(.smooth))
+            .navigationTitle("播放模式")
         })
     }
-    func itemPicked(_ item:PlayingMode,name:String) {
+    func itemPicked(_ item:PlayingMode,name:String,needMoreThanOneSong:Bool) {
         showSheet = false
-        withAnimation(.smooth) {
-            self.selected = item
+        if needMoreThanOneSong && (playerHolder.playingList.count <= 1) {
+            showNeedMoreMusicAlert = true
+            //拒绝切换，跳到单曲循环
+            withAnimation(.smooth) {
+                selected = .singleLoop
+            }
+        } else {
+            withAnimation(.smooth) {
+                self.selected = item
+            }
         }
     }
 }
@@ -306,6 +372,8 @@ struct LyricsView: View {
     var haveLyric = true
     @State
     var rawLyric:String? = nil
+    @Namespace
+    var nameSpace
     var body: some View {
         VStack {
             if let music = playerHolder.currentMusic {
@@ -320,7 +388,8 @@ struct LyricsView: View {
                                 //占位，填充满整个页面，即便歌词只有一行或两行
                                     .fill(Color.clear)
                                 
-                                if vm.parsedLyrics.isEmpty {//要么是歌词解析还没有完成，要么是歌词不是空的，但是解析出来是空的（可能是未正确解析）
+                                if vm.parsedLyrics.isEmpty {
+                                    //歌词不是空的，但是解析出来是空的（可能是未正确解析）
                                     //说明解析出来的歌词确实是空的，那就显示原始歌词（未解析的）
                                     LyricUnormalView(rawLyric: $rawLyric)
                                 } else {
@@ -363,18 +432,17 @@ struct LyricsView: View {
                             }
                             .transition(.blurReplace)
                         } else {
-                            if !enableLyricsTranslate {
-                                //因为在从歌词翻译切回歌词的时候，会不可避免的在动画期间出现此View，这不行
-                                Zero3Delay {
-                                    Text("这首音乐没有歌词")
-                                        .transition(.blurReplace)
+                            //确保这行字总是居中，而不会乱飘
+                           Rectangle()
+                                .fill(Color.clear)
+                                .overlay(alignment: .center) {
+                                    Text(enableLyricsTranslate ? "这首音乐没有歌词翻译" : "这首音乐没有歌词")
+                                        .contentTransition(.numericText()) //在两个状态之间切换的时候，有连贯的动画效果
+                                        .animation(.smooth, value: enableLyricsTranslate)//似乎在外层放的enableLyricsTranslate的animation对这里的numericText无效
                                 }
-                            } else {
-                                Text("这首音乐没有歌词翻译")
-                                    .transition(.blurReplace)
-                            }
                         }
                     }
+                    
                     .onChange(of: enableLyricsTranslate, initial: false) { oldValue, newValue in
                         //重新加载歌词+重新滚动
                         Task {
@@ -383,7 +451,6 @@ struct LyricsView: View {
                             enableAutoScroll(.onLoad,isEnable: isAutoScrolling)
                         }
                     }
-                    .animation(.smooth, value: haveLyric)
                     .transition(.blurReplace)
                 } else {
                     ProgressView()
@@ -520,6 +587,8 @@ struct LyricUnormalView: View {
     var rawLyric:String?
     @State
     var rawLyricCopy:String? = nil
+    @State
+    var changeCount = 0
     var body: some View {
         VStack(content: {
             if let rawLyricCopy {
@@ -536,9 +605,14 @@ struct LyricUnormalView: View {
             self.rawLyricCopy = rawLyric
         }
         .onChange(of: rawLyric, initial: false) { _, newValue in
+            changeCount += 1
+            if changeCount >= 2 {
 #if DEBUG
-            fatalError("这不应该发生，调查一下")
+                fatalError("这不应该发生，调查一下")
 #endif
+            } else {
+                //会在视图即将消失前变成新的歌词，使changeCount = 1
+            }
         }
     }
 }

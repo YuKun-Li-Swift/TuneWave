@@ -38,9 +38,10 @@ struct LoginView: View {
     enum LoginMethod {
         case password
         case verificationCode
+        case qr
     }
     @State
-    private var selectedLoginMethod = LoginMethod.verificationCode
+    private var selectedLoginMethod = LoginMethod.qr//默认用二维码，刚好也强制用户下个网易云app在手机上，这样可以管理歌单，毕竟本app不做搜索功能。
     @State
     private var phonePasswordShip:PhonePasswordLogin? = nil
     @State
@@ -52,33 +53,39 @@ struct LoginView: View {
             if !showLoginView {
                 LoginTipView(continue: $showLoginView)
             } else {
-                ScrollView {
-                    VStack {
-                       
-                        switch selectedLoginMethod {
-                        case .password:
-                            PhonePasswordLoginView(mod: mod,scrollPosition:$scrollPosition)
-                        case .verificationCode:
-                            PhoneVerificationCodeLoginView(mod: mod,scrollPosition:$scrollPosition)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack {
+                           
+                            switch selectedLoginMethod {
+                            case .qr:
+                                QRLoginViewPack(scrollProxy:proxy)
+                            case .password:
+                                PhonePasswordLoginView(mod: mod,scrollPosition:$scrollPosition)
+                            case .verificationCode:
+                                PhoneVerificationCodeLoginView(mod: mod,scrollPosition:$scrollPosition)
+                            }
+                            
+                        }
+                        .scrollTargetLayout()
+                        .toolbar {
+                            ToolbarItemGroup(placement: .automatic) {
+                                Picker("选择登录方式", selection: $selectedLoginMethod, content: {
+                                    Text("手机扫码")
+                                        .tag(LoginMethod.qr)
+                                    Text("短信验证码")
+                                        .tag(LoginMethod.verificationCode)
+                                    Text("手机号+密码")
+                                        .tag(LoginMethod.password)
+                                })
+                                .pickerStyle(.navigationLink)
+                                .tint(.blue)
+                            }
                         }
                         
                     }
-                    .scrollTargetLayout()
-                    .toolbar {
-                        ToolbarItemGroup(placement: .automatic) {
-                            Picker("选择登录方式", selection: $selectedLoginMethod, content: {
-                                Text("手机号+密码")
-                                    .tag(LoginMethod.password)
-                                Text("短信验证码")
-                                    .tag(LoginMethod.verificationCode)
-                            })
-                            .pickerStyle(.navigationLink)
-                            .tint(.blue)
-                        }
-                    }
-                    
+                    .scrollPosition(id: $scrollPosition, anchor: .top)
                 }
-                .scrollPosition(id: $scrollPosition, anchor: .top)
             }
         })
         .navigationDestination(item: $phonePasswordShip, destination: { ship in

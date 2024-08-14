@@ -9,7 +9,7 @@ import Foundation
 import SwiftyJSON
 
 extension JSON {
-    func errorCheck() throws {
+    func errorCheck(outputBodyIfError:Bool = true) throws {
         func switchCode(_ code:Int64) throws {
             switch code {
             case 301:
@@ -28,6 +28,9 @@ extension JSON {
             if code == 200 {
                 return
             } else {
+                if outputBodyIfError {
+                    print("错误的返回体：\(self)")
+                }
                 try switchCode(code)
             }
         } else

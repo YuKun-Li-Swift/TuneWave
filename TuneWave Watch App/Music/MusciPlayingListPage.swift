@@ -33,17 +33,7 @@ struct MusciPlayingListPage: View {
                     List {
                         Section("播放列表中共有\(playerHolder.playingList.count)首音乐", content: {
                           ForEach(playerHolder.playingList, content: { music in
-                              MusicRowSingleLine(tapAction: {
-                                  try playerHolder.switchMusic(to: music)
-                              }, imageURL: {
-                                  do {
-                                      return try music.albumImg.createTemporaryURL(extension: "")
-                                  } catch {
-                                      print("音乐封面图加载出错\(error.localizedDescription)")
-                                      return nil
-                                  }
-                              }(), name: music.name,hightlight:(music.musicID == playerHolder.currentMusic?.musicID))                              //正在播放的这首，高亮
-                              .id(music.musicID)
+                              MusicRowSingleLinePackForMusciPlayingListPage(music: music)
                           })
                             Button("添加音乐", action: {
                                 actionExcuter.startWorkFlow()
@@ -61,6 +51,69 @@ struct MusciPlayingListPage: View {
         .navigationTitle("播放列表")
     }
 }
+
+struct MusicRowSingleLinePackForMusciPlayingListPage: View {
+    @Environment(MusicPlayerHolder.self)
+    private var playerHolder:MusicPlayerHolder
+    var music:YiMusic
+    @State
+    private var hightlightMe = false
+    var body: some View {
+        MusicRowSingleLine(tapAction: {
+            try playerHolder.switchMusic(to: music)
+        }, imageURL: {
+            do {
+                return try music.albumImg.createTemporaryURL(extension: "")
+            } catch {
+                print("音乐封面图加载出错\(error.localizedDescription)")
+                return nil
+            }
+        }(), name: music.name,hightlight:hightlightMe)                              //正在播放的这首，高亮
+        .onChange(of: playerHolder.currentMusic, initial: true, { oldValue, currentMusic in
+            withAnimation(.smooth) {
+                if music.musicID == currentMusic?.musicID {
+                    self.hightlightMe = true
+                } else {
+                    self.hightlightMe = false
+                }
+            }
+        })
+        .id(music.musicID)
+        
+    }
+}
+
+
+
+
+//音乐数量多，页面初始化耗时，Lazy一下
+struct MusciPlayingListPagePack: View {
+    @State
+    private var showRealPage = false
+    var body: some View {
+        VStack {
+            if showRealPage {
+                MusciPlayingListPage()
+                    .transition(.blurReplace)
+            } else {
+                ProgressView()
+                    .transition(.blurReplace)
+            }
+        }
+        
+        .onLoad {
+            Task {
+                try? await Task.sleep(nanoseconds:300000000)//0.3s
+                //延迟0.3秒加载，避免在页面slide入的动画过程中卡顿
+                withAnimation(.easeIn) {
+                    showRealPage = true
+                }
+            }
+           
+        }
+    }
+}
+
 
 @Observable
 class GoPlayListAndPickAMsuicAction {

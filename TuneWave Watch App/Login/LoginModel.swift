@@ -41,6 +41,25 @@ class YiLoginModel {
         }
     }
     
+    func loginByQR(cookie:String,modelContext:ModelContext) async throws {
+        print("二维码登录得到的cookie："+cookie)
+        let route = "/login/status"
+        let fullURL = baseAPI + route
+        let json = try await AF.request(fullURL,parameters:["cookie":cookie] as [String:String]).LSAsyncJSON()
+        try json.errorCheck()
+        print("loaginBy\(json)")
+        let user = try YiLoginModel.parseQRLoginData(json,cookie:cookie)
+        //如果用户同一个账号登录了又退出登录又登录
+        //删除现有的用户
+        let exsistUser = try CurrentUserFinder().userWith(userID: user.userID, modelContext: modelContext)
+        for userNeedDelete in exsistUser {
+            modelContext.delete(userNeedDelete)
+        }
+        //再插入新的用户
+        modelContext.insert(user)
+        try modelContext.save()
+    }
+    
     func loaginBy(phone:String,countrycode:String,password:String? = nil,captcha:String? = nil,modelContext:ModelContext) async throws {
         let route = "/login/cellphone"
         let fullURL = baseAPI + route
@@ -77,6 +96,26 @@ class YiLoginModel {
                 "没有足够的字段"
             }
         }
+    }
+    static
+    func parseQRLoginData(_ json:JSON,cookie:String) throws -> YiUser {
+        let profile = json["data"]["profile"]
+        let token = ""//就像数据结构里说明的那样，通过QR登录的，这个字段是空字符串
+        guard let userId = profile["userId"].int64,let avatarUrl = profile["avatarUrl"].url,let nickname = profile["nickname"].string,let vipType = profile["vipType"].int64 else {
+            throw LoginError.noEnoughBlank
+        }
+        return YiUser(userID: String(userId), nickname: nickname, avatarUrl: avatarUrl.absoluteString, vipType: vipType,token:token,cookie: cookie)
+    }
+    
+    //token和cookie就用老的
+    static
+    func parseUserInfo(_ json:JSON,token:String,cookie:String) throws -> YiUser {
+        let profile = json["profile"]
+        let cookie = cookie
+        guard let userId = profile["userId"].int64,let avatarUrl = profile["avatarUrl"].url,let nickname = profile["nickname"].string,let vipType = profile["vipType"].int64 else {
+            throw LoginError.noEnoughBlank
+        }
+        return YiUser(userID: String(userId), nickname: nickname, avatarUrl: avatarUrl.absoluteString, vipType: vipType,token:token,cookie: cookie)
     }
     func parseLoginData(_ json:JSON) throws -> YiUser {
         let profile = json["profile"]
@@ -116,18 +155,47 @@ class YiLoginModel {
 }
 
 @MainActor
-class LoginRefresher {
+class PersonInfoRefresher {
     func refreshLogin(for user:YiUser,modelContext:ModelContext) async throws {
-        let route = "/login/refresh"
-        let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL).LSAsyncJSON()
-        try json.errorCheck()
-        guard let cookie = json["cookie"].string else {
-            throw RefreshCookieError.noCookie
+        let cookie = user.cookie
+        if cookie.isEmpty {
+            throw RefreshPersonInfoError.noCookie
         }
-        user.cookie = cookie
+        let route = "/user/detail"
+        let fullURL = baseAPI + route
+        let json = try await AF.request(fullURL,parameters:["uid":user.userID,"cookie":cookie] as [String:String]).LSAsyncJSON()
+        try json.errorCheck()
+//        print("refreshingLoginBy\(json)")
+        let newUserInfo = try YiLoginModel.parseUserInfo(json,token:user.token,cookie:cookie)
+        user.refreshInfo(nickname: newUserInfo.nickname, avatarUrl: newUserInfo.avatarUrl, vipType: newUserInfo.vipType, token: newUserInfo.token, cookie: newUserInfo.cookie)
         try modelContext.save()
-        print("刷新Cookie成功")
+        print("刷新用户信息成功")
+    }
+    enum RefreshPersonInfoError:Error,LocalizedError {
+        case noCookie
+        var errorDescription: String? {
+            switch self {
+            case .noCookie:
+                "没有Cookie字段"
+            }
+        }
+    }
+}
+
+@MainActor
+class LoginRefresher {
+    
+    ///向网易云服务器请求新的cookie，让服务器知道客户端有在每天登录
+    func refreshLogin(for user:YiUser,modelContext:ModelContext) async throws {
+            let route = "/login/refresh"
+            let fullURL = baseAPI + route
+            let json = try await AF.request(fullURL,parameters: ["cookie":user.cookie] as [String:String]).LSAsyncJSON()
+            try json.errorCheck(outputBodyIfError: false)
+            guard let cookie = json["cookie"].string else {
+                throw RefreshCookieError.noCookie
+            }
+            //新的cookie不用存下来，请求这个接口只是让服务器知道“老cookie我还在用”
+            print("刷新Cookie成功")
     }
     enum RefreshCookieError:Error,LocalizedError {
         case noCookie
