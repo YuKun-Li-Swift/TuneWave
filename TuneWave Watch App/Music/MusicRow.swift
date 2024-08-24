@@ -24,16 +24,20 @@ struct MusicRowSingleLine: View {
             //如果上一次点击还没加载完，不允许下一次
             if !loading {
                 loadingTask = Task {
+                    guard !Task.isCancelled else { return }
                     loading = true
+                    guard !Task.isCancelled else { return }
                     errorText = nil
+                    guard !Task.isCancelled else { return }
                     do {
+                        guard !Task.isCancelled else { return }
                         try await tapAction()
+                        guard !Task.isCancelled else { return }
                     } catch {
-                        //离屏了就不要弹出错误了
-                        if !Task.isCancelled {
-                            errorText = error.localizedDescription
-                        }
+                        guard !Task.isCancelled else { return }
+                        errorText = error.localizedDescription
                     }
+                    guard !Task.isCancelled else { return }
                     loading = false
                 }
             }

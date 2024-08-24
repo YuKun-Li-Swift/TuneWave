@@ -36,12 +36,12 @@ struct AboutPage: View {
         .navigationDestination(isPresented: $showThridLibraryPage, destination: {
             ThirdPartPackage()
         })
-        .sheet(isPresented: $showGitHubQR, content: {
+        .navigationDestination(isPresented: $showGitHubQR, destination: {
             Image(.githubQR)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
+                .navigationTitle("扫码查看源代码")
         })
-        
     }
 }
 struct ThirdPartPackage: View {

@@ -47,6 +47,7 @@ struct QRLoginView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.01)
                         .hidden()
+                        .accessibilityHidden(true)
                         .onAppear {
                             self.size = proxy.size
                         }
@@ -57,24 +58,22 @@ struct QRLoginView: View {
                     if let qrImage = vm.qr {
                         HStack {
                             Text("请使用网易云音乐app扫码")
-                                .font(.headline)
+                                .font(.headline.bold())
                                 .foregroundStyle(.accent)
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
+                        
                         Image(uiImage: qrImage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: size?.width, height: size?.width, alignment: .center)
-                            .padding(.top, 13)//13刚好可以滚动到屏幕中心
-                            .id("QRImage")
                             .mask {
                                 switch vm.step3Status {
                                 case .waitingScan,.none:
                                     Rectangle()
                                 case .waitingComfirm,.canceled,.unknow(_):
                                     //显示错误的时候，使用圆角遮罩，匹配overlay的Material的形状
-                                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)//这里的圆角更大一点，避免产生锯齿
                                 }
                             }
                             .overlay(alignment: .center) {
@@ -88,6 +87,7 @@ struct QRLoginView: View {
                                             switch vm.step3Status {
                                             case .waitingComfirm:
                                                 Text("请在手机上点击确认登录")
+                                                    .padding(.horizontal)
                                             case .canceled:
                                                 VStack {
                                                     Text("该二维码已失效")
@@ -98,29 +98,24 @@ struct QRLoginView: View {
                                                     }
                                                     .buttonStyle(.borderedProminent)
                                                 }
+                                                .padding(.horizontal)
                                             case .unknow(let message):
                                                 Text(message)
+                                                    .padding(.horizontal)
                                             case .none,.waitingScan:
                                                 EmptyView()
                                             }
                                         }
                                     
                                 }
-                             
                             }
+                            .padding([.top,.horizontal])//可以再向内收进去一点，二维码太大了手动滚到到位比较困难
+                        .id("QRImage")
                     } else {
                         ErrorView(errorText: "登录异常，"+DeveloperContactGenerator.generate())
                     }
                 }
                 .scenePadding(.horizontal)
-            }
-            .onAppear {
-                Task {
-                    try? await Task.sleep(nanoseconds: 1000000000)//1s，不要在View刚出现就触发滚动，会没反应。1秒让用户看清提示文本
-                    withAnimation(.easeOut) {
-                        scrollProxy.scrollTo("QRImage", anchor: .center)
-                    }
-                }
             }
             .onReceive(timer, perform: { _ in
                 vm.checkScanStatus(mod: mod, modelContext: modelContext)

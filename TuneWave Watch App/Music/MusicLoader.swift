@@ -45,6 +45,21 @@ actor MusicLoader {
         }
     }
     
+    @MainActor
+    static
+    func getCachedMusic(musicID:String,modelContext: ModelContext) throws -> YiMusic? {
+        let predicate = #Predicate<YiMusic> { music in
+            music.musicID == musicID
+        }
+        let fetchDescriptor = FetchDescriptor<YiMusic>(predicate: predicate)
+        let allResult = try modelContext.fetch(fetchDescriptor)
+        if let matched = allResult.last {
+            return matched
+        } else {
+            return nil
+        }
+    }
+    
     var audioURL:URL? = nil
     var audioDataFidelity:String? = nil
     var audioFileExtension:String? = nil
@@ -53,7 +68,7 @@ actor MusicLoader {
     func step1() async throws {
         let route = "/song/url"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: {
+        let json = try await AFTW.request(fullURL,parameters: {
             if isOnline {
                 ["id":musicID,"br":"64000"] as [String:String]//在线播放用64k音质，加载速度很重要
             } else {
@@ -61,7 +76,7 @@ actor MusicLoader {
             }
         }()).LSAsyncJSON()
         try json.errorCheck()
-        print("请求到音乐链接\(json)")
+//        print("请求到音乐链接\(json)")
         //可能是只能听试听版（那不播放了，不然之后开了VIP还要重新缓存音乐）
         //也可能是完全听不了，比如专辑是付费专辑
         if let code:Int64? = json["data"].array?.first?["code"].int64 {
@@ -159,9 +174,9 @@ actor MusicLoader {
     func step3() async throws {
         let route = "/lyric"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: ["id":musicID] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters: ["id":musicID] as [String:String]).LSAsyncJSON()
         try json.errorCheck()
-        print("歌词\(json)")
+//        print("歌词\(json)")
         if let lrc = json["lrc"]["lyric"].string {
             self.lyrics = lrc
         } else {
@@ -186,6 +201,9 @@ actor MusicLoader {
     }
     
     var audioData:Data? = nil
+    
+
+    
     func step4() async throws {
         guard let audioURL,let audioFileExtension else {
             throw NeverError.neverError
@@ -197,7 +215,7 @@ actor MusicLoader {
         }
         try await withCheckedThrowingContinuation { (continuation:CheckedContinuation<Void,Error>) -> Void in
             //永远不要超时，因为音乐云盘里的音乐会很大
-            AF.download(URLRequest(url: audioURL,timeoutInterval: 3600), to: destination)
+            AFTW.download(URLRequest(url: audioURL,timeoutInterval: 3600), to: destination)
                     .downloadProgress { progress in
                         Task { @MainActor in
                             await self.vm.audioDownloadProgress = progress.fractionCompleted

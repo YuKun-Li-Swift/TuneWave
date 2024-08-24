@@ -22,7 +22,7 @@ struct SavePlayingModeChange: ViewModifier {
     }
 }
 
-
+@MainActor
 @Observable
 class MusicPlayerHolder {
     let avplayer = AVPlayer()
@@ -61,19 +61,22 @@ class MusicPlayerHolder {
         }
     }
     enum PlayMusicError:Error,LocalizedError {
-    case notRightPlayingList
+        case notRightPlayingList
+        case failedToFetchMusicDuration
         var errorDescription: String? {
             switch self {
+            case .failedToFetchMusicDuration:
+                "音乐播放失败，因为无法获取音乐时长，"+DeveloperContactGenerator.generate()
             case .notRightPlayingList:
                 "歌单出现异常，请换一个歌单播放"
             }
         }
     }
+    var lyricsData:LyricsData?
     //playingList是当前歌曲的上下文，目前的策略是，当前歌曲从哪一个歌单里来的，就把播放列表替换为那个歌单。
     //如果播放的这首歌已经被缓存了，那么playingList就会包含这首歌
     //如果播放的这首歌，在点击音乐Row时尚未被缓存，那么playingList就不包含这首歌
-    func playMusic(_ yiMusic:YiMusic,playingList:[YiMusic]) throws {
-  
+    func playMusic(_ yiMusic:YiMusic,playingList:[YiMusic]) async throws {
         if !playingList.contains(yiMusic) {
             throw PlayMusicError.notRightPlayingList
         }
@@ -84,6 +87,11 @@ class MusicPlayerHolder {
         self.musicURL = url
         let item = AVPlayerItem(url: url)
         avplayer.replaceCurrentItem(with: item)
+        
+         let duration = item.duration 
+            
+            self.lyricsData = await .init(music: yiMusic, duration: duration)
+       
         avplayer.audiovisualBackgroundPlaybackPolicy = .continuesIfPossible
         avplayer.actionAtItemEnd = .none
 
@@ -92,6 +100,7 @@ class MusicPlayerHolder {
         avplayer.defaultRate = 1.0
         avplayer.rate = 1.0
         avplayer.playImmediately(atRate: 1.0)
+
         cancellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
             .sink(receiveValue: { [weak self] _ in
                 Self.handleDidPlayToEndTime(self: self)
@@ -262,10 +271,10 @@ class MusicPlayerHolder {
             addError("音乐："+error.localizedDescription)
         }
         self.playingError = errorMessage
-        
+        var newWaitingPlayingReason:String = ""
         if avplayer.timeControlStatus == .waitingToPlayAtSpecifiedRate {
             if let reason = avplayer.reasonForWaitingToPlay {
-                self.waitingPlayingReason = {
+                newWaitingPlayingReason = {
                     switch reason {
                     case .evaluatingBufferingRate://很快，要么变为toMinimizeStalls要么就开始播放了。
                         return ("正在加载中")
@@ -281,6 +290,7 @@ class MusicPlayerHolder {
                 }()
             }
         }
+        self.waitingPlayingReason = newWaitingPlayingReason
     }
 }
 

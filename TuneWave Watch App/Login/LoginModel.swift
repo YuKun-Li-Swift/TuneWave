@@ -24,7 +24,7 @@ class YiLoginModel {
         }
         let route = "/captcha/sent"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: ["phone":phoneNumber,"ctcode":ctcode] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters: ["phone":phoneNumber,"ctcode":ctcode] as [String:String]).LSAsyncJSON()
         print("sendCode\(json)")
         try json.errorCheck()
     }
@@ -45,7 +45,7 @@ class YiLoginModel {
         print("二维码登录得到的cookie："+cookie)
         let route = "/login/status"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters:["cookie":cookie] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters:["cookie":cookie] as [String:String]).LSAsyncJSON()
         try json.errorCheck()
         print("loaginBy\(json)")
         let user = try YiLoginModel.parseQRLoginData(json,cookie:cookie)
@@ -63,7 +63,7 @@ class YiLoginModel {
     func loaginBy(phone:String,countrycode:String,password:String? = nil,captcha:String? = nil,modelContext:ModelContext) async throws {
         let route = "/login/cellphone"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: {
+        let json = try await AFTW.request(fullURL,parameters: {
             if let password {
                 ["phone":phone,"password":password,"countrycode":countrycode] as [String:String]
             } else if let captcha {
@@ -163,7 +163,7 @@ class PersonInfoRefresher {
         }
         let route = "/user/detail"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters:["uid":user.userID,"cookie":cookie] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters:["uid":user.userID,"cookie":cookie] as [String:String]).LSAsyncJSON()
         try json.errorCheck()
 //        print("refreshingLoginBy\(json)")
         let newUserInfo = try YiLoginModel.parseUserInfo(json,token:user.token,cookie:cookie)
@@ -189,7 +189,7 @@ class LoginRefresher {
     func refreshLogin(for user:YiUser,modelContext:ModelContext) async throws {
             let route = "/login/refresh"
             let fullURL = baseAPI + route
-            let json = try await AF.request(fullURL,parameters: ["cookie":user.cookie] as [String:String]).LSAsyncJSON()
+            let json = try await AFTW.request(fullURL,parameters: ["cookie":user.cookie] as [String:String]).LSAsyncJSON()
             try json.errorCheck(outputBodyIfError: false)
             guard let cookie = json["cookie"].string else {
                 throw RefreshCookieError.noCookie
@@ -212,8 +212,8 @@ class LoginRefresher {
 @Observable
 class CurrentUserFinder {
     func userWith(userID:String,modelContext:ModelContext) throws -> [YiUser] {
-        let predicate = #Predicate<YiUser> { music in
-            music.userID == userID
+        let predicate = #Predicate<YiUser> { user in
+            user.userID == userID
         }
         let fetchDescriptor = FetchDescriptor<YiUser>(predicate: predicate)
         let allResult = try modelContext.fetch(fetchDescriptor)
@@ -257,25 +257,28 @@ struct LoadingSkelton<V0:View,V1:View,V2:View>: View {
                 EmptyView()
             }
         }
-        .task { @MainActor in
-            if !loaded {
-                loaded = true
-                do {
-                    try await loadingAction()
-                    await MainActor.run {
-                        withAnimation(.smooth) {
-                            self.stage = .success
+        .onLoad {
+            Task {
+                if !loaded {
+                    loaded = true
+                    do {
+                        try await loadingAction()
+                        await MainActor.run {
+                            withAnimation(.smooth) {
+                                self.stage = .success
+                            }
                         }
-                    }
-                } catch {
-                    await MainActor.run {
-                        withAnimation(.smooth) {
-                            self.stage = .error(error)
+                    } catch {
+                        await MainActor.run {
+                            withAnimation(.smooth) {
+                                self.stage = .error(error)
+                            }
                         }
                     }
                 }
             }
         }
+     
     }
 }
 
@@ -299,6 +302,7 @@ struct APIErrorDisplay: View {
                 Text(error.localizedDescription)
                     .font(.footnote)
             }
+            .scenePadding(.horizontal)
         }
         .alert(DeveloperContactGenerator.generate(), isPresented: $showSheet) { }
     }
@@ -360,27 +364,5 @@ extension Alamofire.DataRequest {
     }
 }
 
-extension View {
-    @ViewBuilder
-    func onLoad(perform action: (() -> Void)? = nil) -> some View {
-        self
-            .modifier(OnLoad(action: action))
-    }
-}
-struct OnLoad: ViewModifier {
-    @State
-    private var loaded = false
-    var action: (() -> Void)? = nil
-    func body(content: Content) -> some View {
-        content
-            .onAppear(perform: {
-                if loaded == false {
-                    loaded = true
-                    if let action {
-                        action()
-                    }
-                }
-            })
-    }
-}
+
 

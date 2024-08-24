@@ -302,8 +302,10 @@ struct PlayListDetailSearchResultPage: View {
                 ProgressView()
             }
         }
-        .task {
-            await vm.doSearch(keyword: keyword, in: allSongs)
+        .onLoad {
+            Task {
+                await vm.doSearch(keyword: keyword, in: allSongs)
+            }
         }
     }
 }

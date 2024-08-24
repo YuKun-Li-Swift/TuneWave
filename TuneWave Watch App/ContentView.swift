@@ -216,6 +216,7 @@ struct RefreshCookie: ViewModifier {
     }
 }
 
+@MainActor
 struct MusicPlayerCover: ViewModifier {
     @Environment(MusicPlayerHolder.self)
     var playerHolder
@@ -227,10 +228,14 @@ struct MusicPlayerCover: ViewModifier {
     private var sceneVM = SceneModelShip()
     @Environment(GoPlayListAndPickAMsuicAction.self)
     private var actionExcuter:GoPlayListAndPickAMsuicAction
+    @State
+    private var cachedMusic:YiMusic? = nil
+    @Environment(\.modelContext)
+    private var modelContext
     func body(content: Content) -> some View {
         content
             .sheet(item: $ship) { ship in
-                PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.coverImgURL, playList: ship.playList,showPlayPage:{
+                PlayMusicPage(musicID: ship.musicID, name: ship.name, artist: ship.artist, converImgURL: ship.coverImgURL, playList: ship.playList, cachedMusic: $cachedMusic,showPlayPage:{
                     self.ship = nil
                     self.showNowPlayView = true
                 },cancelAction: {
@@ -239,12 +244,8 @@ struct MusicPlayerCover: ViewModifier {
                 .environment(playerHolder)
                 .environment(sceneVM)
             }
-            .onReceive(playMusic, perform: {
-                //play cover sheet弹出过程中这个动画是能看到的
-                withAnimation(.smooth) {
-                    actionExcuter.showPleasePickBanner = false
-                }
-                self.ship = $0
+            .onReceive(playMusic, perform: { musicInfo in
+                playMusicAction(musicInfo: musicInfo)
             })
             .sheet(isPresented: $showNowPlayView, content: {
                 NavigationStack {
@@ -254,17 +255,29 @@ struct MusicPlayerCover: ViewModifier {
                 }
                 .environment(playerHolder)
             })
-            .task(priority: .background) {
-                do {
-                    try await sceneVM.sceneModel.load()
-                } catch {
-                    print("3D场景加载失败\(error.localizedDescription)")
+            .onLoad {
+                Task(priority: .background) {
+                    do {
+                        try await sceneVM.sceneModel.load()
+                    } catch {
+                        print("3D场景加载失败\(error.localizedDescription)")
+                    }
                 }
             }
             .onLoad {
                 //APP启动，先激活正确的音频会话
                 playerHolder.setupAVAudioSession()
             }
+    }
+    func playMusicAction(musicInfo:MusicPlayShip) {
+        //play cover sheet弹出过程中这个动画是能看到的
+        withAnimation(.smooth) {
+            actionExcuter.showPleasePickBanner = false
+        }
+        if let cachedMusic:YiMusic = try? MusicLoader.getCachedMusic(musicID:musicInfo.musicID,modelContext: modelContext) {
+            self.cachedMusic = cachedMusic
+        }
+        self.ship = musicInfo
     }
 }
 

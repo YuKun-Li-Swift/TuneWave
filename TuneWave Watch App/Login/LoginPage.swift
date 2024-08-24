@@ -99,13 +99,16 @@ struct LoginTipView: View {
     @Binding
     var `continue`:Bool
     var body: some View {
-        Text("您正在登录的是网易云音乐账号")
-        Button("继续") {
-            withAnimation(.easeOut) {
-                `continue` = true
+        VStack {
+            Text("您正在登录的是网易云音乐账号")
+            Button("继续") {
+                withAnimation(.easeOut) {
+                    `continue` = true
+                }
             }
+            .buttonStyle(.borderedProminent)
         }
-        .buttonStyle(.borderedProminent)
+        .scenePadding(.horizontal)
     }
 }
 

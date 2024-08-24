@@ -9,6 +9,7 @@ import SwiftUI
 
 //设计的时候是按照模拟器上的屏幕尺寸、默认的字体大小设计的，但是实际使用的时候，用户可能会走更小屏幕的设备上运行、在更大的系统字体上运行
 //通过这个灵活的切换，当按照设计无法显示完全的时候，就自动包裹进ScrollView来确保能够显示完全
+@available(watchOS 10,iOS 16,*)
 struct ScrollViewOrNot<V:View>: View {
     var content:() -> (V)
     var body: some View {
@@ -108,3 +109,26 @@ struct FourLineHeightPlaceholder: View {
     }
 }
 
+extension View {
+    @ViewBuilder
+    func onLoad(perform action: (() -> Void)? = nil) -> some View {
+        self
+            .modifier(OnLoad(action: action))
+    }
+}
+struct OnLoad: ViewModifier {
+    @State
+    private var loaded = false
+    var action: (() -> Void)? = nil
+    func body(content: Content) -> some View {
+        content
+            .onAppear(perform: {
+                if loaded == false {
+                    loaded = true
+                    if let action {
+                        action()
+                    }
+                }
+            })
+    }
+}

@@ -69,8 +69,10 @@ struct Model3DView: View {
                 //            .opacity(loaded ? 1 : 0)
                     .blur(radius: blurDone ? 0 : 23)
                 //加载完成后淡入效果
-                    .task {
-                        await loadScene()
+                    .onLoad {
+                        Task {
+                            await loadScene()
+                        }
                     }
             } else {
                 HomeMakeSlashSymbol(symbolName: "view.3d", accessibilityLabel: "3D模型不可用")

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+///确保我包裹在ScrollView或者ScrollViewOrNot中
 struct ErrorView: View {
     var errorText:String
     var body: some View {
@@ -17,6 +18,7 @@ struct ErrorView: View {
             Text(errorText)
                 .foregroundStyle(.secondary)
         }
+        .scenePadding(.horizontal)
         .transition(.blurReplace)
     }
 }

@@ -59,7 +59,7 @@ struct UserInfoView: View {
                 })
             }
         })
-        .task {
+        .onLoad {
             vm.refreshInfo(for: userContainer.activedUser, modelContext: modelContext)
         }
         .tabViewStyle(.verticalPage)

@@ -22,6 +22,8 @@ class MusicLoadingViewModel {
     var step3Error:String? = nil
     var step4Done = false
     var step4Error:String? = nil
+    var doneLoading = false
+    var haveAnyStepError = false
     var isCanceledPlay = false
     var playError:Error? = nil
     
@@ -32,7 +34,8 @@ class MusicLoadingViewModel {
         do {
             if !isCanceledPlay {
                 let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
-                try playerHolder.playMusic(yiMusic,playingList:playingList)
+               
+                try await playerHolder.playMusic(yiMusic,playingList:playingList)
                 //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
                 showPlayPage()
             }
@@ -48,13 +51,31 @@ class MusicLoadingViewModel {
             try modelContext.save()
             if !isCanceledPlay {
                 let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
-                try playerHolder.playMusic(yiMusic,playingList:playingList)
+                try await playerHolder.playMusic(yiMusic,playingList:playingList)
                 withAnimation(.smooth) {
                     showPlayPage()
                 }
             }
         } catch {
             self.playError = error
+        }
+    }
+    
+    func updateHaveAnyStepError() {
+        let vm = self
+        if (vm.step1Error != nil) || (vm.step2Error != nil) || (vm.step3Error != nil) || (vm.step4Error != nil) {
+            self.haveAnyStepError = true
+        } else {
+            self.haveAnyStepError = false
+        }
+    }
+    enum PlayError:Error,LocalizedError {
+    case noDownloadMode
+        var errorDescription: String? {
+            switch self {
+            case .noDownloadMode:
+                "缺少了加载模块，"+DeveloperContactGenerator.generate()
+            }
         }
     }
 }

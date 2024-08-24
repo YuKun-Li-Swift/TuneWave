@@ -88,7 +88,7 @@ class YiQRLoginActor {
     func getKey() async throws -> String {
         let route = "/login/qr/key"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: ["timestamp":String(Int(Date.now.timeIntervalSince1970.rounded()))] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters: ["timestamp":String(Int(Date.now.timeIntervalSince1970.rounded()))] as [String:String]).LSAsyncJSON()
         try json.errorCheck()
         guard let unikey = json["data"]["unikey"].string else {
             throw QRLoginError.noFieldUnikey
@@ -99,7 +99,7 @@ class YiQRLoginActor {
     func getQR(key:String) async throws -> UIImage {
         let route = "/login/qr/create"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: ["key":key] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters: ["key":key] as [String:String]).LSAsyncJSON()
         try json.errorCheck()
 //        print("getQR\(json)")
         guard let qrContent = json["data"]["qrurl"].string else {
@@ -137,7 +137,7 @@ class YiQRLoginActor {
     func checkScanStatus(key:String,mod:YiLoginModel) async throws -> (Status?,String?) {
         let route = "/login/qr/check"
         let fullURL = baseAPI + route
-        let json = try await AF.request(fullURL,parameters: ["key":key,"timestamp":String(Int(Date.now.timeIntervalSince1970.rounded()))] as [String:String]).LSAsyncJSON()
+        let json = try await AFTW.request(fullURL,parameters: ["key":key,"timestamp":String(Int(Date.now.timeIntervalSince1970.rounded()))] as [String:String]).LSAsyncJSON()
 //        print("checkScanStatus\(json)")
         guard let code = json["code"].int64  else {
             throw QRLoginError.noCode
