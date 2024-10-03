@@ -31,8 +31,10 @@ struct V1HomeView: View {
 
 struct V2HomeView: View {
     var body: some View {
-        VStack {
+        VStack(spacing:20) {
             Label("在Apple Watch上使用全部功能", systemImage: "applewatch")
+            Text("Apple Watch需要watchOS 10.0或更高系统版本")
+                .font(.footnote)
         }
         .padding()
     }

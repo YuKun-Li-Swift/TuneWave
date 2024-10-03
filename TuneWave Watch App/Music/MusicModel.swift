@@ -54,7 +54,7 @@ class MusicModel {
 import SwiftData
 
 @Model
-class YiMusic {
+class YiMusic:Identifiable,Hashable,Equatable {
     var id = UUID()
     var isOnline:Bool
     var musicID:String
@@ -87,5 +87,44 @@ class YiMusic {
         self.audioData = audioData
         self.audioDataFidelity = audioDataFidelity
         self.audioDataFileExtension = audioDataFileExtension
+    }
+    
+    func toShell() -> YiMusicShell {
+        .init(musicID: musicID)
+    }
+    
+    func toFullShell() async throws -> YiMusicDetailedShell {
+        let url = try await self.albumImg.createTemporaryURLAsync(extension: "")
+        return .init(id: id, musicID: musicID, name: name, albumImgURL: url,plainShell:toShell())
+    }
+}
+
+///如果直接在内存中存储整个来自数据库的列表，因为每个Record是包含了实际的Data的，会占用超大量内存引起闪退
+struct YiMusicShell:Identifiable,Equatable {
+    var id:String {
+        musicID
+    }
+    var musicID:String
+}
+
+struct YiMusicDetailedShell:Identifiable,Equatable,Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    var id:UUID
+    var musicID:String
+    var name:String
+    var albumImgURL:URL
+    var plainShell:YiMusicShell
+}
+
+
+enum GetCachedMusicError:Error,LocalizedError {
+    case musicLost
+    var errorDescription: String? {
+        switch self {
+        case .musicLost:
+            "音乐丢失了，"+DeveloperContactGenerator.generate()
+        }
     }
 }

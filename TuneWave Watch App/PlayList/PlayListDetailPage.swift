@@ -32,7 +32,7 @@ struct PlayListDetailPage: View {
             APIErrorDisplay(remoteControlTag: "playListDetailPage", error: error)
         } loadingAction: {
             let cachedPlayList =  try await reqMod.getPlaylistDetail(playlist: playList,useCache: true)
-            let localMusic = try await OnlineToLocalConverter.convert(onlineSongs: cachedPlayList.0.songs, modelContext: modelContext)
+//            let localMusic = try await OnlineToLocalConverter.convert(onlineSongs: cachedPlayList.0.songs, modelContext: modelContext)
             let newVM = PlayListDetailPageModel(data:cachedPlayList.0, haveMore: cachedPlayList.1, haveMoreCount: cachedPlayList.2)
             self.vm = newVM
             vm?.loadingByNoCache(playList: playList, reqMod: reqMod, modelContext: modelContext)
@@ -78,6 +78,10 @@ struct PlayListDetailList: View {
     private var actionExcuter:GoPlayListAndPickAMsuicAction
     @State
     private var scrollProxy:ScrollViewProxy?
+    @Environment(YiUserContainer.self)
+    private
+    var user:YiUserContainer
+    
     var body: some View {
         VStack {
             if vm.data.songs.isEmpty {
@@ -95,7 +99,7 @@ struct PlayListDetailList: View {
                         ForEach(vm.data.songs) { song in
                             MusicRowSingleLine(tapAction:{
                                 playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: vm.data.songs))
-                            },imageURL: song.imageURL, name: song.name)
+                            },imageURL: .constant(song.imageURL), name: song.name, hightlight: .constant(false))
                             //因为静默刷新，为了避免刷新的时候导致批量重载，我们需要显式添加id
                             .id(song.id)
                         }
@@ -142,6 +146,7 @@ struct PlayListDetailList: View {
         }
         .sheet(isPresented: $vm.showMoreActionPage, content: {
             PlayListDetailActionsSheet(vm: vm)
+                .environment(user)
         })
         .alert("未能从云端同步最新歌单\n"+(vm.forceIgnoreCacheLoadError ?? "未知错误"), isPresented: $showNoCacheLoadingError, actions: {
             
@@ -180,6 +185,9 @@ struct PleasePickBannerPlayListDetail: View {
 struct PlayListDetailActionsSheet: View {
     @State
     var vm:PlayListDetailPageModel
+    @Environment(YiUserContainer.self)
+    private
+    var user:YiUserContainer
     @Environment(\.modelContext)
     private var modelContext
     var body: some View {
@@ -198,7 +206,7 @@ struct PlayListDetailActionsSheet: View {
                         Button(action: {
                             Task {
                                 vm.showMoreActionPage = false
-                                try? await Task.sleep(nanoseconds:300000000)//0.3s，等自己所处的sheet先收回去
+                                try? await Task.sleep(for: .seconds(0.3))//0.3s，等自己所处的sheet先收回去
                                 if let song = vm.data.songs.randomElement() {
                                     playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: vm.data.songs))
                                 } else {
@@ -211,7 +219,19 @@ struct PlayListDetailActionsSheet: View {
                             Label("随机播放一首歌", systemImage: "shuffle")
                         })
                         .transition(.blurReplace.animation(.smooth))
+                        
+                        Button(action: {
+                            vm.showBatchDownloadPage = true
+                        }, label: {
+                            Label("批量下载", systemImage: "square.and.arrow.down.on.square.fill")
+                        })
+                        .transition(.blurReplace.animation(.smooth))
+                        .navigationDestination(isPresented: $vm.showBatchDownloadPage) {
+                            BatchDownloadPack(playList: vm.data.songs, showMe: $vm.showBatchDownloadPage)
+                                .environment(user)
+                        }
                     }
+                    
                 }
             }
         }
@@ -294,7 +314,7 @@ struct PlayListDetailSearchResultPage: View {
                         ForEach(vm.searchedRes) { song in
                             MusicRowSingleLine(tapAction:{
                                 playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: allSongs))
-                            },imageURL: song.imageURL, name: song.name)
+                            },imageURL: .constant(song.imageURL), name: song.name, hightlight: .constant(false))
                         }
                     }
                 }
@@ -322,9 +342,6 @@ struct PlayListDetailSearchNotFound: View {
                 Divider()
                 if !keyword.isEmpty {
                     Text("没有歌名包含“\(keyword)”的音乐在歌单中")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                    Text("本搜索严格区分大小写、简繁体")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } else {
@@ -360,7 +377,7 @@ actor PlayListDetailSearchBackendModel {
     func doSearch(keyword:String,in songs:[PlayListModel.PlayListSong]) -> [PlayListModel.PlayListSong] {
         var searchResult:[PlayListModel.PlayListSong] = []
         for i in songs {
-            if i.name.contains(keyword) {
+            if i.name.lowercased().contains(keyword.lowercased()) {
                 searchResult.append(i)
             }
         }
@@ -412,6 +429,7 @@ class PlayListDetailPageModel:Hashable {
     static func == (lhs: PlayListDetailPageModel, rhs: PlayListDetailPageModel) -> Bool {
         lhs.id == rhs.id
     }
+    var showBatchDownloadPage = false
     var showSearchPage = false
     var showMoreActionPage = false
     var id = UUID()

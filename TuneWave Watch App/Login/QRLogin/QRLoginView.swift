@@ -36,6 +36,8 @@ struct QRLoginView: View {
     private var mod = YiLoginModel()
     @Environment(\.modelContext)
     var modelContext
+    @Environment(\.scenePhase)
+    private var scenePhase
     var body: some View {
         LoadingSkelton {
             ProgressView()
@@ -63,62 +65,35 @@ struct QRLoginView: View {
                                 .multilineTextAlignment(.leading)
                             Spacer()
                         }
-                        
-                        Image(uiImage: qrImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .mask {
-                                switch vm.step3Status {
-                                case .waitingScan,.none:
-                                    Rectangle()
-                                case .waitingComfirm,.canceled,.unknow(_):
-                                    //显示错误的时候，使用圆角遮罩，匹配overlay的Material的形状
-                                    RoundedRectangle(cornerRadius: 16, style: .continuous)//这里的圆角更大一点，避免产生锯齿
-                                }
-                            }
-                            .overlay(alignment: .center) {
-                                switch vm.step3Status {
-                                case .none,.waitingScan:
-                                    EmptyView()
-                                default:
-                                    RoundedRectangle(cornerRadius: 13, style: .continuous)
-                                        .fill(Material.regular)
-                                        .overlay(alignment: .center) {
-                                            switch vm.step3Status {
-                                            case .waitingComfirm:
-                                                Text("请在手机上点击确认登录")
-                                                    .padding(.horizontal)
-                                            case .canceled:
-                                                VStack {
-                                                    Text("该二维码已失效")
-                                                    Button("刷新二维码") {
-                                                        withAnimation(.easeOut) {
-                                                            refreshID = UUID()
-                                                        }
-                                                    }
-                                                    .buttonStyle(.borderedProminent)
-                                                }
-                                                .padding(.horizontal)
-                                            case .unknow(let message):
-                                                Text(message)
-                                                    .padding(.horizontal)
-                                            case .none,.waitingScan:
-                                                EmptyView()
-                                            }
-                                        }
-                                    
-                                }
-                            }
-                            .padding([.top,.horizontal])//可以再向内收进去一点，二维码太大了手动滚到到位比较困难
-                        .id("QRImage")
+                        LoginQRView(qrImage: qrImage, vm: vm, refreshID: $refreshID)
                     } else {
                         ErrorView(errorText: "登录异常，"+DeveloperContactGenerator.generate())
                     }
                 }
                 .scenePadding(.horizontal)
             }
-            .onReceive(timer, perform: { _ in
-                vm.checkScanStatus(mod: mod, modelContext: modelContext)
+            .sheet(isPresented: $vm.showLargeQRSheet, content: {
+                if let qrImage = vm.qr {
+                    LoginQRView(qrImage: qrImage, vm: vm, refreshID: $refreshID)
+                } else {
+                    ScrollViewOrNot {
+                        ErrorView(errorText: "登录异常，"+DeveloperContactGenerator.generate())
+                    }
+                }
+            })
+            .background(alignment: .center, content: {
+                if scenePhase == .active {
+                    Rectangle()
+                        .fill(.clear)
+                        .accessibilityHidden(true)
+                        .frame(width: 1, height: 1, alignment: .center)
+                    
+                    .onReceive(timer, perform: { _ in
+                        vm.checkScanStatus(mod: mod, modelContext: modelContext)
+                    })
+                } else {
+                    //只在亮屏的时候轮询，熄屏幕必网络错误
+                }
             })
             .animation(.smooth, value: vm.step3Status)
         } errorView: { error in
@@ -131,3 +106,92 @@ struct QRLoginView: View {
     }
 }
 
+struct LoginQRView: View {
+    var qrImage:UIImage
+    var vm:YiQRLoginModel
+    @Binding
+    var refreshID:UUID
+    @Environment(\.scenePhase)
+    private var scenePhase
+    var body: some View {
+        Image(uiImage: qrImage)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .mask {
+                switch vm.step3Status {
+                case .waitingScan,.none:
+                    Rectangle()
+                case .waitingComfirm,.canceled,.error(_):
+                    //显示错误的时候，使用圆角遮罩，匹配overlay的Material的形状
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)//这里的圆角更大一点，避免产生锯齿
+                }
+            }
+            .overlay(alignment: .center) {
+                switch vm.step3Status {
+                case .none,.waitingScan:
+                        Button {
+                            vm.showLargeQRSheet.toggle()
+                        } label: {
+                            Color.touchZone
+                        }
+                        .buttonStyle(.plain)
+                default:
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
+                        .fill(Material.regular)
+                        .overlay(alignment: .center) {
+                            switch vm.step3Status {
+                            case .waitingComfirm:
+                                Text("请在手机上点击确认登录")
+                                    .padding(.horizontal)
+                            case .canceled:
+                                VStack {
+                                    Text("该二维码已失效")
+                                    Button("刷新二维码") {
+                                        withAnimation(.easeOut) {
+                                            refreshID = UUID()
+                                        }
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                }
+                                .padding(.horizontal)
+                            case .error(let message):
+                                if scenePhase != .active {
+                                    Text("扫码登录过程中请保持Apple Watch屏幕点亮")//不然屏幕熄灭轮询就不做了
+                                        .scenePadding(.horizontal)
+                                        .transition(.blurReplace.animation(.smooth))
+                                } else {
+                                    Text(message)
+                                        .padding(.horizontal)
+                                        .transition(.blurReplace.animation(.smooth))
+                                }
+                            case .none,.waitingScan:
+                                EmptyView()
+                            }
+                        }
+                }
+            }
+            .padding([.top,.horizontal])//可以再向内收进去一点，二维码太大了手动滚到到位比较困难
+        .id("QRImage")
+    }
+}
+
+extension Color {
+    public static var touchZone: Image {
+        .init(uiImage: .init(color: .clear)!)
+        .resizable()
+    }
+}
+
+public extension UIImage {
+    convenience init?(color: UIColor, size: CGSize = CGSize(width: 1, height: 1)) {
+        let rect = CGRect(origin: .zero, size: size)
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)
+        color.setFill()
+        UIRectFill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        guard let cgImage = image?.cgImage else { return nil }
+        self.init(cgImage: cgImage)
+    }
+}

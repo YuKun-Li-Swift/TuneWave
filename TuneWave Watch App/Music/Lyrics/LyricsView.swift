@@ -36,13 +36,10 @@ struct LyricsView: View {
         VStack {
             if let loadedLyrics = playerHolder.lyricsData {
                 LyricsViewInner(parsedLyric: $parsedLyric,blurTransition:$blurTransition,rawLyric: $rawLyric,isAutoScrolling:$isAutoScrolling,  enableLyricsTranslate:$enableLyricsTranslate)
-             
-                //为切换翻译开关做了动画
+                    //为切换翻译开关做了动画
                     .onChange(of: enableLyricsTranslate, initial: false) { oldValue, newValue in
-                        
                             switchLyricSmooth()
                     }
-                    
                     .transition(.blurReplace.animation(.smooth))
             } else {
                 Text("当前没有在播放的音乐")
@@ -54,9 +51,10 @@ struct LyricsView: View {
         //页面初始化出来的歌词不需要有动画，就好像歌词一直在那儿一样
         .onLoad {
             switchLyricNoAnimation()
+            switchRawLyricNoAnimation()
         }
         //为歌词页面打开时切歌做了动画
-        .onChange(of: playerHolder.currentMusic, initial: false) { oldValue, newValue in
+        .onChange(of: playerHolder.lyricsData, initial: false) { oldValue, newValue in
             switchLyricSmooth()
         }
     }
@@ -69,17 +67,17 @@ struct LyricsView: View {
         
         blurTransitionTask = Task {
             guard !Task.isCancelled else { return }
-            withAnimation(.smooth(duration: 0.2)) {
+            withAnimation(.smooth(duration: 0.3)) {
                 blurTransition = true
             }
             guard !Task.isCancelled else { return }
-            try? await Task.sleep(for: .seconds(0.2))//先把动画做好了，此时歌词看不见了，再切换歌词
-            guard !Task.isCancelled else { return }
-            switchRawLyricNoAnimation()
+            try? await Task.sleep(for: .seconds(0.3))//先把动画做好了，此时歌词看不见了，再切换歌词
             guard !Task.isCancelled else { return }
             switchLyricNoAnimation()
             guard !Task.isCancelled else { return }
-            withAnimation(.smooth(duration: 0.2)) {
+            switchRawLyricNoAnimation()
+            guard !Task.isCancelled else { return }
+            withAnimation(.smooth(duration: 0.3)) {
                 blurTransition = false
             }
         }
@@ -159,6 +157,7 @@ struct LyricsViewInner: View {
                             .scrollPosition(id: $focusLyrics, anchor: .center)
                         }
                     })
+                    
                 }
             })
             
@@ -220,11 +219,11 @@ struct LyricsViewInner: View {
             case .onLoad,.onAppear:
                 //主动滚动一次，并且不需要动画（因为歌曲可能已经播放到一半）
                 let time = playerHolder.currentTime()
-                updateCurrentLyric(time: time, animation: nil,onLoad:true)
+                updateCurrentLyric(time: time, animation: nil)
                 //后续更新歌词滚动需要动画
                 playerHolder.startToUpdateLyrics { time in
                     Task { @MainActor in
-                        updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+                        updateCurrentLyric(time: time, animation: .easeOut)
                     }
                 }
             case .withAnimation:
@@ -234,7 +233,7 @@ struct LyricsViewInner: View {
                 //后续更新歌词滚动需要动画
                 playerHolder.startToUpdateLyrics { time in
                     Task { @MainActor in
-                        updateCurrentLyric(time: time, animation: .easeOut,onLoad:false)
+                        updateCurrentLyric(time: time, animation: .easeOut)
                     }
                 }
             }
@@ -264,7 +263,7 @@ struct LyricsViewInner: View {
         //页面都在TabView中划走了，利落一点，不然动画会残留到划回来的时候，导致冲突
         self.focusLyrics = nil
     }
-    func updateCurrentLyric(time:CMTime,animation:Animation?,onLoad:Bool = true) {
+    func updateCurrentLyric(time:CMTime,animation:Animation?) {
         do {
             let matched:LyricsModel.LyricsLine? = vm.updateLineAtTime(date: playerHolder.currentTime(), parsedLyrics: try getParsedLyric())
             if let animation {
@@ -272,17 +271,13 @@ struct LyricsViewInner: View {
                 withAnimation(animation) {
                     self.focusLyrics = matched
                 }
-            } else if onLoad {
-                print("触发无动画滚动")
-                self.focusLyrics = matched
             } else {
                 //不能在页面刚onAppear时执行，不然会导致视图刷新时刷新。
                 Task {
-                    try? await Task.sleep(nanoseconds:100000000)//0.1s
+                    self.focusLyrics = nil//在由翻译歌词切换到原词的时候，需要先设为nil再设置为matched才能有效果。
+                    try? await Task.sleep(for: .seconds(0.1))
                     print("触发延迟无动画滚动")
-                    await MainActor.run {
-                        self.focusLyrics = matched
-                    }
+                    self.focusLyrics = matched
                 }
             }
         } catch {
@@ -315,7 +310,6 @@ struct LyricUnormalView: View {
                     .opacity(blurTransition ? 0.5 : 1)
             }
         })
-       
     }
 }
 

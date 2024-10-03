@@ -48,6 +48,103 @@ struct LightCancelButton: View {
         .position(x: 27.5, y: 30)
     }
 }
+    
+
+@available(iOS 17.0,watchOS 10.0, *)
+struct CancelButton: View {
+    var symbolName:String
+    var accessbilityLabel:String
+    var action:()->()
+    var body: some View {
+        Button("", systemImage: symbolName, action: {
+            action()
+        })
+        .bold()
+        .accessibilityLabel(Text(accessbilityLabel))
+        .buttonBorderShape(.circle)
+        .foregroundStyle(.accent, Material.ultraThinMaterial)
+        .clipShape(Circle())
+        //在View Hierarchy Debug下测出来的
+        .frame(width: buttonWidthAndHeight(), height: buttonWidthAndHeight(), alignment: .center)
+        .padding([.top,.leading], topPaddingAndLeadingPadding())
+    }
+    #if os(watchOS)
+    let screen = WKInterfaceDevice.current().screenBounds.size
+    #else
+    let screen = CGSize(width: 100, height: 100)
+    #endif
+    enum DeviceSize {
+        case The40mm
+        case The42mm
+        case The44mm
+        case The46mm
+        case The49mm
+        case The41mm
+        case The45mm
+        case Unknow
+    }
+    func deviceSize() -> DeviceSize {
+        switch screen {
+        case .init(width: 162, height: 197):
+                .The40mm
+        case .init(width: 184, height: 224):
+                .The44mm
+        case .init(width: 176, height: 215):
+                .The41mm
+        case .init(width: 198, height: 242):
+                .The45mm
+        case .init(width: 187, height: 223):
+                .The42mm
+        case .init(width: 208, height: 248):
+                .The46mm
+        case .init(width: 205, height: 251):
+                .The49mm
+        default:
+                .Unknow
+        }
+    }
+    func buttonWidthAndHeight() -> CGFloat {
+        switch deviceSize() {
+        case .The40mm:
+            30
+        case .The44mm:
+            34
+        case .The41mm:
+            32
+        case .The45mm:
+            36
+        case .The42mm:
+            32
+        case .The46mm:
+            35
+        case .The49mm:
+            36
+        case .Unknow:
+            32
+        }
+    }
+    func topPaddingAndLeadingPadding() -> CGFloat {
+        switch deviceSize() {
+        case .The40mm:
+            15
+        case .The44mm:
+            17
+        case .The41mm:
+            16
+        case .The45mm:
+            18
+        case .The42mm:
+            16
+        case .The46mm:
+            17.5
+        case .The49mm:
+            18
+        case .Unknow:
+            17.5
+        }
+    }
+}
+
 
 struct LightToolbarButton: View {
     var symbolName:String

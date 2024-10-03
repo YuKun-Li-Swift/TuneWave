@@ -15,6 +15,9 @@ extension Data {
         try self.write(to: fileURL)
         return fileURL
     }
+    func createTemporaryURLAsync(`extension`: String) async throws -> URL {
+        return try await AsyncWriter.createTemporaryURL(data:self,extension: `extension`)
+    }
 //    func createTemporaryURL(filename: String) throws -> URL {
 //        // 获取临时目录
 //        let temporaryDirectoryURL = FileManager.default.temporaryDirectory
@@ -28,6 +31,16 @@ extension Data {
 //        try self.write(to: fileURL)
 //        return fileURL
 //    }
+}
+
+actor AsyncWriter {
+    static
+    func createTemporaryURL(data:Data,`extension`: String) async throws -> URL {
+        let fileURL = URL.createTemporaryURL(extension: `extension`)
+        // 将Data写入文件
+        try data.write(to: fileURL)
+        return fileURL
+    }
 }
 
 extension URL {

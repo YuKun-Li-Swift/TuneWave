@@ -31,6 +31,7 @@ actor UserPlayListModel {
             guard let plArray = json["playlist"].array else {
                 throw PlayListResponseError.array
             }
+            
             let mappedArray = try plArray.map { json in
                 return try PlayListObj.parse(json)
             }
@@ -212,7 +213,7 @@ actor PlayListModel {
                     return cloudStorageMusic
                 }
             }
-            return "未知作者"
+            return "网易云音乐"//未知作者，比如说音乐云盘中的歌
         }()
         return PlayListSong(songID: id, name: name, artist: artist, imageURL: picUrl)
     }

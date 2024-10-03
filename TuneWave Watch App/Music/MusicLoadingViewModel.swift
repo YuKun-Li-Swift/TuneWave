@@ -30,12 +30,12 @@ class MusicLoadingViewModel {
     //0到1之间的值
     var audioDownloadProgress:Double = 0
     var audioDataSize:Double? = nil
-    func playMusicWithCached(yiMusic: YiMusic,playList:[PlayListModel.PlayListSong], playerHolder: MusicPlayerHolder,modelContext: ModelContext) async {
+    func playMusicWithCached(yiMusic: YiMusic,playList:[PlayListModel.PlayListSong], playerHolder: MusicPlayerHolder,modelContext: ModelContext,preferencedSeekModeRawValue: SeekPreference.RawValue) async {
         do {
             if !isCanceledPlay {
                 let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
                
-                try await playerHolder.playMusic(yiMusic,playingList:playingList)
+                try await playerHolder.playMusic(yiMusic,playingList:playingList, preferencedSeekModeRawValue: preferencedSeekModeRawValue)
                 //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
                 showPlayPage()
             }
@@ -44,14 +44,14 @@ class MusicLoadingViewModel {
         }
     }
     
-    func playMusic(downloadMod: MusicLoader, modelContext: ModelContext, playerHolder: MusicPlayerHolder,playList:[PlayListModel.PlayListSong]) async {
+    func playMusic(downloadMod: MusicLoader,isOnline:Bool, modelContext: ModelContext, playerHolder: MusicPlayerHolder,playList:[PlayListModel.PlayListSong],preferencedSeekModeRawValue: SeekPreference.RawValue) async {
         do {
-            let yiMusic = try await downloadMod.generateFinalMusicObject()
+            let yiMusic = try await downloadMod.generateFinalMusicObject(isOnline: isOnline)
             modelContext.insert(yiMusic)
             try modelContext.save()
             if !isCanceledPlay {
                 let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
-                try await playerHolder.playMusic(yiMusic,playingList:playingList)
+                try await playerHolder.playMusic(yiMusic,playingList:playingList, preferencedSeekModeRawValue: preferencedSeekModeRawValue)
                 withAnimation(.smooth) {
                     showPlayPage()
                 }

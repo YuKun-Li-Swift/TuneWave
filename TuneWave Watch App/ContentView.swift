@@ -25,6 +25,10 @@ struct ContentView: View {
     private var actionExcuter = GoPlayListAndPickAMsuicAction()
     @State
     private var showMyPlayListPage = false
+    @State
+    private var openSettingPage:Bool = false
+    @State
+    private var openOfflineCleaner:UUID = UUID()
     var body: some View {
         VStack {
             NavigationStack {
@@ -57,19 +61,29 @@ struct ContentView: View {
                             }
                         }
                         
-                        if let userContainer {
+                        if let userContainer { //用户先把账号登好，不然这么多入口摆在这儿容易误导用户
                             Button {
                                 showMyPlayListPage = true
                             } label: {
                                 Label("歌单", systemImage: "star.fill")
                             }
+                            
+                            
+                            Button {
+                                openSettingPage = true
+                            } label: {
+                                Label("设置", systemImage: "gear.circle.fill")
+                            }
+                            
+                            
+                            NavigationLink {
+                                AboutPage()
+                            } label: {
+                                Label("关于", systemImage: "apple.terminal.on.rectangle.fill")
+                            }
+                            
+                            DisclaimerView()
                         }
-                        NavigationLink {
-                            AboutPage()
-                        } label: {
-                            Label("关于", systemImage: "apple.terminal.on.rectangle.fill")
-                        }
-                        DisclaimerView()
                     }
                 }
                 .navigationDestination(isPresented: $showMyPlayListPage, destination: {
@@ -77,10 +91,11 @@ struct ContentView: View {
                         .environment(actionExcuter)
                         .environment(userContainer)
                 })
-                .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView))
+                .modifier(SettingPageNavigationLink(openSettingPage: $openSettingPage, openOfflineCleaner: $openOfflineCleaner))
+                .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView, openOfflineCleaner: myOpenOfflineCleaner))
+                .modifier(DataBaseAccess())
                 .modifier(ManagerPlayingList())
                 .modifier(SavePlayingModeChange())
-                .environment(playerHolder)
                 .modifier(GoPlayListAndPickAMsuicActionModifier(showNowPlayView: $showNowPlayView, showMyPlayListPage: $showMyPlayListPage))
                 .environment(actionExcuter)
                 .environment(userContainer)
@@ -102,6 +117,16 @@ struct ContentView: View {
                 .modifier(ShowDisclaimer())
                 .navigationTitle("悦音音乐")
             }
+            .environment(playerHolder)
+        }
+    }
+    func myOpenOfflineCleaner() {
+        Task {
+            showMyPlayListPage = false
+            //导航堆栈的推入，好像不等也没事，在watchOS 10下是如此
+            openSettingPage = true
+            try? await Task.sleep(for: .seconds(0.6))//0.5s就不能正常工作了
+            openOfflineCleaner = UUID()
         }
     }
 }
@@ -170,7 +195,7 @@ struct ShowDisclaimer: ViewModifier {
                             showAlert = true
                             
                             Task {
-                                try? await Task.sleep(nanoseconds:100000000)//0.1s
+                                try? await Task.sleep(for: .seconds(0.1))
                                 withAnimation(.snappy) {
                                     alertText = text
                                 }
@@ -224,6 +249,7 @@ struct MusicPlayerCover: ViewModifier {
     var ship:MusicPlayShip? = nil
     @Binding
     var showNowPlayView:Bool
+    var openOfflineCleaner:()->()
     @State
     private var sceneVM = SceneModelShip()
     @Environment(GoPlayListAndPickAMsuicAction.self)
@@ -232,6 +258,8 @@ struct MusicPlayerCover: ViewModifier {
     private var cachedMusic:YiMusic? = nil
     @Environment(\.modelContext)
     private var modelContext
+    @AppStorage("ignore Silent Mode")
+    private var ignoreSlientMode = true
     func body(content: Content) -> some View {
         content
             .sheet(item: $ship) { ship in
@@ -241,7 +269,6 @@ struct MusicPlayerCover: ViewModifier {
                 },cancelAction: {
                     self.ship = nil
                 })
-                .environment(playerHolder)
                 .environment(sceneVM)
             }
             .onReceive(playMusic, perform: { musicInfo in
@@ -251,9 +278,8 @@ struct MusicPlayerCover: ViewModifier {
                 NavigationStack {
                     NowPlayView(dismissMe:{
                         showNowPlayView = false
-                    })
+                    }, openOfflineCleaner: myOpenOfflineCleaner)
                 }
-                .environment(playerHolder)
             })
             .onLoad {
                 Task(priority: .background) {
@@ -265,9 +291,19 @@ struct MusicPlayerCover: ViewModifier {
                 }
             }
             .onLoad {
-                //APP启动，先激活正确的音频会话
-                playerHolder.setupAVAudioSession()
+                if ignoreSlientMode {
+                    //APP启动，先激活正确的音频会话
+                    playerHolder.setupAVAudioSession()
+                }
             }
+    }
+    func myOpenOfflineCleaner() {
+        showNowPlayView = false
+        Task {
+            //等待页面关闭的动画完成，不然watchOS 10下导航会不工作
+            try? await Task.sleep(for: .seconds(0.3))
+            openOfflineCleaner()
+        }
     }
     func playMusicAction(musicInfo:MusicPlayShip) {
         //play cover sheet弹出过程中这个动画是能看到的
@@ -276,12 +312,33 @@ struct MusicPlayerCover: ViewModifier {
         }
         if let cachedMusic:YiMusic = try? MusicLoader.getCachedMusic(musicID:musicInfo.musicID,modelContext: modelContext) {
             self.cachedMusic = cachedMusic
+        } else {
+            //这里需要重置，清理掉上次的cached，不然下次播放还是上次的歌了
+            self.cachedMusic = nil
         }
         self.ship = musicInfo
     }
 }
 
-
-#Preview {
-    ContentView()
+struct DataBaseAccess: ViewModifier {
+    @Environment(MusicPlayerHolder.self)
+    private var playerHolder
+    @Environment(\.modelContext)
+    private var modelContext
+    func body(content: Content) -> some View {
+        content
+            .onLoad {
+                //我这个View一直持有modelContext（考虑到这首我们aapp的核心功能，一直持有也不算太过分），这样playerHolder想访问数据库的时候就可以通过我直接访问。
+                //我的责任只有musicShellToRealObject，其它时候要访问，尽量中函数里由发起者把modelContext传进去。
+                playerHolder.musicShellToRealObject = { shell in
+                    let targetMusicID = shell.musicID
+                    guard let matched = try modelContext.fetch(FetchDescriptor(predicate: #Predicate<YiMusic>{ music in
+                        music.musicID == targetMusicID
+                    })).first else {
+                        throw MusicPlayerHolder.MusicShellToRealObjectError.musicLost
+                    }
+                    return matched
+                }
+            }
+    }
 }

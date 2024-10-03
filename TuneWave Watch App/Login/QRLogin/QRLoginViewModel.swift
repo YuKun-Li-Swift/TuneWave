@@ -16,6 +16,7 @@ import SwiftData
 @MainActor
 @Observable
 class YiQRLoginModel {
+    var showLargeQRSheet = false
     let actor = YiQRLoginActor()
     var unikey:String? = nil//step1获取这个
     var qr:UIImage? = nil//step2获取这个
@@ -57,10 +58,10 @@ class YiQRLoginModel {
                         try await mod.loginByQR(cookie: cookie, modelContext: modelContext)
                         step3Status = .waitingComfirm//这个再也看不见了，因为会之间跳登录成功的UI
                     } else {
-                        step3Status = .unknow("未知错误\n"+DeveloperContactGenerator.generate())
+                        step3Status = .error("未知错误\n"+DeveloperContactGenerator.generate())
                     }
                 } catch {
-                    step3Status = .unknow(error.localizedDescription)
+                    step3Status = .error(error.localizedDescription)
                 }
             }
         } else {
@@ -132,7 +133,7 @@ class YiQRLoginActor {
         case waitingScan
         case waitingComfirm
         case canceled//可能是过期了，也可能是用户扫了然后点击取消登录
-        case unknow(String)
+        case error(String)
     }
     func checkScanStatus(key:String,mod:YiLoginModel) async throws -> (Status?,String?) {
         let route = "/login/qr/check"
@@ -153,10 +154,10 @@ class YiQRLoginActor {
                 if let cookie = json["cookie"].string {
                     return (nil,cookie)
                 } else {
-                    return  (.unknow(json["message"].string ?? "错误码\(code)"),nil)
+                    return  (.error(json["message"].string ?? "错误码\(code)"),nil)
                 }
             default:
-                return  (.unknow(json["message"].string ?? "错误码\(code)"),nil)
+                return  (.error(json["message"].string ?? "错误码\(code)"),nil)
             }
         
     }

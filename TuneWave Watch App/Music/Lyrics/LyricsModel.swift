@@ -10,13 +10,21 @@ import SwiftUI
 import CoreMedia
 import Combine
 //这个类负责存储解析好的歌词，获取匹配当前时间点的歌词
-struct LyricsData {
+struct LyricsData:Identifiable,Equatable {
+    var id = UUID()
     var parsedLyrics: [LyricsModel.LyricsLine] = []
     var parsedTranslateLyrics: [LyricsModel.LyricsLine] = []
     init(music:YiMusic,duration:CMTime) async {
+        
         let actor = LyricsModel()
+        
         parsedTranslateLyrics = await actor.parseLyrics(music.tlyric, duration: duration)
+//        print("歌词译文\(music.tlyric)")
+//        print("歌词译文（解析）\(parsedTranslateLyrics.map({ i in i.content }))")
+        
         parsedLyrics = await actor.parseLyrics(music.lyric, duration: duration)
+//        print("歌词原文\(music.lyric)")
+//        print("歌词原文（解析）\(parsedLyrics.map({ i in i.content }))")
     }
 }
 
@@ -150,7 +158,15 @@ actor LyricsModel {
             }
             
         }
-        
+        let isAllEmptyLyrics:Bool = lyricsLines.allSatisfy({ line in
+            line.content.isEmpty
+        })
+        guard !isAllEmptyLyrics else { return [] }
+        //避免了“让风告诉你”的英文翻译是只有时间戳、内容全空白⬇️，这种情况在这边直接做拦截了，而不是让视图去判断
+        [03:01.257]
+        [03:05.006]
+        [03:09.241]
+        [03:13.139]
         return lyricsLines
     }
 }

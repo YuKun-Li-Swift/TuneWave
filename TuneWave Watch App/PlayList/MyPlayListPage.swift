@@ -45,7 +45,7 @@ struct MyPlayList: View {
                                     PleasePickBannerMyPlayList()
                                 }
                                 VStack {
-                                    HStack(alignment: .center, spacing: 16.7/3) {
+                                    HStack(alignment: .top, spacing: 16.7/3) {//左右两列应该.top对其，不然左边一列文本更长的情况下，会在首屏看不到右边那列的顶了
                                         VStack(alignment: .center, spacing: 16.7/3) {
                                             ForEach(leftColumn) { i in
                                                 PlayListGrid(playList: i,selected:$selected)
@@ -95,6 +95,7 @@ struct MyPlayList: View {
             .navigationDestination(item: $selected) { playlist in
                 PlayListDetailPage(playList: playlist)
                     .environment(actionExcuter)
+                    .environment(userContainer)
             }
         } errorView: { error in
             APIErrorDisplay(remoteControlTag: "myPlayListPage", error: error)

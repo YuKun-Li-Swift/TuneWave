@@ -17,17 +17,15 @@ actor MusicLoader {
     var name: String
     var artist: String
     var coverImgURL: URL
-    var vm:MusicLoadingViewModel
     var user: YiUserContainer
     //这里要求YiUserContainer是为了提醒开发人员，登录后才能播放音乐。因为不登录的话还要处理试听版的问题。
     //即使是登录后也要处理会员状态变化，之前缓存的音乐现在是不是应该重新下载（以更高音质/非试听版）。
-    init(isOnline:Bool,musicID: String, name: String, artist: String, coverImgURL: URL,vm:MusicLoadingViewModel, user: YiUserContainer) {
+    init(isOnline:Bool,musicID: String, name: String, artist: String, coverImgURL: URL, user: YiUserContainer) {
         self.isOnline = isOnline
         self.musicID = musicID
         self.name = name
         self.artist = artist
         self.coverImgURL = coverImgURL
-        self.vm = vm
         self.user = user
     }
     @MainActor
@@ -65,7 +63,7 @@ actor MusicLoader {
     var audioFileExtension:String? = nil
     //如果要 320k 则可设置为 320000
     //考虑到Apple Watch通过手机蓝牙共享网络网速慢、使用本app的时候还可能连耳机、进一步挤占蓝牙带宽，故默认音质为64k
-    func step1() async throws {
+    func step1() async throws -> Double {
         let route = "/song/url"
         let fullURL = baseAPI + route
         let json = try await AFTW.request(fullURL,parameters: {
@@ -75,21 +73,22 @@ actor MusicLoader {
                 ["id":musicID,"br":"320000"] as [String:String]//下载的话用320k音质
             }
         }()).LSAsyncJSON()
+        print("音乐信息")
         try json.errorCheck()
-//        print("请求到音乐链接\(json)")
+        //        print("请求到音乐链接\(json)")
         //可能是只能听试听版（那不播放了，不然之后开了VIP还要重新缓存音乐）
         //也可能是完全听不了，比如专辑是付费专辑
         if let code:Int64? = json["data"].array?.first?["code"].int64 {
             switch code {
-             case -110:
-                 throw Step1Error.noPaidAlbum
-             case 200:
+            case -110:
+                throw Step1Error.noPaidAlbum
+            case 200:
                 if let cantNormallyListen = json["data"].array?.first?["freeTrialPrivilege"]["cannotListenReason"].int64 {
                     //如果这个字段不是null，就说明有问题了
                     switch cantNormallyListen {
-                        case 1:
+                    case 1:
                         //只能听试听版导致的播放异常
-                         throw Step1Error.noVIP
+                        throw Step1Error.noVIP
                     default:
                         //可能是IP不对，比如海外无法听大陆的音乐
                         throw Step1Error.cannotListen
@@ -99,12 +98,12 @@ actor MusicLoader {
                 }
             case 404:
                 throw Step1Error.noMusicSource
-             default:
+            default:
                 //可能是IP不对，比如海外无法听大陆的音乐
                 throw Step1Error.cannotListen
-           }
+            }
         }
-
+        
         guard let link = json["data"].array?.first?["url"].url else {
             throw Step1Error.noLink
         }
@@ -122,9 +121,7 @@ actor MusicLoader {
         self.audioURL = link
         self.audioFileExtension = type
         self.audioDataFidelity = level
-        await MainActor.run { @MainActor [vm] in
-            vm.audioDataSize = Double(size)
-        }
+        return Double(size)
     }
     enum Step1Error:Error,LocalizedError {
         case noLink
@@ -158,11 +155,11 @@ actor MusicLoader {
     }
     var coverData:Data? = nil
     func step2() async throws {
-        let (cover,_) = try await URLSession.shared.data(from: {
+        let (cover,_) = try await USTW.data(from: {
             if isOnline {
-                coverImgURL.lowRes(xy2x: 172*3)//在线播放用小图。为什么选择这个尺寸？因为41mm的NowPlay的大封面图是这个尺寸
+                coverImgURL.lowRes(xy2x: 172*3)//在线播放用小图。为什么选择这个尺寸？因为41mm的NowPlayView的大封面图是这个尺寸
             } else {
-                coverImgURL
+                coverImgURL//下载用大图
             }
         }())
         self.coverData = cover
@@ -176,17 +173,22 @@ actor MusicLoader {
         let fullURL = baseAPI + route
         let json = try await AFTW.request(fullURL,parameters: ["id":musicID] as [String:String]).LSAsyncJSON()
         try json.errorCheck()
-//        print("歌词\(json)")
+        //        print("歌词\(json)")
         if let lrc = json["lrc"]["lyric"].string {
             self.lyrics = lrc
         } else {
-            print("遇到一首\(musicID)的没有歌词的歌\(json)")
+            print("遇到一首\(musicID)的没有原歌词的歌\(json)")
             self.lyrics = ""
         }
         if let lrc = json["tlyric"]["lyric"].string {
             self.tlyric = lrc
         } else {
-            print("遇到一首\(musicID)的没有歌词的歌\(json)")
+            if lyrics?.hasSuffix("纯音乐，请欣赏\n") == true {
+                //很可能是原歌词为[00:00.00] 作曲 : cloudfield\n[00:05.00]纯音乐，请欣赏\n
+                //所以没有翻译歌词
+            } else {
+                print("遇到一首\(musicID)的没有翻译歌词的歌\(json)")
+            }
             self.tlyric = ""
         }
     }
@@ -202,38 +204,37 @@ actor MusicLoader {
     
     var audioData:Data? = nil
     
-
     
-    func step4() async throws {
+    
+    func step4(fileURL:URL,onProgressChange:@escaping (Progress)->()) async throws {
         guard let audioURL,let audioFileExtension else {
             throw NeverError.neverError
         }
         // 定义下载文件保存的路径
         let destination: DownloadRequest.Destination = { _, _ in
-            let fileURL = URL.createTemporaryURL(extension: audioFileExtension)
             return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
         }
         try await withCheckedThrowingContinuation { (continuation:CheckedContinuation<Void,Error>) -> Void in
             //永远不要超时，因为音乐云盘里的音乐会很大
-            AFTW.download(URLRequest(url: audioURL,timeoutInterval: 3600), to: destination)
-                    .downloadProgress { progress in
-                        Task { @MainActor in
-                            await self.vm.audioDownloadProgress = progress.fractionCompleted
-                        }
+            AFTW.download(audioURL, to: destination)
+                .downloadProgress { progress in
+                    Task { @MainActor in
+                        onProgressChange(progress)
                     }
-                    .response { response in
-                        do {
-                            // 下载完成后的处理
-                            if response.error == nil, let filePath = response.fileURL {
-                                self.audioData = try Data(contentsOf: filePath)
-                            } else {
-                                throw response.error ?? Step4Error.unknowNetError
-                            }
-                            continuation.resume(returning: ())
-                        } catch {
-                            continuation.resume(throwing: error)
+                }
+                .response { response in
+                    do {
+                        // 下载完成后的处理
+                        if response.error == nil, let filePath = response.fileURL {
+                            self.audioData = try Data(contentsOf: filePath)
+                        } else {
+                            throw response.error ?? Step4Error.unknowNetError
                         }
+                        continuation.resume(returning: ())
+                    } catch {
+                        continuation.resume(throwing: error)
                     }
+                }
         }
     }
     enum Step4Error:Error,LocalizedError {
@@ -246,7 +247,7 @@ actor MusicLoader {
         }
     }
     
-    func generateFinalMusicObject() throws -> YiMusic {
+    func generateFinalMusicObject(isOnline:Bool) throws -> YiMusic {
         guard let lyrics,let tlyric else {
             throw GenerateFinalMusicObjectError.parametersNotReady
         }
@@ -262,7 +263,7 @@ actor MusicLoader {
         guard let audioFileExtension else {
             throw GenerateFinalMusicObjectError.parametersNotReady
         }
-        let object = YiMusic(isOnline: true, musicID: self.musicID, name: self.name, artist: self.artist, lyrics: lyrics, tlyric: tlyric, albumImg: coverData, audioData: audioData, audioDataFidelity: audioDataFidelity, audioDataFileExtension: audioFileExtension)
+        let object = YiMusic(isOnline: isOnline, musicID: self.musicID, name: self.name, artist: self.artist, lyrics: lyrics, tlyric: tlyric, albumImg: coverData, audioData: audioData, audioDataFidelity: audioDataFidelity, audioDataFileExtension: audioFileExtension)
         return object
     }
     enum GenerateFinalMusicObjectError:Error,LocalizedError {

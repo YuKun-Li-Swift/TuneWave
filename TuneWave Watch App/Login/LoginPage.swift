@@ -199,7 +199,7 @@ struct PhoneNumberEnter: View {
                             Task {
                                 scrollPosition = nil//不然在第二次的时候，可能不会触发滚动了
                                 showCtPage = false
-                                try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                                try? await Task.sleep(for: .seconds(0.3))
                                 withAnimation(.smooth) {
                                     scrollPosition = "PhoneInput"
                                 }
@@ -218,9 +218,9 @@ struct PhoneNumberEnter: View {
                                                 Task {
                                                     scrollPosition = nil
                                                     showCtPageDeep = false
-                                                    try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                                                    try? await Task.sleep(for: .seconds(0.3))
                                                     showCtPage = false
-                                                    try? await Task.sleep(nanoseconds: 300000000)//0.3s
+                                                    try? await Task.sleep(for: .seconds(0.3))
                                                     withAnimation(.smooth) {
                                                         scrollPosition = "PhoneInput"
                                                     }

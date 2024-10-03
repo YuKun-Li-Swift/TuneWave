@@ -11,27 +11,23 @@ import SwiftData
 
 @MainActor
 struct OnlineToLocalConverter {
-    static func convert(onlineSongs:[PlayListModel.PlayListSong],modelContext: ModelContext) async throws -> [YiMusic] {
+    static func convert(onlineSongs:[PlayListModel.PlayListSong],modelContext: ModelContext) async throws -> [YiMusicShell] {
         //歌单中的歌曲
         let allSongID:[String] = onlineSongs.map({ song in
             song.songID
         })
         
-        //找到已经缓存的音乐中，有哪些是这个歌单的
-        let predicate = #Predicate<YiMusic> { music in
-            allSongID.contains(music.musicID)
-        }
-        let fetchDescriptor = FetchDescriptor<YiMusic>(predicate: predicate)
-        let allResult = try modelContext.fetch(fetchDescriptor)
         
 
         //排序要与在线歌单内的保持一致
-        var tempMusics:[YiMusic] = []
+        var tempMusics:[YiMusicShell] = []
         for songID in allSongID {
-            if let music = allResult.first(where: { music in
+            if let music = try modelContext.fetch(.init(predicate: #Predicate<YiMusic> { music in
                 music.musicID == songID
-            }) {
-                tempMusics.append(music)
+            })).first {
+                tempMusics.append(music.toShell())
+            } else {
+                //说明这首歌还没有被缓存/下载呗
             }
         }
         return tempMusics

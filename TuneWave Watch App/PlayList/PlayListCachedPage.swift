@@ -129,7 +129,7 @@ struct PlayListCachedMusicPage: View {
                             ForEach(fetchedSongs, content: { song in
                                 MusicRowSingleLine(tapAction:{
                                     playMusic.send(.init(musicID: song.songID, name: song.name, artist: song.artist, coverImgURL: song.imageURL, playList: fetchedSongs))
-                                },imageURL: song.imageURL, name: song.name)
+                                },imageURL: .constant(song.imageURL), name: song.name, hightlight: .constant(false))
                                 //因为静默刷新，为了避免刷新的时候导致批量重载，我们需要显式添加id
                                 .id(song.id)
                             })

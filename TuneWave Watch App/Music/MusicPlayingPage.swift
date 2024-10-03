@@ -6,8 +6,9 @@
 //
 
 import SwiftUI
-
+import SwiftData
 import WatchKit
+
 struct NowPlayView: View {
     enum Page {
         case playingListPage
@@ -15,6 +16,7 @@ struct NowPlayView: View {
         case lyricsPage
     }
     var dismissMe:()->()
+    var openOfflineCleaner:()->()
     @Environment(MusicPlayerHolder.self)
     var playerHolder:MusicPlayerHolder
     @State
@@ -31,6 +33,10 @@ struct NowPlayView: View {
     var showAutoScrollTip = false
     @State
     private var showInformation = false
+    
+    
+    @AppStorage("PreferencedSeekMode")
+    private var preferencedSeekModeRawValue:SeekPreference.RawValue = SeekPreference.song.rawValue//默认显示上一首下一首按钮
     var body: some View {
         
         ZStack {
@@ -43,7 +49,7 @@ struct NowPlayView: View {
                             .tag(Page.playingListPage)
                         NowPlayingView()
                             .tag(Page.nowPlayPage)
-                        LyricsView(isAutoScrolling: $isAutoScrolling)
+                        LyricsViewPack(isAutoScrolling: $isAutoScrolling)
                             .tag(Page.lyricsPage)
                     })
                 })
@@ -78,7 +84,7 @@ struct NowPlayView: View {
                         slideToPage(.playingListPage)
                     }, showLyricPage: {
                         slideToPage(.lyricsPage)
-                    })
+                    }, openOfflineCleaner: myOpenOfflineCleaner)
                 })
                 
                 .onReceive(errorCheckTimer, perform: { _ in
@@ -116,10 +122,12 @@ struct NowPlayView: View {
                 }
             }
         }
-        .onAppear {
-            //在第三方app中播放过别的内容，再切回这里，NowPlay会停留在第三方app的内容，需要主动刷新一下。
-            playerHolder.updateNowPlay()
-        }
+        .onChange(of: selectedTab, initial: true, { oldValue, newValue in
+            if newValue == Page.nowPlayPage {
+                //在第三方app中播放过别的内容（比如说HomePod也在播放播客），再切回这里，NowPlay会停留在第三方app的内容，需要主动刷新一下。
+                playerHolder.updateNowPlay(preferencedSeekModeRawValue: preferencedSeekModeRawValue)
+            }
+        })
         .animation(.smooth, value: showInformation)
         .onChange(of: playerHolder.playingError, initial: true) { oldValue, newValue in
             updateShowInformation()
@@ -139,10 +147,18 @@ struct NowPlayView: View {
         showMorePage = false
         Task {
             //等待页面关闭的动画完成，不然Tab切换没效果
-            try? await Task.sleep(nanoseconds:300000000)//0.3s
+            try? await Task.sleep(for: .seconds(0.3))//0.3s
             withAnimation(.smooth) {
                 selectedTab = page
             }
+        }
+    }
+    func myOpenOfflineCleaner() {
+        showMorePage = false
+        Task {
+            //等待页面关闭的动画完成，不然watchOS 10下导航会不工作
+            try? await Task.sleep(for: .seconds(0.3))//0.3s
+            openOfflineCleaner()
         }
     }
 }
@@ -150,17 +166,16 @@ struct NowPlayView: View {
 struct NowPlayMoreActionPage: View {
     var dismissMe:()->()
     @State
-    private var tutorialFailed = false
-    @State
-    private var haptic = UUID()
-    @State
     private var showNeedMoreMusicAlert = false
     @Environment(MusicPlayerHolder.self)
     private var playerHolder:MusicPlayerHolder
     @State
     private var enlargeButton = false
+    @State
+    private var showVolumePage = false
     var showPlayingListPage:()->()
     var showLyricPage:()->()
+    var openOfflineCleaner:()->()
     var body: some View {
         ScrollViewOrNot {
             VStack {
@@ -180,52 +195,226 @@ struct NowPlayMoreActionPage: View {
                         .symbolEffect(.pulse, options: .repeating)
                 })
                 Button(action: {
-                    //触发触感，告诉用户是点到了的，因为接下来的动画可能让人迷惑
-                    haptic = UUID()
-                    dismissMe()
-                    Task {
-                        //需要等待sheet关闭的动画完成，否则会无法正确弹出视频
-                        try? await Task.sleep(nanoseconds: 3000000000)//0.3s
-                        playTutorialVideo()
-                    }
+                    showVolumePage = true
                 }, label: {
                     Label("调节音量", systemImage: "volume.3.fill")
                         .symbolEffect(.pulse, options: .repeating)
                 })
-                .sensoryFeedback(.impact, trigger: haptic)
-              
-                
+                NowPlayDownloadButton(openOfflineCleaner:openOfflineCleaner)
             }
-            .alert("调节音量教程视频播放失败，"+DeveloperContactGenerator.generate(), isPresented: $tutorialFailed, actions: {})
             .alert("当前播放列表中只有一首歌，只能单曲循环，请先查看您的播放列表", isPresented: $showNeedMoreMusicAlert, actions: {
                 Button("我去看看", action: {
                     focusToPlayListButton()
                 })
+            })
+            .navigationDestination(isPresented: $showVolumePage, destination: {
+                VolumePage()
             })
             
         }
     }
     func focusToPlayListButton() {
         withAnimation(.smooth.delay(0.5)) {
-                enlargeButton = true
-            } completion: {
-                Task {
-                    try? await Task.sleep(nanoseconds: 200000000)//0.2s
-                    withAnimation(.smooth) {
-                        enlargeButton = false
-                    }
+            enlargeButton = true
+        } completion: {
+            Task {
+                try? await Task.sleep(for: .seconds(0.2))//0.2s
+                withAnimation(.smooth) {
+                    enlargeButton = false
                 }
             }
+        }
     }
-    func playTutorialVideo() {
-        //没声音的视频，可以直接开始播放
-        WKExtension.shared().visibleInterfaceController?.presentMediaPlayerController(with: Bundle.main.url(forResource: "ChangeVolumeVideo", withExtension: "mp4")!, options: [WKMediaPlayerControllerOptionsAutoplayKey:true,WKMediaPlayerControllerOptionsVideoGravityKey:WKVideoGravity.resizeAspect.rawValue,WKMediaPlayerControllerOptionsLoopsKey:true], completion: { _, _, error in
-            if error != nil {
-                self.tutorialFailed = true
+}
+
+struct VolumePage: View {
+    var body: some View {
+        ScrollViewOrNot {
+            VStack {
+                Text("请点击下方的小喇叭图标")
+                VolumeIndicatorView()
+                Text("然后旋转手表的侧边旋钮")
+            }
+            .scenePadding(.horizontal)
+        }
+    }
+}
+
+#Preview {
+    VolumePage()
+}
+
+struct VolumeIndicatorView: WKInterfaceObjectRepresentable {
+    
+    typealias WKInterfaceObjectType = WKInterfaceVolumeControl
+    
+    func makeWKInterfaceObject(context: WKInterfaceObjectRepresentableContext<VolumeIndicatorView>) -> WKInterfaceVolumeControl {
+        let control = WKInterfaceVolumeControl(origin: .local)
+        control.setTintColor(.blue)
+        return control
+    }
+    
+    func updateWKInterfaceObject(_ control: WKInterfaceVolumeControl, context: WKInterfaceObjectRepresentableContext<VolumeIndicatorView>) {
+        
+    }
+}
+
+struct NowPlayDownloadButtonInner: View {
+    @State
+    var currentMusic:YiMusic
+    @Environment(\.modelContext)
+    private var modelContext
+    @State
+    private var impactHaptic = UUID()
+    @State
+    private var downloaded = false
+    @State
+    private var vm = DownloadButtonViewModel()
+    var body: some View {
+        Button(action:{
+            impactHaptic = UUID()
+            if !downloaded {
+                vm.downloadMusicButton(yiMusic: currentMusic, modelContext: modelContext)
+            } else {
+                vm.showDeleteConfirmAlert = true
+            }
+        }) {
+            if !downloaded {
+                Label("下载音乐", systemImage: "icloud.and.arrow.down")
+                    .symbolEffect(.pulse, options: .repeating)
+                    .transition(.blurReplace.animation(.smooth.delay(0.2)))//延迟，避免交互式掉帧
+            } else {
+                VStack(alignment: .leading) {
+                    Label("已下载", systemImage: "icloud.and.arrow.down")
+                        .symbolEffect(.pulse, options: .repeating)
+                    Text("可离线播放")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .transition(.blurReplace.animation(.smooth.delay(0.2)))//延迟，避免交互式掉帧
+            }
+        }
+        .sensoryFeedback(.impact, trigger: impactHaptic)
+        .alert("确认删除已下载的音乐吗？", isPresented: $vm.showDeleteConfirmAlert, actions: {
+            Button(role: .destructive) {
+                vm.deleteMusicButton(yiMusic: currentMusic, modelContext: modelContext)
+            } label: {
+                Text("删除")
+            }
+            Button(role: .cancel) { } label: {
+                Text("取消")
+            }
+        })
+        .sheet(item: $vm.downloadError) { pack in
+            ScrollViewOrNot {
+                ErrorView(errorText: pack.error.localizedDescription)
+            }
+        }
+        .sheet(item: $vm.deleteError) { pack in
+            ScrollViewOrNot {
+                ErrorView(errorText: pack.error.localizedDescription)
+            }
+        }
+        .onChange(of: currentMusic.isOnline, initial: true) { oldValue, newValue in
+            self.downloaded = updateDownloadedStatus(isOnline: newValue)
+            print("更新downloaded到\(downloaded)")
+        }
+    }
+    func updateDownloadedStatus(isOnline:Bool) -> Bool {
+        if isOnline {
+            return false
+        } else {
+            return true
+        }
+    }
+}
+
+struct NowPlayDownloadButton: View {
+    var openOfflineCleaner:()->()
+    @Environment(MusicPlayerHolder.self)
+    private var playerHolder:MusicPlayerHolder
+    @State
+    private var currentMusic:YiMusic? = nil
+    var body: some View {
+        VStack {
+            if let currentMusic {
+                NowPlayDownloadButtonInner(currentMusic: currentMusic)
+                    .transition(.blurReplace)
+            } else {
+                //没有正在播放的音乐，不显示下载按钮
+            }
+        }
+        .onChange(of: playerHolder.currentMusic, initial: true, { oldValue,newValue in
+            withAnimation(.smooth) {
+                currentMusic = newValue
             }
         })
     }
 }
+
+@MainActor
+@Observable
+class DownloadButtonViewModel {
+    var showDeleteConfirmAlert = false
+    var downloadError:ErrorPack? = nil
+    var deleteError:ErrorPack? = nil
+    func downloadMusicButton(yiMusic:YiMusic?,modelContext:ModelContext) {
+        do {
+            downloadError = nil
+            try downloadMusic(yiMusic: yiMusic,modelContext:modelContext)
+        } catch {
+            downloadError = .init(error: error)
+        }
+    }
+    private
+    func downloadMusic(yiMusic:YiMusic?,modelContext:ModelContext) throws {
+        guard let yiMusic else {
+            throw DownloadOrDeleteMusicError.notPlaying
+        }
+        //这样就说明用户已经显式下载了，而不是自动缓存
+        yiMusic.isOnline = false
+        print("已经标记为下载状态")
+        try modelContext.save()
+    }
+    func deleteMusicButton(yiMusic:YiMusic?,modelContext:ModelContext) {
+        do {
+            deleteError = nil
+            try deletedMusic(yiMusic: yiMusic,modelContext:modelContext)
+        } catch {
+            deleteError = .init(error: error)
+        }
+    }
+    private
+    func deletedMusic(yiMusic:YiMusic?,modelContext:ModelContext) throws {
+        guard let yiMusic else {
+            throw DownloadOrDeleteMusicError.notPlaying
+        }
+        //变回自动缓存的音乐
+        yiMusic.isOnline = true
+        print("已经标记为自动缓存状态")
+        try modelContext.save()
+    }
+    enum DownloadOrDeleteMusicError:Error,LocalizedError {
+        case notPlaying
+        var errorDescription: String? {
+            switch self {
+            case .notPlaying:
+                "当前没有正在播放的音乐"
+            }
+        }
+    }
+}
+
+struct OptionalOnChangeView: View {
+    var body: some View {
+        Rectangle()
+            .fill(.clear)
+            .frame(width: 1, height: 1, alignment: .center)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}
+
 
 //原生的Picker会出现背景毛玻璃丢失、返回按钮消失的问题。
 struct TuneWavePicker: View {
@@ -329,7 +518,7 @@ extension NowPlayView {
             withAnimation(.snappy) {
                 showAutoScrollTip = true
             }
-            try? await Task.sleep(nanoseconds: 1000000000)//1s
+            try? await Task.sleep(for: .seconds(1))//1s
             withAnimation(.snappy) {
                 showAutoScrollTip = false
             }
@@ -371,8 +560,7 @@ struct Zero3Delay<V:View>: View {
                 .onLoad {
                     Task {
                         if showMe == false {
-                            try? await Task.sleep(nanoseconds: 300000000)//0.3s
-                            print("0.3秒之期已到！")
+                            try? await Task.sleep(for: .seconds(0.3))
                             withAnimation(.smooth) {
                                 showMe = true
                             }
