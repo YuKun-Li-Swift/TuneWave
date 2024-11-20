@@ -35,26 +35,11 @@ class DownloadManageViewModel {
     
     private
     func getAllDownloadedMusic(modelContext:ModelContext) async throws -> [YiMusicDetailedShell] {
-        var descriptor = FetchDescriptor<YiMusic>(predicate: #Predicate<YiMusic>{ music in
+        try await PersistentModel.fetchFromDBVersionC(predicate: #Predicate<YiMusic> { music in
             !music.isOnline//现在要找的是已下载的音乐
-        },sortBy: [SortDescriptor(\.name)])
-        descriptor.propertiesToFetch = [\.id]
-        var downloadedMusics = [YiMusicDetailedShell]()
-        let objectIDs:[UUID] = try modelContext.fetch(descriptor).map({ yiMuisc in
-            yiMuisc.id
-        })//批量取只取UUID，避免占用大量内存
-        
-        for objectID in objectIDs {
-            //在单独转换每个对象，这样每个对象在返回后就会释放
-            if let music = try modelContext.fetch(.init(predicate: #Predicate<YiMusic> { music in
-                music.id == objectID
-            })).first {
-                try await downloadedMusics.append(music.toFullShell())
-            } else {
-                throw GetCachedMusicError.musicLost
-            }
-        }
-        return downloadedMusics
+        }, sortBy: { $0.name.localizedCompare($1.name) == .orderedAscending
+            /*按照首字母排序*/
+        }, modelContext: modelContext)
     }
 }
 

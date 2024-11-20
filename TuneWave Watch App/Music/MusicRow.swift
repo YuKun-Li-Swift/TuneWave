@@ -117,7 +117,7 @@ struct MusicRowSingleLine<V:View>: View {
 struct ImageViewForMusicRowSingleLine: View {
     var imageURL:URL
     var body: some View {
-        if imageURL.isFileURL {
+        if imageURL.isFileURL {//本地图片，加载很快，在加载过程中不用显示占位图
             InlineCoverLocalImageView(imageURL: imageURL)
         } else {
             WebImage(url: imageURL.lowRes(xy2x: 80)) { phase in
@@ -150,13 +150,14 @@ struct InlineCoverLocalImageView: View {
             Group {
                 if let uiimage {
                     InlineCoverImageView(image: .init(uiImage: uiimage))
-                        .transition(.blurReplace.animation(.smooth))
+                        .transition(.opacity.animation(.easeOut))//用户快速滑动的时候更有机会看到封面图
                 } else if let loadLocalImageError {
                     FixSizeImage(systemName: "photo")
-                        .id("LoadingOrError")//标识符，避免重新渲染
+                        .transition(.blurReplace.animation(.smooth))
                 } else {
                     FixSizeImage(systemName: "photo")
-                        .id("LoadingOrError")//标识符，避免重新渲染
+                        .foregroundStyle(Color.clear)//本地图片，加载很快，在加载过程中不用显示占位图
+                    //我本来就是透明的，根本不需要.transition
                 }
             }
             .task {

@@ -61,7 +61,7 @@ struct MyPlayList: View {
                                             } else {
                                                 //如果新号只有一个歌单
                                                 //占位，不然布局不对了
-                                                PlayListGrid(playList: .placeholder(),selected:$selected)
+                                                Spacer()
                                                     .hidden()
                                             }
                                         }

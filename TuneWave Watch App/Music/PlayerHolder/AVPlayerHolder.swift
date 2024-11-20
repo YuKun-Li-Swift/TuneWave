@@ -31,7 +31,7 @@ class MusicPlayerHolder {
     var musicURL:URL? = nil
     //播放列表
     
-    var playingList:[YiMusicShell] = []
+    var playingList:[YiMusicDetailedShell] = []
     var currentMusic:YiMusic? = nil
     var cancellable:AnyCancellable?
     var lyricsCancellable:Any?
@@ -59,7 +59,7 @@ class MusicPlayerHolder {
     }
     
     
-    var musicShellToRealObject:(YiMusicShell) throws -> (YiMusic) = { _ in
+    var musicShellToRealObject:(YiMusicDetailedShell) throws -> (YiMusic) = { _ in
         throw MusicShellToRealObjectError.notImplement
     }
     
@@ -107,8 +107,10 @@ class MusicPlayerHolder {
     //如果播放的这首歌已经被缓存了，那么playingList就会包含这首歌
     //如果播放的这首歌，在点击音乐Row时尚未被缓存，那么playingList就不包含这首歌
     ///修改此次逻辑时，记得考虑要不要修改switchMusic(to yiMusic:YiMusic)的逻辑
-    func playMusic(_ yiMusic:YiMusic,playingList:[YiMusicShell],preferencedSeekModeRawValue: SeekPreference.RawValue) async throws {
-        if !playingList.contains(yiMusic.toShell()) {
+    func playMusic(_ yiMusic:YiMusic,playingList:[YiMusicDetailedShell],preferencedSeekModeRawValue: SeekPreference.RawValue) async throws {
+        if !playingList.contains(where: { music in
+            music.musicID == yiMusic.musicID
+        }) {
             throw PlayMusicError.notRightPlayingList
         }
         self.playingList = playingList
@@ -244,7 +246,7 @@ enum PlayingMode:Int {
 extension MusicPlayerHolder {
     func updateCurrentMusic() {
         if let exsist = self.playingList.first(where: { music in
-            music.id == self.currentMusic?.musicID
+            music.musicID == self.currentMusic?.musicID
         }) {
             //正常的，什么都不做
         } else {
@@ -379,12 +381,15 @@ extension MusicPlayerHolder {
         }
     }
     //不要真随机，不然前一首是A，下一首随机出来又是A，就尴尬了
-    func getRandomMusic() throws -> YiMusic {
+    func getRandomMusic() async throws -> YiMusic {
         if let currentMusic {
             playedItems.append(currentMusic.toShell())
         }
-        let pickFrom:[YiMusicShell] = playingList.filter { music in
-            !playedItems.contains(music)
+        //优先从随机播放还没放过的歌中抽取
+        let pickFrom:[YiMusicDetailedShell] = playingList.filter { musicInPlayingList in
+            !playedItems.contains { musicInPlayedItems in
+                musicInPlayingList.musicID == musicInPlayedItems.musicID
+            }
         }
         print("歌单一共有\(playingList.count)，还剩\(pickFrom.count)首可以随机的")
         if pickFrom.isEmpty {
@@ -401,7 +406,7 @@ extension MusicPlayerHolder {
             return try musicShellToRealObject(randomOne)
         }
     }
-    func getPerviousMusic() throws -> YiMusic {
+    func getPerviousMusic() async throws -> YiMusic {
         if self.playingList.isEmpty {
             //比如说用户播放过程中进行了垃圾清理？导致当前播放的这首歌都没了
             throw GetNextMusicError.emptyPlayingList
@@ -414,7 +419,9 @@ extension MusicPlayerHolder {
             }
         } else {
             guard let currentMusic else { throw GetNextMusicError.currentMusicNotInPlayingList }
-            guard let currentCount = playingList.firstIndex(of: currentMusic.toShell()) else { throw GetNextMusicError.currentMusicNotInPlayingList }
+            guard let currentCount = playingList.firstIndex(where: { music in
+                music.musicID == currentMusic.musicID
+            }) else { throw GetNextMusicError.currentMusicNotInPlayingList }
             let previousIndex = currentCount - 1
             if previousIndex >= 0 {
                 let switchTo = playingList[previousIndex]
@@ -429,7 +436,7 @@ extension MusicPlayerHolder {
             }
         }
     }
-    func getNextMusic() throws -> YiMusic {
+    func getNextMusic() async throws -> YiMusic {
         if self.playingList.isEmpty {
             //比如说用户播放过程中进行了垃圾清理？导致当前播放的这首歌都没了
             throw GetNextMusicError.emptyPlayingList
@@ -442,7 +449,9 @@ extension MusicPlayerHolder {
             }
         } else {
             guard let currentMusic else { throw GetNextMusicError.currentMusicNotInPlayingList }
-            guard let currentCount = playingList.firstIndex(of: currentMusic.toShell()) else { throw GetNextMusicError.currentMusicNotInPlayingList }
+            guard let currentCount = playingList.firstIndex(where: { music in
+                music.musicID == currentMusic.musicID
+            }) else { throw GetNextMusicError.currentMusicNotInPlayingList }
             let nextIndex = currentCount + 1
             if nextIndex <= playingList.count-1 {
                 let nextOneShell = playingList[nextIndex]

@@ -29,6 +29,8 @@ struct ContentView: View {
     private var openSettingPage:Bool = false
     @State
     private var openOfflineCleaner:UUID = UUID()
+    @State
+    private var showVolumePage = false
     var body: some View {
         VStack {
             NavigationStack {
@@ -46,6 +48,12 @@ struct ContentView: View {
                                     Text(nowPlay.name)
                                         .foregroundStyle(.secondary)
                                 }
+                            }
+                        } else {
+                            if let userContainer { //用户先把账号登好，不然这么多入口摆在这儿容易误导用户
+                                VolumeButton(pushPage: {
+                                    showVolumePage = true
+                                })
                             }
                         }
                         
@@ -86,6 +94,7 @@ struct ContentView: View {
                         }
                     }
                 }
+                
                 .navigationDestination(isPresented: $showMyPlayListPage, destination: {
                     MyPlayList()
                         .environment(actionExcuter)
@@ -114,7 +123,20 @@ struct ContentView: View {
                     }
                 })
                 .modifier(RefreshCookie(userContainer: $userContainer))
+                .navigationDestination(isPresented: $showVolumePage, destination: {
+                    VolumePage()
+                })
+                .background {
+                    if let userContainer {
+                        Rectangle()
+                            .fill(Color.clear)
+                            .hidden()
+                            .accessibilityHidden(true)
+                            .modifier(ExternalSpeakerAlert())
+                    }
+                }
                 .modifier(ShowDisclaimer())
+                
                 .navigationTitle("悦音音乐")
             }
             .environment(playerHolder)
@@ -258,8 +280,6 @@ struct MusicPlayerCover: ViewModifier {
     private var cachedMusic:YiMusic? = nil
     @Environment(\.modelContext)
     private var modelContext
-    @AppStorage("ignore Silent Mode")
-    private var ignoreSlientMode = true
     func body(content: Content) -> some View {
         content
             .sheet(item: $ship) { ship in
@@ -291,10 +311,8 @@ struct MusicPlayerCover: ViewModifier {
                 }
             }
             .onLoad {
-                if ignoreSlientMode {
-                    //APP启动，先激活正确的音频会话
-                    playerHolder.setupAVAudioSession()
-                }
+                //APP启动，先激活正确的音频会话
+                playerHolder.setupAVAudioSession()
             }
     }
     func myOpenOfflineCleaner() {

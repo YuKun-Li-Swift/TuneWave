@@ -1,28 +1,8 @@
-//
-//  LyricsView.swift
-//  TuneWave Watch App
-//
-//  Created by Yukun Li on 2024/8/23.
-//
-
 import SwiftUI
 import CoreMedia
 
-struct LyricsViewSwitcher: View {
-    @Binding
-    var isAutoScrolling:Bool
-    var body: some View {
-        if #available(watchOS 11.0, *) {
-            LyricsView(isAutoScrolling: $isAutoScrolling)
-        } else {
-            //watchOS 10不支持MeshGradient，不提供背景效果
-            LyricsViewOS10(isAutoScrolling: $isAutoScrolling)
-        }
-    }
-}
-
-@available(watchOS 11.0, *)
-struct LyricsView: View {
+@MainActor
+struct LyricsViewOS10: View {
     @Environment(MusicPlayerHolder.self)
     var playerHolder:MusicPlayerHolder
     @State
@@ -48,20 +28,17 @@ struct LyricsView: View {
     var body: some View {
       
         VStack {
-            if let loadedLyrics = playerHolder.lyricsData,let currentMusic = playerHolder.currentMusic {
-                ZStack {
-                    LyricsBackgroundView(currentMusic: currentMusic)
-                    LyricsViewInner(parsedLyric: $parsedLyric,blurTransition:$blurTransition,rawLyric: $rawLyric,isAutoScrolling:$isAutoScrolling,  enableLyricsTranslate:$enableLyricsTranslate)
+            if let loadedLyrics = playerHolder.lyricsData {
+                    LyricsViewInnerOS10(parsedLyric: $parsedLyric,blurTransition:$blurTransition,rawLyric: $rawLyric,isAutoScrolling:$isAutoScrolling,  enableLyricsTranslate:$enableLyricsTranslate)
                     //为切换翻译开关做了动画
                         .onChange(of: enableLyricsTranslate, initial: false) { oldValue, newValue in
                             switchLyricSmooth()
                         }
-                }
                 .transition(.blurReplace.animation(.smooth))
             } else {
                 Text("当前没有在播放的音乐")
                     .scenePadding(.horizontal)
-                    .transition(.opacity.animation(.smooth))
+                    .transition(.blurReplace.animation(.smooth))
             }
             
         }
@@ -123,8 +100,7 @@ struct LyricsView: View {
 }
 
 
-@MainActor
-struct LyricsViewInner: View {
+struct LyricsViewInnerOS10: View {
     @Binding
     var parsedLyric:[LyricsModel.LyricsLine]
     @Binding
@@ -156,14 +132,14 @@ struct LyricsViewInner: View {
                 if parsedLyric.isEmpty {
                     //歌词不是空的，但是解析出来是空的（可能是未正确解析）
                     //说明解析出来的歌词确实是空的，那就显示原始歌词（未解析的）
-                    LyricUnormalView(rawLyric: $rawLyric,blurTransition:$blurTransition, enableLyricsTranslate: $enableLyricsTranslate)
+                    LyricUnormalViewOS10(rawLyric: $rawLyric,blurTransition:$blurTransition, enableLyricsTranslate: $enableLyricsTranslate)
                 } else {
                     TimelineView(.periodic(from: .now, by: 1/30), content: { _ in
                         VStack {
                             ScrollView(.vertical) {
                                 VStack(alignment: .leading,spacing:23.3) {
                                     ForEach(parsedLyric) { lyric in
-                                        LyricsLineView(lyric: lyric,playingLyric:$playingLyrics,isAutoScrolling:$isAutoScrolling)
+                                        LyricsLineViewOS10(lyric: lyric,playingLyric:$playingLyrics,isAutoScrolling:$isAutoScrolling)
                                             .id(lyric)
                                     }
                                 }
@@ -221,6 +197,7 @@ struct LyricsViewInner: View {
             }
         }
         .animation(.smooth, value: enableLyricsTranslate)
+        
     }
     enum ScrollType {
         //毫不迟疑直接无动画滚动
@@ -310,22 +287,10 @@ struct LyricsViewInner: View {
         //把对focusLyrics的赋值反映给playingLyrics，因为playingLyrics只在歌词行里使用，动画不动画是由歌词行内决定的
         playingLyrics = focusLyrics
     }
-    private
-    func fontSize(textStyle:UIFont.TextStyle) -> CGFloat {
-         
-         // 转换成 UIFont
-         let uiFont = UIFont.preferredFont(forTextStyle: textStyle)
-         
-         // 根据上下文调整字体大小
-         let metrics = UIFontMetrics(forTextStyle: textStyle)
-         let adjustedFont = metrics.scaledFont(for: uiFont)
-         
-         return adjustedFont.pointSize
-     }
 }
 
 
-struct LyricUnormalView: View {
+struct LyricUnormalViewOS10: View {
     @Binding
     var rawLyric:String?
     @Binding
@@ -352,7 +317,7 @@ struct LyricUnormalView: View {
 }
 
 //每一行分离到一个显式的View，便于SwiftUI自己优化性能
-struct LyricsLineView: View {
+struct LyricsLineViewOS10: View {
     var lyric:LyricsModel.LyricsLine
     @Binding
     var playingLyric:LyricsModel.LyricsLine?
@@ -360,16 +325,17 @@ struct LyricsLineView: View {
     var isAutoScrolling:Bool
     @State
     private var isBoldText = false
+    @Environment(\.isLuminanceReduced)
+    private var isLuminanceReduced
     @State
     private var textColor:Color = .primary
     var body: some View {
         VStack(content: {
             if !lyric.content.isEmpty {
                 Text(lyric.content)
-                    .font(isBoldText ? .title3 : .body)//英文字体变化是连续动画的，中文字体变化是渐隐渐显的
+                    .font(isBoldText ? .title3 : .body)
                     .bold()
                     .foregroundStyle(textColor)
-                    .shadow(radius: isBoldText ? 5 : 0, x: isBoldText ? 3 : 0, y: isBoldText ? 3 : 0)
             } else {
                 Text("")
             }
@@ -382,6 +348,9 @@ struct LyricsLineView: View {
             updateHighlightState()
         }
         .onChange(of: isBoldText, initial: true) {
+            updateTextColor()
+        }
+        .onChange(of: isLuminanceReduced, initial: true) {
             updateTextColor()
         }
     }
@@ -405,11 +374,21 @@ struct LyricsLineView: View {
     //会受到isLuminanceReduced和hightlight影响
     func updateTextColor() {
         withAnimation(.smooth) {
-            if isBoldText {
-                //放下手腕时，暗红色的文字很难在黑色背景中被辨认，此时白色文字才是可读性最好的
-                self.textColor = .primary
+            if !isLuminanceReduced {
+                //亮屏时
+                if isBoldText {
+                    self.textColor = .red
+                } else {
+                    self.textColor = .primary
+                }
             } else {
-                self.textColor = .secondary
+                //放下手腕时
+                if isBoldText {
+                    //放下手腕时，暗红色的文字很难在黑色背景中被辨认，此时白色文字才是可读性最好的
+                    self.textColor = .primary
+                } else {
+                    self.textColor = .secondary
+                }
             }
         }
     }

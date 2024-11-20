@@ -94,10 +94,6 @@ actor LyricsModel {
         var id = UUID()
         var content: String
         var time: ClosedRange<CMTime>
-        static
-        func placeHolder() -> Self {
-            return .init(content: "", time: CMTime.invalid...CMTime.invalid)
-        }
     }
     
     func parseLyrics(_ LRC: String,duration:CMTime) -> [LyricsLine] {

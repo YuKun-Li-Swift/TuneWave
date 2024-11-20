@@ -87,6 +87,7 @@ struct BatchDownload: View {
             vm.startBatchDownload(user: user, modelContext: modelContext)
         }
         .onChange(of: showMe, initial: false) { oldValue, newValue in
+            //离开页面了，取消批量下载
             if newValue == false {
                 vm.batchDownloadTask?.cancel()
             }
@@ -140,6 +141,10 @@ class BatchDownloadViewModel {
         batchDownloadTask?.cancel()
         batchDownloadTask = Task {
             for downloadTask in batchTask {
+                //如果已经离开批量下载页面了，就不要下载了，不然在后台占网速/占性能/占空间就不好了
+                guard !Task.isCancelled else {
+                    print("已取消批量下载")
+                    return }
                 do {
                     downloadTask.status = .downloading
                     let music = downloadTask.music

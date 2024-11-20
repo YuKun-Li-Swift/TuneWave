@@ -28,6 +28,11 @@ struct SeekSettingsView: View {
                 Text("按钮模式")
             }
             .pickerStyle(.navigationLink)
+            if preferencedSeekModeRawValue == SeekPreference.song.rawValue {
+                Text("仅在部分歌单中生效")
+                    .transition(.blurReplace.animation(.smooth))
+                    .listRowBackground(EmptyView())
+            }
         }
         .navigationTitle("按钮模式")
         .onChange(of: preferencedSeekModeRawValue, initial: false) { oldValue, newValue in

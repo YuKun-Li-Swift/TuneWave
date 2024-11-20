@@ -24,7 +24,7 @@ class RemoteCommandManager {
     // 配置远程控制事件
     // 不配置这个，不会在Now Play显示歌曲信息
     // 这里的几个闭包，在调用前都应该检查self还存不存在的
-    func configureRemoteCommandCenter(avplayer:AVPlayer,playingList:[YiMusicShell],userTapPreviousTrackButton:@escaping () -> (MPRemoteCommandHandlerStatus),userTapNextTrackButton:@escaping () -> (),needRefreshNowPlay:@escaping ()->(),preferencedSeekModeRawValue:SeekPreference.RawValue) {
+    func configureRemoteCommandCenter(avplayer:AVPlayer,playingList:[YiMusicDetailedShell],userTapPreviousTrackButton:@escaping () -> (MPRemoteCommandHandlerStatus),userTapNextTrackButton:@escaping () -> (),needRefreshNowPlay:@escaping ()->(),preferencedSeekModeRawValue:SeekPreference.RawValue) {
         self.needRefreshNowPlay = needRefreshNowPlay
         let commandCenter = MPRemoteCommandCenter.shared()
         

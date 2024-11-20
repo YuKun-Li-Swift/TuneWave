@@ -75,28 +75,25 @@ class OfflineCacheCleanerViewModel {
         }
     }
     
+    
     private
     func getAllCachedMusic(modelContext:ModelContext) async throws -> [YiMusicDetailedShell] {
-        var descriptor = FetchDescriptor<YiMusic>(predicate: #Predicate<YiMusic>{ music in
-            music.isOnline
-        },sortBy: [SortDescriptor(\.name)])
-        descriptor.propertiesToFetch = [\.id]
-        var cachedMusic = [YiMusicDetailedShell]()
-        let objectIDs:[UUID] = try modelContext.fetch(descriptor).map({ yiMuisc in
-            yiMuisc.id
-        })//批量取只取UUID，避免占用大量内存
-        
-        for objectID in objectIDs {
-            //在单独转换每个对象，这样每个对象在返回后就会释放
-            if let music = try modelContext.fetch(.init(predicate: #Predicate<YiMusic> { music in
-                music.id == objectID
-            })).first {
-                try await cachedMusic.append(music.toFullShell())
-            } else {
-                throw GetCachedMusicError.musicLost
-            }
+        try await PersistentModel.fetchFromDBVersionC(predicate: #Predicate<YiMusic> { music in
+            music.isOnline//取在线音乐（在线的代表是缓存的，而不是用户下载的）
+        }, sortBy: { $0.name.localizedCompare($1.name) == .orderedAscending
+            /*按照首字母排序*/
+        }, modelContext: modelContext)
+    }
+     
+    func toMusicDetail(musics:FetchResultsCollection<YiMusic>,cachedMusic: inout [YiMusicDetailedShell]) async throws -> [YiMusicDetailedShell] {
+        for music in musics.shuffled() {
+            try await func2(music: music)
+//            try await (music.toDetailedShell())
         }
-        return cachedMusic
+        return []
+    }
+    func func2(music:YiMusic) async throws {
+        try await print(music.toDetailedShell())
     }
 }
 

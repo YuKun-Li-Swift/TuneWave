@@ -54,7 +54,6 @@ struct SettingPage: View {
                 } label: {
                     Label("按钮模式", systemImage: "gauge.open.with.lines.needle.33percent.and.arrowtriangle.from.0percent.to.50percent")
                 }
-                IgnoreSlientModeButton(pushIgnoreSlientModePage: $pushIgnoreSlientModePage)
             }
         }
         .navigationDestination(isPresented: $pushCleanerPage, destination: {

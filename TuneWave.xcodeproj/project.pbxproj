@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C01F1052CC118D5004D15B4 /* AudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C01F1042CC118D2004D15B4 /* AudioSession.swift */; };
 		7C0484E02CA5AE4F009EC427 /* DownloadManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0484DF2CA5AE3E009EC427 /* DownloadManageView.swift */; };
 		7C1206232C7851BD0004B08A /* SwiftUIExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E862C454FAB00E9143F /* SwiftUIExtension.swift */; };
 		7C2F55E92C96832C00BA11D1 /* RemoteCommandManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F55E82C96832300BA11D1 /* RemoteCommandManager.swift */; };
@@ -43,7 +44,7 @@
 		7C310EC32C4554D000E9143F /* AVPlayerHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EC22C4554D000E9143F /* AVPlayerHolder.swift */; };
 		7C310EC62C45555F00E9143F /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EC52C45555F00E9143F /* ErrorView.swift */; };
 		7C310EC82C45577100E9143F /* NeverError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EC72C45577100E9143F /* NeverError.swift */; };
-		7C310ECB2C455C7200E9143F /* TempURLCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ECA2C455C7200E9143F /* TempURLCreator.swift */; };
+		7C310ECB2C455C7200E9143F /* TempFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ECA2C455C7200E9143F /* TempFileCreator.swift */; };
 		7C310ECE2C455EFA00E9143F /* AboutPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ECD2C455EFA00E9143F /* AboutPage.swift */; };
 		7C310ED22C46439300E9143F /* MusicPlayingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ED12C46439300E9143F /* MusicPlayingPage.swift */; };
 		7C44BA132C1C7DC7008DB511 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 7C44BA122C1C7DC7008DB511 /* Alamofire */; };
@@ -58,6 +59,7 @@
 		7C94F1FB2C4FE6C700D05579 /* PlayListCachedPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C94F1FA2C4FE6C700D05579 /* PlayListCachedPage.swift */; };
 		7C9DC4E22C7833E0007AA080 /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9DC4E12C7833E0007AA080 /* LyricsView.swift */; };
 		7C9DC4E42C7833F6007AA080 /* LyricsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9DC4E32C7833F6007AA080 /* LyricsModel.swift */; };
+		7CA4FD922CEAD95F00D5A1B7 /* PlayListMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CA4FD912CEAD95900D5A1B7 /* PlayListMenuView.swift */; };
 		7CB18B3B2C490DD90042DB8B /* AnimatedLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */; };
 		7CB18B3D2C490EB30042DB8B /* YiMusicLogo.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */; };
 		7CB18B412C491FA80042DB8B /* URLRequestExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */; };
@@ -86,6 +88,11 @@
 		7CE67ABB2C64CA3500979669 /* QRLoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE67ABA2C64CA3500979669 /* QRLoginViewModel.swift */; };
 		7CEB292A2C59D91800E2A3D8 /* OnlineToLocalConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */; };
 		7CEB292C2C59E77F00E2A3D8 /* MusciPlayingListPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */; };
+		7CEEE7162CEC890C00137873 /* ColorThief.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEEE7142CEC890C00137873 /* ColorThief.swift */; };
+		7CEEE7172CEC890C00137873 /* MMCQ.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEEE7152CEC890C00137873 /* MMCQ.swift */; };
+		7CEEE71A2CEC892200137873 /* FlowBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEEE7192CEC892200137873 /* FlowBackground.swift */; };
+		7CEEE71C2CEC899000137873 /* LyricsBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEEE71B2CEC898C00137873 /* LyricsBackgroundView.swift */; };
+		7CEEE71E2CEC8C6C00137873 /* LyricsViewOS10.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEEE71D2CEC8C6800137873 /* LyricsViewOS10.swift */; };
 		7CFE33CD2C4B84E700BA77F4 /* DeveloperContactGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */; };
 /* End PBXBuildFile section */
 
@@ -152,6 +159,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7C01F1042CC118D2004D15B4 /* AudioSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSession.swift; sourceTree = "<group>"; };
 		7C0484DF2CA5AE3E009EC427 /* DownloadManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManageView.swift; sourceTree = "<group>"; };
 		7C2F55E82C96832300BA11D1 /* RemoteCommandManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommandManager.swift; sourceTree = "<group>"; };
 		7C310E7C2C454FAB00E9143F /* SearchModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
@@ -186,7 +194,7 @@
 		7C310EC22C4554D000E9143F /* AVPlayerHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerHolder.swift; sourceTree = "<group>"; };
 		7C310EC52C45555F00E9143F /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		7C310EC72C45577100E9143F /* NeverError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeverError.swift; sourceTree = "<group>"; };
-		7C310ECA2C455C7200E9143F /* TempURLCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempURLCreator.swift; sourceTree = "<group>"; };
+		7C310ECA2C455C7200E9143F /* TempFileCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempFileCreator.swift; sourceTree = "<group>"; };
 		7C310ECD2C455EFA00E9143F /* AboutPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutPage.swift; sourceTree = "<group>"; };
 		7C310ED02C456F4700E9143F /* TuneWave-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TuneWave-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		7C310ED12C46439300E9143F /* MusicPlayingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayingPage.swift; sourceTree = "<group>"; };
@@ -199,6 +207,7 @@
 		7C94F1FA2C4FE6C700D05579 /* PlayListCachedPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListCachedPage.swift; sourceTree = "<group>"; };
 		7C9DC4E12C7833E0007AA080 /* LyricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsView.swift; sourceTree = "<group>"; };
 		7C9DC4E32C7833F6007AA080 /* LyricsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsModel.swift; sourceTree = "<group>"; };
+		7CA4FD912CEAD95900D5A1B7 /* PlayListMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayListMenuView.swift; sourceTree = "<group>"; };
 		7CB18B3A2C490DD90042DB8B /* AnimatedLoadingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnimatedLoadingView.swift; sourceTree = "<group>"; };
 		7CB18B3C2C490EB30042DB8B /* YiMusicLogo.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = YiMusicLogo.usdz; sourceTree = "<group>"; };
 		7CB18B402C491FA80042DB8B /* URLRequestExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLRequestExtension.swift; sourceTree = "<group>"; };
@@ -231,6 +240,11 @@
 		7CE67ABA2C64CA3500979669 /* QRLoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRLoginViewModel.swift; sourceTree = "<group>"; };
 		7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineToLocalConverter.swift; sourceTree = "<group>"; };
 		7CEB292B2C59E77F00E2A3D8 /* MusciPlayingListPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusciPlayingListPage.swift; sourceTree = "<group>"; };
+		7CEEE7142CEC890C00137873 /* ColorThief.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorThief.swift; sourceTree = "<group>"; };
+		7CEEE7152CEC890C00137873 /* MMCQ.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMCQ.swift; sourceTree = "<group>"; };
+		7CEEE7192CEC892200137873 /* FlowBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowBackground.swift; sourceTree = "<group>"; };
+		7CEEE71B2CEC898C00137873 /* LyricsBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsBackgroundView.swift; sourceTree = "<group>"; };
+		7CEEE71D2CEC8C6800137873 /* LyricsViewOS10.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsViewOS10.swift; sourceTree = "<group>"; };
 		7CFE33CC2C4B84E700BA77F4 /* DeveloperContactGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperContactGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -300,6 +314,7 @@
 		7C2F55E72C96831000BA11D1 /* PlayerHolder */ = {
 			isa = PBXGroup;
 			children = (
+				7C01F1042CC118D2004D15B4 /* AudioSession.swift */,
 				7C310EC22C4554D000E9143F /* AVPlayerHolder.swift */,
 				7CD26E932C968AED0043805E /* NowPlayManager.swift */,
 				7C2F55E82C96832300BA11D1 /* RemoteCommandManager.swift */,
@@ -330,6 +345,7 @@
 			children = (
 				7C310EA42C454FBE00E9143F /* MyPlayListPage.swift */,
 				7C310EA52C454FBE00E9143F /* PlayListDetailPage.swift */,
+				7CA4FD912CEAD95900D5A1B7 /* PlayListMenuView.swift */,
 				7C94F1FA2C4FE6C700D05579 /* PlayListCachedPage.swift */,
 				7CEB29292C59D91800E2A3D8 /* OnlineToLocalConverter.swift */,
 				7C310EA62C454FBE00E9143F /* PlaylistModel.swift */,
@@ -379,7 +395,7 @@
 		7C310EC92C455C6600E9143F /* FileManager */ = {
 			isa = PBXGroup;
 			children = (
-				7C310ECA2C455C7200E9143F /* TempURLCreator.swift */,
+				7C310ECA2C455C7200E9143F /* TempFileCreator.swift */,
 			);
 			path = FileManager;
 			sourceTree = "<group>";
@@ -407,6 +423,8 @@
 			isa = PBXGroup;
 			children = (
 				7C9DC4E12C7833E0007AA080 /* LyricsView.swift */,
+				7CEEE71D2CEC8C6800137873 /* LyricsViewOS10.swift */,
+				7CEEE71B2CEC898C00137873 /* LyricsBackgroundView.swift */,
 				7C9DC4E32C7833F6007AA080 /* LyricsModel.swift */,
 			);
 			path = Lyrics;
@@ -477,6 +495,8 @@
 		7CB3D2662C1A6E43004A186D /* TuneWave Watch App */ = {
 			isa = PBXGroup;
 			children = (
+				7CEEE7182CEC891B00137873 /* Backgrounds */,
+				7CEEE7132CEC88F800137873 /* ColorThiefSwift */,
 				7CFE33CB2C4B84D200BA77F4 /* DeveloperContactGenerator */,
 				7C310ED02C456F4700E9143F /* TuneWave-Watch-App-Info.plist */,
 				7C0F33CA2C480CBF0055F4B7 /* Disclaimer */,
@@ -549,6 +569,23 @@
 				7CE67ABA2C64CA3500979669 /* QRLoginViewModel.swift */,
 			);
 			path = QRLogin;
+			sourceTree = "<group>";
+		};
+		7CEEE7132CEC88F800137873 /* ColorThiefSwift */ = {
+			isa = PBXGroup;
+			children = (
+				7CEEE7142CEC890C00137873 /* ColorThief.swift */,
+				7CEEE7152CEC890C00137873 /* MMCQ.swift */,
+			);
+			path = ColorThiefSwift;
+			sourceTree = "<group>";
+		};
+		7CEEE7182CEC891B00137873 /* Backgrounds */ = {
+			isa = PBXGroup;
+			children = (
+				7CEEE7192CEC892200137873 /* FlowBackground.swift */,
+			);
+			path = Backgrounds;
 			sourceTree = "<group>";
 		};
 		7CFE33CB2C4B84D200BA77F4 /* DeveloperContactGenerator */ = {
@@ -829,13 +866,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C310E9A2C454FAB00E9143F /* TuneWaveApp.swift in Sources */,
+				7CEEE71C2CEC899000137873 /* LyricsBackgroundView.swift in Sources */,
 				7C310ED22C46439300E9143F /* MusicPlayingPage.swift in Sources */,
 				7CEB292A2C59D91800E2A3D8 /* OnlineToLocalConverter.swift in Sources */,
 				7CB18B3B2C490DD90042DB8B /* AnimatedLoadingView.swift in Sources */,
 				7C48634C2C9576E000FC6BA6 /* IgnoreSlientModeView.swift in Sources */,
 				7C310EBA2C4551AC00E9143F /* MusicLoadingViewModel.swift in Sources */,
 				7C310EC62C45555F00E9143F /* ErrorView.swift in Sources */,
+				7C01F1052CC118D5004D15B4 /* AudioSession.swift in Sources */,
 				7C310E912C454FAB00E9143F /* AsyncButton.swift in Sources */,
+				7CA4FD922CEAD95F00D5A1B7 /* PlayListMenuView.swift in Sources */,
 				7C310E922C454FAB00E9143F /* LoginModel.swift in Sources */,
 				7C310EBF2C45535800E9143F /* NeverErrorView.swift in Sources */,
 				7C310EA12C454FBA00E9143F /* MusicModel.swift in Sources */,
@@ -844,7 +884,7 @@
 				7C310E8E2C454FAB00E9143F /* LoginPage.swift in Sources */,
 				7CB3D26A2C1A6E43004A186D /* ContentView.swift in Sources */,
 				7CD55D602CA8D73D00AC09DD /* SeekSettings.swift in Sources */,
-				7C310ECB2C455C7200E9143F /* TempURLCreator.swift in Sources */,
+				7C310ECB2C455C7200E9143F /* TempFileCreator.swift in Sources */,
 				7C310EA22C454FBA00E9143F /* MusicLoadingPage.swift in Sources */,
 				7CDA978E2C4A08D7009BD0E5 /* AVPlayerExtension.swift in Sources */,
 				7C48634A2C947D5F00FC6BA6 /* CleanerView.swift in Sources */,
@@ -856,9 +896,11 @@
 				7C310E992C454FAB00E9143F /* ErrorExtension.swift in Sources */,
 				7C9DC4E42C7833F6007AA080 /* LyricsModel.swift in Sources */,
 				7C80A2B52C4686A700A8807C /* UserInfoView.swift in Sources */,
+				7CEEE71E2CEC8C6C00137873 /* LyricsViewOS10.swift in Sources */,
 				7C310EC32C4554D000E9143F /* AVPlayerHolder.swift in Sources */,
 				7C310EAD2C454FC200E9143F /* SettingPage.swift in Sources */,
 				7CE67AB92C64CA2E00979669 /* QRLoginView.swift in Sources */,
+				7CEEE71A2CEC892200137873 /* FlowBackground.swift in Sources */,
 				7C310E982C454FAB00E9143F /* AlamofireExtension.swift in Sources */,
 				7C310E8F2C454FAB00E9143F /* DateExtension.swift in Sources */,
 				7C310EB82C45518B00E9143F /* MusicLoader.swift in Sources */,
@@ -869,6 +911,8 @@
 				7C310E962C454FAB00E9143F /* SwiftUIExtension.swift in Sources */,
 				7C310E8C2C454FAB00E9143F /* SearchModel.swift in Sources */,
 				7CD26E942C968AF50043805E /* NowPlayManager.swift in Sources */,
+				7CEEE7162CEC890C00137873 /* ColorThief.swift in Sources */,
+				7CEEE7172CEC890C00137873 /* MMCQ.swift in Sources */,
 				7C310EC12C45542F00E9143F /* YiResponseError.swift in Sources */,
 				7C94F1F92C4FE18900D05579 /* NetworkTester.swift in Sources */,
 				7C310EA32C454FBA00E9143F /* MusicRow.swift in Sources */,
