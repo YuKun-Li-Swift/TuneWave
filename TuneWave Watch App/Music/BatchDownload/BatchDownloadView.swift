@@ -101,27 +101,29 @@ struct BatchDownloadActionView: View {
     @State
     private var showAlert = false
     var body: some View {
-        ScrollViewOrNot {
-            VStack {
-                Button {
-                    showAlert = false
-                    switch vm.scrollToDownloadingItem() {
-                    case .done:
-                        //此时本页面已经在scrollToDownloadingItem里被pop了
-                        break
-                    case .noDownloadingItem:
-                        showAlert = true
+        NavigationStack {
+            ScrollViewOrNot {
+                VStack {
+                    Button {
+                        showAlert = false
+                        switch vm.scrollToDownloadingItem() {
+                        case .done:
+                            //此时本页面已经在scrollToDownloadingItem里被pop了
+                            break
+                        case .noDownloadingItem:
+                            showAlert = true
+                        }
+                    } label: {
+                        Label("滚动到正在下载的位置", systemImage: "arcade.stick.and.arrow.down")
                     }
-                } label: {
-                    Label("滚动到正在下载的位置", systemImage: "arcade.stick.and.arrow.down")
-                }
-                Button(action:{ }) {
                     Text("已下载\(vm.doneDownloadCount)首歌")
                         .contentTransition(.numericText())
                         .animation(.smooth, value: vm.doneDownloadCount)
+                        .padding(.vertical)
+                        .scenePadding(.horizontal)
                 }
+                .alert("没有正在下载的音乐\n可能是已经全部下载完了，或者全部下载失败了，或者歌单内没有音乐", isPresented: $showAlert, actions: { })
             }
-            .alert("没有正在下载的音乐\n可能是已经全部下载完了，或者全部下载失败了，或者歌单内没有音乐", isPresented: $showAlert, actions: { })
         }
     }
 }

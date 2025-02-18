@@ -164,27 +164,6 @@ struct PlayListDetailList: View {
     }
 }
 
-struct PleasePickBannerPlayListDetail: View {
-    var body: some View {
-        HStack(content: {
-            Text("请在下方音乐中选择你想加入播放列表的")
-                .multilineTextAlignment(.leading)
-                .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
-            .padding()
-            Spacer()
-        })
-            .background(
-                RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .fill(Color.accentColor.gradient))
-            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .id("showPleasePickBanner")
-    }
-}
-
-
-
-
-
 struct PlayListDetailListHaveMoreBanner: View {
     var count:Int
     var notAvailableCount:Int
@@ -209,6 +188,22 @@ struct PlayListDetailListHaveMoreBanner: View {
     }
 }
 
+struct PleasePickBannerPlayListDetail: View {
+    var body: some View {
+        HStack(content: {
+            Text("请在下方音乐中选择你想加入播放列表的")
+                .multilineTextAlignment(.leading)
+                .shadow(color: .black.opacity(0.8), radius: 6, x: 3, y: 3)
+            .padding()
+            Spacer()
+        })
+            .background(
+                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                    .fill(Color.accentColor.gradient))
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .id("showPleasePickBanner")
+    }
+}
 
 struct PlayListDetailSearchPage: View {
     @Binding
@@ -394,9 +389,9 @@ class PlayListDetailPageModel:Hashable {
     var forceIgnoreCacheLoadProgressing = true
     var forceIgnoreCacheLoadError:String? = nil
     func update(data: PlayListModel.PlayListDeatil,haveMore:Bool,haveMoreCount:Int) {
-        self.data = data
-        self.haveMore = haveMore
-        self.haveMoreCount = haveMoreCount
+          self.data = data
+          self.haveMore = haveMore
+          self.haveMoreCount = haveMoreCount
     }
   
     //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表

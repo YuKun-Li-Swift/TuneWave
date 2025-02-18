@@ -10,6 +10,7 @@ import Alamofire
 import SwiftyJSON
 import SwiftUI
 import SwiftData
+import os
 
 //这个类实现了短信验证码登录和手机号登录的功能，会请求登录接口并且将用户信息存储到ModelContext中
 @MainActor
@@ -350,6 +351,9 @@ extension Alamofire.DataRequest {
         try await withUnsafeThrowingContinuation { continuation in
             self.response { response in
                 if let data = response.data {
+//                    if let string = String(data: data, encoding: .utf8) {
+//                        os_log("\(string)")
+//                    }
                     let json = JSON(data)
                     continuation.resume(returning: json)
                 } else {

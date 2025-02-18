@@ -8,6 +8,7 @@
 import SwiftUI
 import Alamofire
 import SwiftyJSON
+import os
 
 //可能要用的参数："timestamp":String(Int64(Date.now.timeIntervalSince1970))
 actor UserPlayListModel {
@@ -130,15 +131,15 @@ actor PlayListModel {
         }
     }
     
-    //可能还有服务器端缓存
-    func getPlaylistDetail(playlist:UserPlayListModel.PlayListObj,useCache:Bool) async throws -> (PlayListDeatil,haveMore:Bool,haveMoreCount:Int) {
+    func playlistTrackCount(playlist:UserPlayListModel.PlayListObj) async throws -> Int {
         let playlistID = playlist.playListID
         let route = "/playlist/detail"
         let fullURL = baseAPI + route
+        let parameters = ["id":playlistID] as [String:String]
         //重写超时错误
         let json = try await {
             do {
-                let res = try await session.request(URLRequest.create(fullURL, parameters: ["id":playlistID] as [String:String], cachePolicy: useCache ? .returnCacheDataElseLoad : .reloadIgnoringLocalAndRemoteCacheData)).LSAsyncJSON()
+                let res = try await session.request(URLRequest.create(fullURL, parameters: parameters, cachePolicy: .returnCacheDataElseLoad)).LSAsyncJSON()
                 return res
             } catch {
                 let error = error as NSError
@@ -149,24 +150,49 @@ actor PlayListModel {
                 }
             }
         }()
-//        print("歌单内容\(json)")
         try json.errorCheck()
-//        guard let trackCount = json["playlist"]["trackCount"].int64 else {
-//            throw getPlaylistDetailError.noTrackCount
-//        }
-        guard let tracks = json["playlist"]["tracks"].array else {
-            throw getPlaylistDetailError.noTracks
+        guard let trackCount = json["playlist"]["trackCount"].int else {
+            throw getPlaylistDetailError.noTrackCount
         }
-        guard let trackIDs = json["playlist"]["trackIds"].array else {
-            throw getPlaylistDetailError.noTrackIds
+        print("歌单内一共有\(trackCount)首歌")
+        return trackCount
+    }
+    
+    //可能还有服务器端缓存
+    func getPlaylistDetail(playlist:UserPlayListModel.PlayListObj,useCache:Bool) async throws -> (PlayListDeatil,haveMore:Bool,haveMoreCount:Int) {
+        let playlistID = playlist.playListID
+        let route = "/playlist/track/all"
+        let fullURL = baseAPI + route
+        // 这个接口最多支持一次性获取1000首歌
+        let parameters = ["id":playlistID,"limit":"1000"] as [String:String]
+        os_log("fullURL:\(fullURL)")
+        os_log("parameters:\(parameters)")
+        //重写超时错误
+        let json = try await {
+            do {
+                let res = try await session.request(URLRequest.create(fullURL, parameters: parameters, cachePolicy: useCache ? .returnCacheDataElseLoad : .reloadIgnoringLocalAndRemoteCacheData)).LSAsyncJSON()
+                return res
+            } catch {
+                let error = error as NSError
+                if error.code == NSURLErrorTimedOut {
+                    throw PlaylistTimeoutError.toBigPlaylist
+                } else {
+                    throw error
+                }
+            }
+        }()
+        try json.errorCheck()
+        let totalTrackCount = try await playlistTrackCount(playlist: playlist)
+        guard let songs = json["songs"].array else {
+            throw getPlaylistDetailError.noSongs
         }
-        print("歌单内一共有\(trackIDs.count)首歌")
-        print("需要处理\(tracks.count)首歌")
-        let haveMore = trackIDs.count > tracks.count
-        let haveMoreCount:Int = trackIDs.count-tracks.count
+        let retrievedTrackCount = songs.count
+        print("歌单获取到了\(retrievedTrackCount)首歌")
+        let haveMore = totalTrackCount > retrievedTrackCount
+        let haveMoreCount:Int = totalTrackCount - retrievedTrackCount
         //使用TaskGroup并行化处理，在歌单内歌曲数量很多的时候可以显著提升速度
         let mappedSongs: [PlayListSong] = try await withThrowingTaskGroup(of: PlayListSong?.self) { group in
-            for item in tracks {
+            for item in songs {
                 group.addTask {
                     return try await self.parseSong(item: item)
                 }
@@ -180,7 +206,7 @@ actor PlayListModel {
             }
             return results
         }
-        return (.init(basic: playlist, songs: mappedSongs),haveMore,haveMoreCount)
+        return (PlayListDeatil(basic: playlist, songs: mappedSongs),haveMore,haveMoreCount)
     }
     func parseSong(item: JSON) throws -> PlayListSong {
         guard let name = item["name"].string else {
@@ -215,7 +241,7 @@ actor PlayListModel {
     }
 
     enum getPlaylistDetailError:Error,LocalizedError {
-        case noTracks
+        case noSongs
         case noMusicName
         case noMusicID
         case noMusicURL
@@ -231,8 +257,8 @@ actor PlayListModel {
                 "获取歌单详情失败（picUrl字段缺失）"
             case .noMusicID:
                 "获取歌单详情失败（id字段缺失）"
-            case .noTracks:
-                "获取歌单详情失败（track字段缺失）"
+            case .noSongs:
+                "获取歌单详情失败（songs字段缺失）"
             case .noMusicName:
                 "获取歌单详情失败（name字段缺失）"
             }

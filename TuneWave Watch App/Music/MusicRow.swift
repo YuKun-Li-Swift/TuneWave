@@ -103,6 +103,7 @@ struct MusicRowSingleLine<V:View>: View {
                 self.errorText = nil
             }
         }), actions: {})
+        .listRowInsets(.init(top: 2, leading: 13, bottom: 2, trailing: 13))
         .listRowBackground({
             if hightlight {
                 return RoundedRectangle(cornerRadius: 13, style: .continuous) .fill(Color.accentColor.gradient)

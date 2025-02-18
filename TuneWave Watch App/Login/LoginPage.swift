@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import os
 
 @MainActor
 struct LoginPage: View {

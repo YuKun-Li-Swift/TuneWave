@@ -13,16 +13,19 @@ struct CleanerView: View {
     @Binding
     var openOfflineCleaner:UUID
     @State
+    private var showDBSpaceAnalyzerView = false
+    @State
     private var showOfflineCleanView = false
     @State
     private var showDownloadManageView = false
     var body: some View {
-        //未来实现
-        //删除isOnline的YiMusic
-        //删除SDWebImage的图片缓存
-        //删除Alamofire的Session缓存
         ScrollView(content: {
             VStack {
+                Button {
+                    showDBSpaceAnalyzerView = true
+                } label: {
+                    Label("空间占用统计", systemImage: "chart.bar.doc.horizontal.fill")
+                }
                 Button {
                     showOfflineCleanView = true
                 } label: {
@@ -36,6 +39,9 @@ struct CleanerView: View {
             }
         })
         .navigationTitle("清理空间")
+        .navigationDestination(isPresented: $showDBSpaceAnalyzerView) {
+            DBSpaceAnalyzer()
+        }
         .navigationDestination(isPresented: $showOfflineCleanView) {
             OfflineCacheCleaner()
         }
