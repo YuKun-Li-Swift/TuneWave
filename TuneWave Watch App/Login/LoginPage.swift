@@ -30,6 +30,25 @@ struct LoginPage: View {
     }
 }
 
+struct LoginOutPage: View {
+    @Environment(YiUserContainer.self)
+    var userContainer:YiUserContainer?
+    @State
+    var showLogoutSuccessAlert = false
+    var body: some View {
+        VStack {
+            if let userContainer {
+                UserInfoView(showLogoutSuccessAlert:{
+                    showLogoutSuccessAlert = true
+                }, selectedTab:.tab1,userContainer:userContainer)
+            } else {
+                LoginView()
+            }
+        }
+        .alert("已退出登录", isPresented: $showLogoutSuccessAlert, actions: {})
+    }
+}
+
 @MainActor
 struct LoginView: View {
     @State
@@ -71,7 +90,7 @@ struct LoginView: View {
                         .scrollTargetLayout()
                         .toolbar {
                             ToolbarItemGroup(placement: .automatic) {
-                                Picker("选择登录方式", selection: $selectedLoginMethod, content: {
+                                Picker("更多登录方式", selection: $selectedLoginMethod, content: {
                                     Text("手机扫码")
                                         .tag(LoginMethod.qr)
                                     Text("短信验证码")
@@ -80,7 +99,7 @@ struct LoginView: View {
                                         .tag(LoginMethod.password)
                                 })
                                 .pickerStyle(.navigationLink)
-                                .tint(.blue)
+                                .tint(.accent)
                             }
                         }
                         

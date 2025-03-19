@@ -98,7 +98,6 @@ struct ContentView: View {
                 .navigationDestination(isPresented: $showMyPlayListPage, destination: {
                     MyPlayList()
                         .environment(actionExcuter)
-                        .environment(userContainer)
                 })
                 .modifier(SettingPageNavigationLink(openSettingPage: $openSettingPage, openOfflineCleaner: $openOfflineCleaner))
                 .modifier(MusicPlayerCover(showNowPlayView: $showNowPlayView, openOfflineCleaner: myOpenOfflineCleaner))
@@ -107,7 +106,6 @@ struct ContentView: View {
                 .modifier(SavePlayingModeChange())
                 .modifier(GoPlayListAndPickAMsuicActionModifier(showNowPlayView: $showNowPlayView, showMyPlayListPage: $showMyPlayListPage))
                 .environment(actionExcuter)
-                .environment(userContainer)
                 
                 .onChange(of: users, initial: true, { oldValue, newValue in
                     do {
@@ -139,6 +137,7 @@ struct ContentView: View {
                 
                 .navigationTitle("悦音音乐")
             }
+            .environment(userContainer)
             .environment(playerHolder)
         }
     }

@@ -11,7 +11,7 @@ let screen = WKInterfaceDevice.current().screenBounds
 @MainActor
 struct MyPlayList: View {
     @Environment(YiUserContainer.self)
-    private var userContainer:YiUserContainer
+    private var userContainer:YiUserContainer?
     @Environment(GoPlayListAndPickAMsuicAction.self)
     private var actionExcuter:GoPlayListAndPickAMsuicAction
     @State
@@ -30,87 +30,98 @@ struct MyPlayList: View {
     private var initLayout = true
     @State
     private var scrollProxy:ScrollViewProxy?
+    @State
+    private var isPresentedLoginOutPage = false
     var body: some View {
-        LoadingSkelton {
-            ProgressView()
-        } successView: {
-            VStack {
-                if let vm {
-                    if vm.playListContainer.playlists.isEmpty {
-                        Text("该账号下没有歌单")
-                    } else {
-                        ScrollViewReader { proxy in
-                            ScrollView {
-                                if actionExcuter.showPleasePickBanner {
-                                    PleasePickBannerMyPlayList()
-                                }
-                                VStack {
-                                    HStack(alignment: .top, spacing: 16.7/3) {//左右两列应该.top对其，不然左边一列文本更长的情况下，会在首屏看不到右边那列的顶了
-                                        VStack(alignment: .center, spacing: 16.7/3) {
-                                            ForEach(leftColumn) { i in
-                                                PlayListGrid(playList: i,selected:$selected)
-                                                    .id(i.playListID)
-                                            }
+        VStack {
+            if let userContainer {
+                LoadingSkelton {
+                    ProgressView()
+                } successView: {
+                    VStack {
+                        if let vm {
+                            if vm.playListContainer.playlists.isEmpty {
+                                NeedReloginView(isPresentedLoginOutPage:$isPresentedLoginOutPage)
+                            } else {
+                                ScrollViewReader { proxy in
+                                    ScrollView {
+                                        if actionExcuter.showPleasePickBanner {
+                                            PleasePickBannerMyPlayList()
                                         }
-                                        VStack(alignment: .center, spacing: 16.7/3) {
-                                            if !rightColumn.isEmpty {
-                                                ForEach(rightColumn) { i in
-                                                    PlayListGrid(playList: i,selected:$selected)
-                                                        .id(i.playListID)
+                                        VStack {
+                                            HStack(alignment: .top, spacing: 16.7/3) {//左右两列应该.top对其，不然左边一列文本更长的情况下，会在首屏看不到右边那列的顶了
+                                                VStack(alignment: .center, spacing: 16.7/3) {
+                                                    ForEach(leftColumn) { i in
+                                                        PlayListGrid(playList: i,selected:$selected)
+                                                            .id(i.playListID)
+                                                    }
                                                 }
-                                            } else {
-                                                //如果新号只有一个歌单
-                                                //占位，不然布局不对了
-                                                Spacer()
-                                                    .hidden()
+                                                VStack(alignment: .center, spacing: 16.7/3) {
+                                                    if !rightColumn.isEmpty {
+                                                        ForEach(rightColumn) { i in
+                                                            PlayListGrid(playList: i,selected:$selected)
+                                                                .id(i.playListID)
+                                                        }
+                                                    } else {
+                                                        //如果新号只有一个歌单
+                                                        //占位，不然布局不对了
+                                                        Spacer()
+                                                            .hidden()
+                                                    }
+                                                }
                                             }
+                                            IgnoreCacheLoadingView(vm: vm)
                                         }
                                     }
-                                    IgnoreCacheLoadingView(vm: vm)
-                                }
-                            }
-                            .onChange(of: vm.playListContainer, initial: true) { oldValue, newValue in
-                                //首次打开页面，不要动画；后续歌单增减了（比如AJAX请求到了新的歌单）需要有动画
-                                let animation:Animation? = {
-                                    if initLayout {
-                                        initLayout = false
-                                        return nil
-                                    } else {
-                                        return .smooth
+                                    .onChange(of: vm.playListContainer, initial: true) { oldValue, newValue in
+                                        //首次打开页面，不要动画；后续歌单增减了（比如AJAX请求到了新的歌单）需要有动画
+                                        let animation:Animation? = {
+                                            if initLayout {
+                                                initLayout = false
+                                                return nil
+                                            } else {
+                                                return .smooth
+                                            }
+                                        }()
+                                        withAnimation(animation) {
+                                            (leftColumn,rightColumn) = vm.rebuildPlayList(origin: newValue.playlists)
+                                        }
                                     }
-                                }()
-                                withAnimation(animation) {
-                                    (leftColumn,rightColumn) = vm.rebuildPlayList(origin: newValue.playlists)
+                                    .onAppear {
+                                        self.scrollProxy = proxy
+                                    }
                                 }
                             }
-                            .onAppear {
-                                self.scrollProxy = proxy
-                            }
+                        } else {
+                            NeverErrorView(remoteControlTag: "MyPlayList")
                         }
                     }
-                } else {
-                    NeverErrorView(remoteControlTag: "MyPlayList")
+                    .navigationDestination(item: $selected) { playlist in
+                        PlayListDetailPage(playList: playlist)
+                            .environment(actionExcuter)
+                    }
+                } errorView: { error in
+                    APIErrorDisplay(remoteControlTag: "myPlayListPage", error: error)
+                } loadingAction: {
+                    let user = userContainer.activedUser
+                    let cachedPlayList = try await mod.getMyPlayList(user: user, useCache: true)
+                    let newVM = MyPlayListViewModel(playList: cachedPlayList)
+                    self.vm = newVM
+                    //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表
+                    vm?.loadingByNoCache(mod: mod, user: user, cachedPlayList: cachedPlayList)
                 }
+                .onChange(of: actionExcuter.showPleasePickBanner, initial: true) { _, showPleasePickBanner in
+                    if showPleasePickBanner {
+                        scrollToPleasePickBanner()
+                    }
+                }
+            } else {
+                RequireLoginView()
             }
-            .navigationDestination(item: $selected) { playlist in
-                PlayListDetailPage(playList: playlist)
-                    .environment(actionExcuter)
-                    .environment(userContainer)
-            }
-        } errorView: { error in
-            APIErrorDisplay(remoteControlTag: "myPlayListPage", error: error)
-        } loadingAction: {
-            let user = userContainer.activedUser
-            let cachedPlayList = try await mod.getMyPlayList(user: user, useCache: true)
-            let newVM = MyPlayListViewModel(playList: cachedPlayList)
-            self.vm = newVM
-            //从缓存请求做完后，再不用缓存做一遍，避免用户看到的是过时的歌单列表
-            vm?.loadingByNoCache(mod: mod, user: user, cachedPlayList: cachedPlayList)
         }
-        .onChange(of: actionExcuter.showPleasePickBanner, initial: true) { _, showPleasePickBanner in
-            if showPleasePickBanner {
-                scrollToPleasePickBanner()
-            }
+        
+        .navigationDestination(isPresented: $isPresentedLoginOutPage) {
+            LoginOutPage()
         }
     }
     func scrollToPleasePickBanner() {
@@ -118,6 +129,44 @@ struct MyPlayList: View {
             self.scrollProxy?.scrollTo("showPleasePickBanner", anchor: .top)
         }
     }
+}
+
+struct NeedReloginView: View {
+    @Binding
+    var isPresentedLoginOutPage:Bool
+    var body: some View {
+        ScrollViewOrNot {
+            VStack(spacing:12.3) {
+                Text("网易云登录已失效，请重新登录")
+                Button("重新登录") {
+                    isPresentedLoginOutPage = true
+                }
+            }
+            .padding(.vertical, 12.3)
+            .scenePadding(.horizontal)
+        }
+    }
+}
+
+struct RequireLoginView: View {
+    @Environment(\.dismiss)
+    private var dismiss
+    var body: some View {
+        ScrollViewOrNot {
+            VStack(spacing:12.3) {
+                Text("请先登录网易云账号")
+                Button("去登录") {
+                    dismiss()
+                }
+            }
+            .padding(.vertical, 12.3)
+            .scenePadding(.horizontal)
+        }
+    }
+}
+
+#Preview {
+    RequireLoginView()
 }
 
 struct PleasePickBannerMyPlayList: View {

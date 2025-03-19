@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 import Alamofire
+import os
 
 //这个类负责加载已经缓存的音乐、负责请求音乐链接（step1）、负责下载封面图（step2）、负责下载歌词（step3）、负责下载音乐文件并且实时追踪进度（step4）
 //步骤1必须在步骤4前，其余步骤可以并行化
@@ -66,6 +67,7 @@ actor MusicLoader {
     func step1() async throws -> Double {
         let route = "/song/url"
         let fullURL = baseAPI + route
+        os_log("音乐ID：\(self.musicID)")
         let json = try await AFTW.request(fullURL,parameters: {
             if isOnline {
                 ["id":musicID,"br":"64000"] as [String:String]//在线播放用64k音质，加载速度很重要
@@ -73,7 +75,8 @@ actor MusicLoader {
                 ["id":musicID,"br":"320000"] as [String:String]//下载的话用320k音质
             }
         }()).LSAsyncJSON()
-        print("音乐信息")
+        os_log("音乐信息")
+        os_log("\(json)")
         try json.errorCheck()
         //        print("请求到音乐链接\(json)")
         //可能是只能听试听版（那不播放了，不然之后开了VIP还要重新缓存音乐）

@@ -22,6 +22,8 @@ import SDWebImageSwiftUI
 struct UserInfoView: View {
     var showLogoutSuccessAlert:()->()
     @State
+    var selectedTab:UserInfoViewModel.Tabs = .tab0
+    @State
     var userContainer:YiUserContainer
     @State
     var mod = YiLoginModel()
@@ -31,7 +33,7 @@ struct UserInfoView: View {
     var vm = UserInfoViewModel()
     
     var body: some View {
-        TabView(content: {
+        TabView(selection: $selectedTab,content: {
             VStack(spacing: 12.3) {
                 UserPicView(userContainer: userContainer)
                 Text(userContainer.activedUser.nickname)
@@ -40,6 +42,7 @@ struct UserInfoView: View {
             }
             .padding(.bottom, 8.8)
             .ignoresSafeArea(edges: .bottom)
+            .tag(UserInfoViewModel.Tabs.tab0)
             VStack {
                 Button("退出登录", role: .destructive) {
                     vm.logOutSheet = true
@@ -58,6 +61,7 @@ struct UserInfoView: View {
                     }
                 })
             }
+            .tag(UserInfoViewModel.Tabs.tab1)
         })
         .onLoad {
             vm.refreshInfo(for: userContainer.activedUser, modelContext: modelContext)
@@ -154,6 +158,7 @@ class UserInfoViewModel {
     var logOutSheet = false
     var logOutError:String? = nil
     var logOutErrorSheet = false
+    
     func logoutAction(userContainer:YiUserContainer,mod:YiLoginModel,modelContext:ModelContext,onSuc:()->()) {
         logOutErrorSheet = false
         logOutError = nil
@@ -176,5 +181,9 @@ class UserInfoViewModel {
                 #endif
             }
         }
+    }
+    enum Tabs {
+        case tab0
+        case tab1
     }
 }

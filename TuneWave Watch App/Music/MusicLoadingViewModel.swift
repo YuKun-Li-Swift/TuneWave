@@ -34,7 +34,6 @@ class MusicLoadingViewModel {
         do {
             if !isCanceledPlay {
                 let playingList = try await OnlineToLocalConverter.convert(onlineSongs: playList, modelContext: modelContext)
-               
                 try await playerHolder.playMusic(yiMusic,playingList:playingList, preferencedSeekModeRawValue: preferencedSeekModeRawValue)
                 //从缓存加载是View一出现就做的事情，不要动画，给人一种“打开页面音乐就在这儿”的感觉
                 showPlayPage()
