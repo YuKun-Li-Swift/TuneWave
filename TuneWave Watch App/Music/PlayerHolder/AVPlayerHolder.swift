@@ -10,6 +10,7 @@ import SwiftUI
 import AVFoundation
 import Combine
 import MediaPlayer
+import os
 
 
 //既然ContentView持有MusicPlayerHolder，那我就附加在ContentView上
@@ -116,9 +117,22 @@ class MusicPlayerHolder {
         self.playingList = playingList
         self.currentMusic = yiMusic
         let url:URL = try yiMusic.audioData.createTemporaryURL(extension: yiMusic.audioDataFileExtension)
-        print("音乐链接\(url)")
         self.musicURL = url
-        let item = AVPlayerItem(url: url)
+        let asset = AVURLAsset(url: url)
+        let item = AVPlayerItem(asset: asset)
+        #if DEBUG
+        let readableSize = humanReadableFileSize(url: url)
+        os_log("文件大小: \(readableSize)")
+        Task { @MainActor in
+            do {
+                let duration:CMTime = try await asset.load(.duration)
+                let readableDuration = humanReadableTime(from: duration)
+                os_log("音乐长度（秒）：\(readableDuration)")
+            } catch {
+                os_log("\(error.localizedDescription)")
+            }
+        }
+        #endif
         avplayer.replaceCurrentItem(with: item)
         let duration = item.duration
         self.lyricsData = await .init(music: yiMusic, duration: duration)
@@ -132,6 +146,7 @@ class MusicPlayerHolder {
         avplayer.playImmediately(atRate: 1.0)//切歌了，总是把播放速率回归1.0，用户这是某首特定的歌要倍速，而不是每首歌都要倍速
         cancellable = NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime, object: item)
             .sink(receiveValue: { [weak self] _ in
+                os_log("一曲终了")
                 Self.handleDidPlayToEndTime(self: self)
             })
     }

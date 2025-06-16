@@ -1,4 +1,12 @@
 //
+//  MeshModel.swift
+//  PlayWithMesh
+//
+//  Created by 凌嘉徽 on 2025/3/22.
+//
+
+
+//
 //  ContentView.swift
 //  PlayWithMeshGradient Watch App
 //
@@ -6,12 +14,24 @@
 //
 
 import SwiftUI
+import os
 
-
-@available(watchOS 11.0, *)
-struct FlowBackground: View {
-    var sourceImage:UIImage
-    @State private var positions: [SIMD2<Float>] = [
+@Observable
+fileprivate
+class MeshModel {
+    struct MeshPositionPack {
+        var positions:[SIMD2<Float>]
+    }
+    var phase = 0.0
+    var meshData:MeshPositionPack
+    init() {
+        meshData = .init(positions: MeshModel.initAnimatedPositions(for: 0))
+    }
+    func update() {
+        meshData = .init(positions: animatedPositions(phase: phase))
+    }
+    private
+    var positions: [SIMD2<Float>] = [
         SIMD2<Float>(0.0, 0.0),
         SIMD2<Float>(0.5, 0.0),
         SIMD2<Float>(1.0, 0.0),
@@ -22,61 +42,112 @@ struct FlowBackground: View {
         SIMD2<Float>(0.5, 1.0),
         SIMD2<Float>(1.0, 1.0)
     ]
+    private
+    func animatedPositions(phase:Double) -> [SIMD2<Float>] {
+        var animatedPositions = positions
+        
+        animatedPositions[1].x = 0.5 + 0.4 * Float(cos(phase))
+        animatedPositions[3].y = 0.5 + 0.3 * Float(cos(phase * 1.1))
+        animatedPositions[4].y = 0.5 - 0.4 * Float(cos(phase * 0.9))
+        animatedPositions[5].y = 0.5 - 0.2 * Float(cos(phase * 0.9))
+        animatedPositions[7].x = 0.5 - 0.4 * Float(cos(phase * 1.2))
+        
+        return animatedPositions
+    }
+    private
+    static
+    func initAnimatedPositions(for phase: Double) -> [SIMD2<Float>] {
+        let positions: [SIMD2<Float>] = [
+            SIMD2<Float>(0.0, 0.0),
+            SIMD2<Float>(0.5, 0.0),
+            SIMD2<Float>(1.0, 0.0),
+            SIMD2<Float>(0.0, 0.5),
+            SIMD2<Float>(0.45, 0.55),
+            SIMD2<Float>(1.0, 0.5),
+            SIMD2<Float>(0.0, 1.0),
+            SIMD2<Float>(0.5, 1.0),
+            SIMD2<Float>(1.0, 1.0)
+        ]
+        var animatedPositions = positions
+        
+        animatedPositions[1].x = 0.5 + 0.4 * Float(cos(phase))
+        animatedPositions[3].y = 0.5 + 0.3 * Float(cos(phase * 1.1))
+        animatedPositions[4].y = 0.5 - 0.4 * Float(cos(phase * 0.9))
+        animatedPositions[5].y = 0.5 - 0.2 * Float(cos(phase * 0.9))
+        animatedPositions[7].x = 0.5 - 0.4 * Float(cos(phase * 1.2))
+        
+        return animatedPositions
+    }
+}
 
+@available(watchOS 11.0, *)
+struct FlowBackground: View {
+    var sourceImage:UIImage
+    @Binding
+    var playing:Bool
     @State
-    private var colors: [Color]? = nil
-//    [
-//        Color(red: 0.922, green: 0.000, blue: 0.000),
-//        Color(red: 1.000, green: 0.535, blue: 0.000),
-//        Color(red: 0.924, green: 0.915, blue: 0.000),
-//        Color(red: 1.000, green: 0.000, blue: 0.465),
-//        Color(red: 0.000, green: 0.749, blue: 1.000),
-//        Color(red: 0.000, green: 1.000, blue: 0.603),
-//        Color(red: 0.576, green: 0.000, blue: 1.000),
-//        Color(red: 1.000, green: 0.000, blue: 0.733),
-//        Color(red: 0.000, green: 0.980, blue: 0.864)
-//    ]
+    private var startDate = Date.now
+    @Environment(\.scenePhase)
+    private var scenePhase
+    @Environment(\.isLuminanceReduced)
+    private var isLuminanceReduced
+    private var shouldAnimate:Bool {
+        // App在前台并且没有放下手腕
+        if scenePhase == .active && !isLuminanceReduced {
+            return true
+        } else {
+            return false
+        }
+    }
+    @State
+    private
+    var colors: [Color]? = nil
+    @State
+    private var meshModel = MeshModel()
+    @State
+    private var updateMeshPositionTimer = Timer.publish(every: 1/60, tolerance: 1/30/*允许轻微帧生成时间不稳定*/, on: .main, in: .default).autoconnect()
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             if let colors {
-                TimelineView(.animation) { phase in
-                  MeshGradient(
-                    width: 3,
-                    height: 3,
-                    locations: .points(animatedPositions(for: phase.date)),
-                    colors: .colors(colors),
-                    background: Color(red: 0.000, green: 0.000, blue: 0.000),
-                    smoothsColors: true
-                  )
+                VStack {
+                    VStack {
+                        MeshGradient(
+                            width: 3,
+                            height: 3,
+                            locations: .points(meshModel.meshData.positions),
+                            colors: .colors(colors),
+                            background: Color(red: 0.000, green: 0.000, blue: 0.000),
+                            smoothsColors: true
+                        )
+                    }
+                    .background {
+                        if shouldAnimate && playing {
+                            EmptyView()
+                                .onReceive(updateMeshPositionTimer) { date in
+                                    // 如果不更新就不加phase，做到真“从哪里暂停就从哪里继续”
+                                    let speedRatio = 1.23
+                                    meshModel.phase += (1/60) * speedRatio
+                                    meshModel.update()
+                                }
+                        }
+                    }
                 }
-                .transition(.opacity.animation(.smooth))
                 .ignoresSafeArea()
+                // 因为ignoresSafeArea了，transition就只能用opacity了，不然安全区会丢失transition动画，硬切。
+                .transition(.opacity.animation(.smooth))
             } else {
                 ProgressView()
-                .transition(.blurReplace.animation(.smooth))
-                .task { @MainActor in
-                    colors = await ImagePaletter.getColors(sourceImage: sourceImage)
-                }
+                    .transition(.blurReplace.animation(.smooth))
+                    .task { @MainActor in
+                        colors = await ImagePaletter.getColors(sourceImage: sourceImage)
+                    }
             }
         }
         //切换图片的时候，重新加载颜色
         .onChange(of: sourceImage, initial: false) { oldValue, newValue in
             colors = nil
         }
-    }
-
-    private
-    func animatedPositions(for date: Date) -> [SIMD2<Float>] {
-      let phase = CGFloat(date.timeIntervalSince1970)
-      var animatedPositions = positions
-
-      animatedPositions[1].x = 0.5 + 0.4 * Float(cos(phase))
-      animatedPositions[3].y = 0.5 + 0.3 * Float(cos(phase * 1.1))
-      animatedPositions[4].y = 0.5 - 0.4 * Float(cos(phase * 0.9))
-      animatedPositions[5].y = 0.5 - 0.2 * Float(cos(phase * 0.9))
-      animatedPositions[7].x = 0.5 - 0.4 * Float(cos(phase * 1.2))
-
-      return animatedPositions
+        .animation(.smooth, value: colors)
     }
 }
 

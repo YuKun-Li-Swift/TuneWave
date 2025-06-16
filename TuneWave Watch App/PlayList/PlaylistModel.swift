@@ -165,8 +165,8 @@ actor PlayListModel {
         let fullURL = baseAPI + route
         // 这个接口最多支持一次性获取1000首歌
         let parameters = ["id":playlistID,"limit":"1000"] as [String:String]
-        os_log("fullURL:\(fullURL)")
-        os_log("parameters:\(parameters)")
+        os_log("正在请求：\(fullURL)")
+        os_log("携带参数：\(parameters)")
         //重写超时错误
         let json = try await {
             do {

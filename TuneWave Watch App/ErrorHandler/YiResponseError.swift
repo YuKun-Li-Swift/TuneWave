@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftyJSON
+import os
 
 extension JSON {
     func errorCheck(outputBodyIfError:Bool = true) throws {
@@ -29,7 +30,7 @@ extension JSON {
                 return
             } else {
                 if outputBodyIfError {
-                    print("错误的返回体：\(self)")
+                    os_log("错误的返回体：\(self)")
                 }
                 try switchCode(code)
             }

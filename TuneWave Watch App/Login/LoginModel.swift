@@ -185,18 +185,20 @@ class PersonInfoRefresher {
 
 @MainActor
 class LoginRefresher {
-    
-    ///向网易云服务器请求新的cookie，让服务器知道客户端有在每天登录
+    // 向网易云服务器请求新的Cookie
     func refreshLogin(for user:YiUser,modelContext:ModelContext) async throws {
+            // 根据后端文档
+            // 不支持刷新二维码登录的Cookie
             let route = "/login/refresh"
             let fullURL = baseAPI + route
             let json = try await AFTW.request(fullURL,parameters: ["cookie":user.cookie] as [String:String]).LSAsyncJSON()
+            os_log("刷新登录状态的响应")
+            os_log("\(json)")
             try json.errorCheck(outputBodyIfError: false)
             guard let cookie = json["cookie"].string else {
                 throw RefreshCookieError.noCookie
             }
-            //新的cookie不用存下来，请求这个接口只是让服务器知道“老cookie我还在用”
-            print("刷新Cookie成功")
+            os_log("刷新Cookie成功")
     }
     enum RefreshCookieError:Error,LocalizedError {
         case noCookie

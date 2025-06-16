@@ -113,7 +113,7 @@ class YiQRLoginActor {
     //使用第三方库
     //屏幕上显示的二维码，存在遮挡的可能性：屏幕漏液、出线，使用默认纠错级别即可。
     func createQRFrom(_ string:String) throws -> UIImage {
-        guard let qr = EFQRCode.generate(for: string) else {
+        guard let qr = EFQRCode.generate(content: string) else {
             throw CreateQRError.unknowReason
         }
         return UIImage(cgImage: qr)

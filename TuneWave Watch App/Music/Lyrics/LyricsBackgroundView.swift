@@ -12,10 +12,15 @@ struct LyricsBackgroundView: View {
     let currentMusic:YiMusic
     @State
     private var coverImage:UIImage? = nil
+    @Environment(MusicPlayerHolder.self)
+    private var musicHolder
+    @State
+    private
+    var playing:Bool = false
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             if let coverImage {
-                FlowBackground(sourceImage: coverImage)
+                FlowBackground(sourceImage: coverImage, playing: $playing)
                     .transition(.opacity.animation(.smooth))
             } else {
                 ProgressView()
@@ -35,6 +40,17 @@ struct LyricsBackgroundView: View {
         .onChange(of: currentMusic, initial: false) { oldValue, newValue in
             coverImage = nil
         }
+        // 更新暂停/播放状态
+        .onLoad {
+            updateIsPlaying()
+        }
+        .onReceive(musicHolder.avplayer.publisher(for: \.timeControlStatus)) { _ in
+            updateIsPlaying()
+        }
+    }
+    private
+    func updateIsPlaying() {
+        self.playing = musicHolder.avplayer.timeControlStatus == .playing
     }
 }
 

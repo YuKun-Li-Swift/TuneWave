@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Alamofire/Alamofire.git",
       "state" : {
-        "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
-        "version" : "5.9.1"
+        "branch" : "master",
+        "revision" : "46249e016881b96846025ed8c2e5045a822af3fe"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/EFPrefix/EFQRCode",
       "state" : {
-        "branch" : "main",
-        "revision" : "3a6c5012f1a0df404a92e55bb01b4b685ff5a2d1"
+        "branch" : "master",
+        "revision" : "e7f804ead881fecb10a5ae1de6fb40d8142e0884"
       }
     },
     {
@@ -33,17 +33,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImageSwiftUI",
       "state" : {
-        "revision" : "5d462f7530677ae0c2b9510c26383aa25ba48751",
-        "version" : "3.1.1"
+        "branch" : "master",
+        "revision" : "ea241055c576d977c607d8cac5fac840c90f80f4"
       }
     },
     {
       "identity" : "swift_qrcodejs",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/EFPrefix/swift_qrcodejs.git",
+      "location" : "https://github.com/ApolloZhu/swift_qrcodejs.git",
       "state" : {
-        "revision" : "817ba220a2eba840bae888e7eeb11207bec05f8c",
-        "version" : "2.3.0"
+        "revision" : "f3fe9fdd39fa48e45b501000194b43a3883f732f",
+        "version" : "1.1.4"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
       "state" : {
-        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
-        "version" : "5.0.2"
+        "branch" : "master",
+        "revision" : "3799654438e1331d8ff6248899508cd37d6e31af"
       }
     }
   ],

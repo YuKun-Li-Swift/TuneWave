@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import os
 
 struct ContentView: View {
     @State
@@ -254,7 +255,8 @@ struct RefreshCookie: ViewModifier {
                             let refresher = LoginRefresher()
                             try await refresher.refreshLogin(for: user, modelContext: modelContext)
                         } catch {
-                            print("刷新登录状态失败\(error.localizedDescription)")
+                            os_log("刷新登录状态失败")
+                            os_log("\(error.localizedDescription)")
                         }
                     }
                 }

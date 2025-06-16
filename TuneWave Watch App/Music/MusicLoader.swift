@@ -67,15 +67,17 @@ actor MusicLoader {
     func step1() async throws -> Double {
         let route = "/song/url"
         let fullURL = baseAPI + route
-        os_log("音乐ID：\(self.musicID)")
-        let json = try await AFTW.request(fullURL,parameters: {
+        let parameters = {
             if isOnline {
                 ["id":musicID,"br":"64000"] as [String:String]//在线播放用64k音质，加载速度很重要
             } else {
                 ["id":musicID,"br":"320000"] as [String:String]//下载的话用320k音质
             }
-        }()).LSAsyncJSON()
-        os_log("音乐信息")
+        }()
+        os_log("正在请求：\(fullURL)")
+        os_log("携带参数：\(parameters)")
+        let json = try await AFTW.request(fullURL,parameters: parameters).LSAsyncJSON()
+        os_log("获取到了音乐信息")
         os_log("\(json)")
         try json.errorCheck()
         //        print("请求到音乐链接\(json)")
