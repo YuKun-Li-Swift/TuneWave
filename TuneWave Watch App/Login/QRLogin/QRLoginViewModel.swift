@@ -23,7 +23,6 @@ class YiQRLoginModel {
     var step3Status:YiQRLoginActor.Status? = nil
     var step3Done = false
     func step1() async throws {
-    
         self.unikey = try await actor.getKey()
     }
     func step2() async throws {
@@ -72,40 +71,36 @@ class YiQRLoginModel {
 
 class YiQRLoginActor {
     enum QRLoginError:Error,LocalizedError {
+        case failedToEncodeURL
         case noFieldUnikey
-        case noFieldQrUrl
         case noCode
         var errorDescription: String? {
             switch self {
+            case .failedToEncodeURL:
+                "无法编码为URL"
             case .noCode:
                 "数据结构不匹配：缺少字段code"
-            case .noFieldQrUrl:
-                "数据结构不匹配：缺少字段data.qrurl"
             case .noFieldUnikey:
                 "数据结构不匹配：缺少字段data.unikey"
             }
         }
     }
     func getKey() async throws -> String {
-        let route = "/login/qr/key"
-        let fullURL = baseAPI + route
-        let json = try await AFTW.request(fullURL,parameters: ["timestamp":String(Int(Date.now.timeIntervalSince1970.rounded()))] as [String:String]).LSAsyncJSON()
+        // 直接请求网易云的服务器
+        let fullURL = "https://api.music.163.com/api/login/qrcode/unikey?type=3"
+        let json = try await AFTW.request(fullURL,method: .post).LSAsyncJSON()
         try json.errorCheck()
-        guard let unikey = json["data"]["unikey"].string else {
+        guard let unikey = json["unikey"].string else {
             throw QRLoginError.noFieldUnikey
         }
         return unikey
     }
     //是一个URL，如果有人用微信扫码了，会提示要下网易云
     func getQR(key:String) async throws -> UIImage {
-        let route = "/login/qr/create"
-        let fullURL = baseAPI + route
-        let json = try await AFTW.request(fullURL,parameters: ["key":key] as [String:String]).LSAsyncJSON()
-        try json.errorCheck()
-//        print("getQR\(json)")
-        guard let qrContent = json["data"]["qrurl"].string else {
-            throw Self.QRLoginError.noFieldQrUrl
+        guard let paramValue = key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            throw Self.QRLoginError.failedToEncodeURL
         }
+        let qrContent = "https://music.163.com/login?codekey=" + paramValue
         let uiimage = try createQRFrom(qrContent)
         return uiimage
     }

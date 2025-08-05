@@ -1,10 +1,10 @@
 {
-  "originHash" : "3e29d0efa97281cfd71e97713d1c35bb3c87f499d70b015b5ee4ea67fb00faa7",
+  "originHash" : "56c42b0b8fa3e147ea7d3efe81e63f6d89cd77e4dd35b66edd1194144060e4ef",
   "pins" : [
     {
       "identity" : "alamofire",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "location" : "https://github.com/Alamofire/Alamofire",
       "state" : {
         "branch" : "master",
         "revision" : "46249e016881b96846025ed8c2e5045a822af3fe"
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/SDWebImage.git",
       "state" : {
-        "revision" : "be0bcd7823ce56629948491f2eaeaa19979514f7",
-        "version" : "5.19.4"
+        "revision" : "b62cb63bf4ed1f04c961a56c9c6c9d5ab8524ec6",
+        "version" : "5.21.1"
       }
     },
     {
