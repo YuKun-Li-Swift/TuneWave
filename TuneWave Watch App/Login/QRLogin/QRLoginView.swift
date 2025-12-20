@@ -38,6 +38,7 @@ struct QRLoginView: View {
     var modelContext
     @Environment(\.scenePhase)
     private var scenePhase
+    private let screenWidth:CGFloat = WKInterfaceDevice.current().screenBounds.width
     var body: some View {
         LoadingSkelton {
             ProgressView()
@@ -101,7 +102,8 @@ struct QRLoginView: View {
         } loadingAction: {
             vm = YiQRLoginModel()//reset，避免页面关闭了但实际上没有销毁vm
             try await vm.step1()
-            try await vm.step2()
+            // 从视图层读取当前的屏幕宽度，并传递给模型层，这是从iPhone这样可能存在多个屏幕的设备上继承下来的好习惯。
+            try await vm.step2(width: screenWidth)
         }
     }
 }

@@ -25,11 +25,11 @@ class YiQRLoginModel {
     func step1() async throws {
         self.unikey = try await actor.getKey()
     }
-    func step2() async throws {
+    func step2(width: CGFloat) async throws {
         guard let unikey else {
             throw Step2Error.noUnikey
         }
-        self.qr = try await actor.getQR(key: unikey)
+        self.qr = try await actor.getQR(key: unikey, width: width)
     }
     enum Step2Error:Error,LocalizedError {
         case noUnikey
@@ -96,22 +96,22 @@ class YiQRLoginActor {
         return unikey
     }
     //是一个URL，如果有人用微信扫码了，会提示要下网易云
-    func getQR(key:String) async throws -> UIImage {
+    func getQR(key:String, width:CGFloat) async throws -> UIImage {
         guard let paramValue = key.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             throw Self.QRLoginError.failedToEncodeURL
         }
         let qrContent = "https://music.163.com/login?codekey=" + paramValue
-        let uiimage = try createQRFrom(qrContent)
+        let uiimage = try createQRFrom(qrContent, width: width)
         return uiimage
     }
     //正常生成二维码用Core Image足矣，但watchOS没有Core Image接口可以用。
     //使用第三方库
     //屏幕上显示的二维码，存在遮挡的可能性：屏幕漏液、出线，使用默认纠错级别即可。
-    func createQRFrom(_ string:String) throws -> UIImage {
-        guard let qr = EFQRCode.generate(content: string) else {
+    func createQRFrom(_ string:String, width:CGFloat) throws -> UIImage {
+        guard let qr = try? EFQRCode.Generator(string, style: .basic(params: .init())).toImage(width: width) else {
             throw CreateQRError.unknowReason
         }
-        return UIImage(cgImage: qr)
+        return qr
     }
     
     enum CreateQRError:Error,LocalizedError {

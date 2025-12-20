@@ -9,8 +9,11 @@
 /* Begin PBXBuildFile section */
 		7C01F1052CC118D5004D15B4 /* AudioSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C01F1042CC118D2004D15B4 /* AudioSession.swift */; };
 		7C0484E02CA5AE4F009EC427 /* DownloadManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C0484DF2CA5AE3E009EC427 /* DownloadManageView.swift */; };
+		7C07EA322E883402001A4280 /* EFQRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 7C07EA312E883402001A4280 /* EFQRCode */; };
+		7C098DE72E88328E00267C4F /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7C098DE62E88328E00267C4F /* SDWebImageSwiftUI */; };
+		7C098DEA2E8832D300267C4F /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7C098DE92E8832D300267C4F /* SwiftyJSON */; };
+		7C098DED2E88330700267C4F /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 7C098DEC2E88330700267C4F /* Alamofire */; };
 		7C1206232C7851BD0004B08A /* SwiftUIExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E862C454FAB00E9143F /* SwiftUIExtension.swift */; };
-		7C2339BF2DFDEA8400E72603 /* EFQRCode in Frameworks */ = {isa = PBXBuildFile; productRef = 7C2339BE2DFDEA8400E72603 /* EFQRCode */; };
 		7C2F55E92C96832C00BA11D1 /* RemoteCommandManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C2F55E82C96832300BA11D1 /* RemoteCommandManager.swift */; };
 		7C310E8C2C454FAB00E9143F /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7C2C454FAB00E9143F /* SearchModel.swift */; };
 		7C310E8D2C454FAB00E9143F /* OpenSourcePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310E7D2C454FAB00E9143F /* OpenSourcePage.swift */; };
@@ -34,7 +37,6 @@
 		7C310EA92C454FBE00E9143F /* PlayListDetailPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EA52C454FBE00E9143F /* PlayListDetailPage.swift */; };
 		7C310EAA2C454FBE00E9143F /* PlaylistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EA62C454FBE00E9143F /* PlaylistModel.swift */; };
 		7C310EAD2C454FC200E9143F /* SettingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EAB2C454FC200E9143F /* SettingPage.swift */; };
-		7C310EB02C454FD600E9143F /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 7C310EAF2C454FD600E9143F /* SDWebImageSwiftUI */; };
 		7C310EB32C45503900E9143F /* YiUserContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EB22C45503900E9143F /* YiUserContainer.swift */; };
 		7C310EB62C4550D000E9143F /* CacheableAlamofire.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EB52C4550D000E9143F /* CacheableAlamofire.swift */; };
 		7C310EB82C45518B00E9143F /* MusicLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310EB72C45518B00E9143F /* MusicLoader.swift */; };
@@ -48,8 +50,6 @@
 		7C310ECB2C455C7200E9143F /* TempFileCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ECA2C455C7200E9143F /* TempFileCreator.swift */; };
 		7C310ECE2C455EFA00E9143F /* AboutPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ECD2C455EFA00E9143F /* AboutPage.swift */; };
 		7C310ED22C46439300E9143F /* MusicPlayingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C310ED12C46439300E9143F /* MusicPlayingPage.swift */; };
-		7C43E5822E3B5E4600DC5E28 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 7C43E5812E3B5E4600DC5E28 /* Alamofire */; };
-		7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 7C44BA172C1C7DDC008DB511 /* SwiftyJSON */; };
 		7C48634A2C947D5F00FC6BA6 /* CleanerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C4863492C947D5B00FC6BA6 /* CleanerView.swift */; };
 		7C48634C2C9576E000FC6BA6 /* IgnoreSlientModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C48634B2C9576DB00FC6BA6 /* IgnoreSlientModeView.swift */; };
 		7C80A2B52C4686A700A8807C /* UserInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C80A2B42C4686A700A8807C /* UserInfoView.swift */; };
@@ -281,10 +281,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C310EB02C454FD600E9143F /* SDWebImageSwiftUI in Frameworks */,
-				7C43E5822E3B5E4600DC5E28 /* Alamofire in Frameworks */,
-				7C2339BF2DFDEA8400E72603 /* EFQRCode in Frameworks */,
-				7C44BA182C1C7DDC008DB511 /* SwiftyJSON in Frameworks */,
+				7C098DEA2E8832D300267C4F /* SwiftyJSON in Frameworks */,
+				7C07EA322E883402001A4280 /* EFQRCode in Frameworks */,
+				7C098DED2E88330700267C4F /* Alamofire in Frameworks */,
+				7C098DE72E88328E00267C4F /* SDWebImageSwiftUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -686,10 +686,10 @@
 			);
 			name = "TuneWave Watch App";
 			packageProductDependencies = (
-				7C44BA172C1C7DDC008DB511 /* SwiftyJSON */,
-				7C310EAF2C454FD600E9143F /* SDWebImageSwiftUI */,
-				7C2339BE2DFDEA8400E72603 /* EFQRCode */,
-				7C43E5812E3B5E4600DC5E28 /* Alamofire */,
+				7C098DE62E88328E00267C4F /* SDWebImageSwiftUI */,
+				7C098DE92E8832D300267C4F /* SwiftyJSON */,
+				7C098DEC2E88330700267C4F /* Alamofire */,
+				7C07EA312E883402001A4280 /* EFQRCode */,
 			);
 			productName = "TuneWave Watch App";
 			productReference = 7CB3D2622C1A6E43004A186D /* TuneWave Watch App.app */;
@@ -776,10 +776,10 @@
 			);
 			mainGroup = 7CB3D2332C1A6E41004A186D;
 			packageReferences = (
-				7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
-				7C310EAE2C454FD600E9143F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				7C2339BD2DFDEA8400E72603 /* XCRemoteSwiftPackageReference "EFQRCode" */,
-				7C43E5802E3B5E4600DC5E28 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				7C098DE52E88328E00267C4F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				7C098DE82E8832D300267C4F /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+				7C098DEB2E88330700267C4F /* XCRemoteSwiftPackageReference "Alamofire" */,
+				7C07EA302E883402001A4280 /* XCRemoteSwiftPackageReference "EFQRCode" */,
 			);
 			productRefGroup = 7CB3D23D2C1A6E41004A186D /* Products */;
 			projectDirPath = "";
@@ -1117,18 +1117,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TuneWave Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=watchos*]" = S2A3V6PK7D;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TuneWave-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.GraerMefri.corge;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.tunewave;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				INFOPLIST_KEY_WKWatchOnly = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1136,10 +1134,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GraerMefri.corge.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]" = "Watch App";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1155,18 +1152,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TuneWave Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=watchos*]" = S2A3V6PK7D;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TuneWave-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.GraerMefri.corge;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.xvkun.tunewave;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				INFOPLIST_KEY_WKWatchOnly = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1174,10 +1169,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GraerMefri.corge.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]" = "Watch App";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1195,12 +1189,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TuneWave/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S2A3V6PK7D;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
@@ -1215,10 +1207,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GraerMefri.corge;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "iOS App";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -1233,12 +1224,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TuneWave/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = S2A3V6PK7D;
+				DEVELOPMENT_TEAM = HXPM794ZFN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "悦音音乐";
@@ -1253,10 +1242,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.GraerMefri.corge;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xvkun.tunewave;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "iOS App";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -1514,60 +1502,60 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		7C2339BD2DFDEA8400E72603 /* XCRemoteSwiftPackageReference "EFQRCode" */ = {
+		7C07EA302E883402001A4280 /* XCRemoteSwiftPackageReference "EFQRCode" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/EFPrefix/EFQRCode";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.3;
 			};
 		};
-		7C310EAE2C454FD600E9143F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+		7C098DE52E88328E00267C4F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.3;
 			};
 		};
-		7C43E5802E3B5E4600DC5E28 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+		7C098DE82E8832D300267C4F /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
+			};
+		};
+		7C098DEB2E88330700267C4F /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire";
 			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
-			requirement = {
-				branch = master;
-				kind = branch;
+				kind = exactVersion;
+				version = 5.10.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7C2339BE2DFDEA8400E72603 /* EFQRCode */ = {
+		7C07EA312E883402001A4280 /* EFQRCode */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7C2339BD2DFDEA8400E72603 /* XCRemoteSwiftPackageReference "EFQRCode" */;
+			package = 7C07EA302E883402001A4280 /* XCRemoteSwiftPackageReference "EFQRCode" */;
 			productName = EFQRCode;
 		};
-		7C310EAF2C454FD600E9143F /* SDWebImageSwiftUI */ = {
+		7C098DE62E88328E00267C4F /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7C310EAE2C454FD600E9143F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			package = 7C098DE52E88328E00267C4F /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
 		};
-		7C43E5812E3B5E4600DC5E28 /* Alamofire */ = {
+		7C098DE92E8832D300267C4F /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7C43E5802E3B5E4600DC5E28 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
-		};
-		7C44BA172C1C7DDC008DB511 /* SwiftyJSON */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 7C44BA162C1C7DDC008DB511 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			package = 7C098DE82E8832D300267C4F /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
 			productName = SwiftyJSON;
+		};
+		7C098DEC2E88330700267C4F /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C098DEB2E88330700267C4F /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
