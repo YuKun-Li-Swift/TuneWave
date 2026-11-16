@@ -96,6 +96,19 @@ actor LyricsModel {
         var time: ClosedRange<CMTime>
     }
     
+    /// 兼容网易云的错误格式时间戳：把 mm:ss:xx 最后一个冒号替换成小数点，正常 mm:ss / mm:ss.xx 不改动
+    private func fixMalformedTimeTag(_ s: String) -> String {
+        var chars = Array(s)
+        guard let lastColonIdx = chars.lastIndex(of: ":") else {
+            return s
+        }
+        // 在最后一个冒号之前还存在冒号，说明是 mm:ss:xx 格式
+        if chars[0..<lastColonIdx].contains(":") {
+            chars[lastColonIdx] = "."
+        }
+        return String(chars)
+    }
+    
     func parseLyrics(_ LRC: String,duration:CMTime) -> [LyricsLine] {
         var lyricsLines: [LyricsLine] = []
         let lines = LRC.components(separatedBy: .newlines)
@@ -112,9 +125,11 @@ actor LyricsModel {
             while cLine.hasPrefix("[") {
                 guard let endIndex = cLine.range(of: "]")?.upperBound else { break }
                 let timeTag = String(cLine[cLine.index(after: cLine.startIndex)..<cLine.index(before: endIndex)])
+                // 修复时间戳
+                let fixedTimeTag = fixMalformedTimeTag(timeTag)
                 cLine.removeSubrange(cLine.startIndex..<endIndex)
                 
-                let timeComponents = timeTag.components(separatedBy: ":")
+                let timeComponents = fixedTimeTag.components(separatedBy: ":")
                 if timeComponents.count == 2 {
                     if let minutes = Double(timeComponents[0]), let seconds = Double(timeComponents[1]) {
                         let time = CMTime(seconds: minutes * 60 + seconds, preferredTimescale: 600)
